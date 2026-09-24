@@ -116,7 +116,7 @@ function open<T>(
   options: SureRequest["options"],
   cancelValue: T
 ) {
-  if (!mounts) throw new Error("Add <Sure /> to your root layout")
+  if (!mounts) throw new Error("Add <Sure /> to your root layout.")
   const { signal } = options
   if (signal?.aborted) return Promise.resolve(cancelValue)
 
