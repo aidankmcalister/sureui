@@ -1,11 +1,12 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 
-import { families, installCommand } from "@/components/site/families"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Code } from "@/components/site/code"
-import { Page, Section } from "@/components/site/page"
+import { DocsSection, DocsTitle } from "@/components/site/docs"
+import { families, installCommand } from "@/components/site/families"
+import { Preview } from "@/components/site/preview"
 import { PropsTable } from "@/components/site/props-table"
-import { ResultLog } from "@/components/site/result-log"
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -24,26 +25,37 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   return { title: (await getFamily(props))?.name }
 }
 
-export default async function FamilyPage(props: Props) {
+export default async function ComponentPage(props: Props) {
   const family = await getFamily(props)
   if (!family) notFound()
 
   return (
-    <Page title={family.name} description={family.description}>
-      <ResultLog>
-        <div className="flex min-h-40 items-center justify-center rounded-xl border p-6">
-          <family.Demo />
-        </div>
-      </ResultLog>
-      <Section title="Install">
+    <>
+      <DocsTitle
+        title={family.name}
+        badge={family.friction}
+        description={family.description}
+      />
+      <Tabs defaultValue="preview">
+        <TabsList>
+          <TabsTrigger value="preview">Preview</TabsTrigger>
+          <TabsTrigger value="code">Code</TabsTrigger>
+        </TabsList>
+        <TabsContent value="preview">
+          <Preview>
+            <family.Demo />
+          </Preview>
+        </TabsContent>
+        <TabsContent value="code">
+          <Code>{family.usage}</Code>
+        </TabsContent>
+      </Tabs>
+      <DocsSection title="Installation">
         <Code>{installCommand(family.item)}</Code>
-      </Section>
-      <Section title="Usage">
-        <Code>{family.usage}</Code>
-      </Section>
-      <Section title="Props">
+      </DocsSection>
+      <DocsSection title="Props">
         <PropsTable rows={family.props} />
-      </Section>
-    </Page>
+      </DocsSection>
+    </>
   )
 }

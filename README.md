@@ -1,47 +1,68 @@
 # SureUI
 
-Confirmation components for [shadcn/ui](https://ui.shadcn.com). Five ways to ask "are you sure?" behind one awaitable API.
+Confirmation components for [shadcn/ui](https://ui.shadcn.com). Every control shares one contract: `onConfirm`, `onCancel`, `undo`, an async pending state and full Button passthrough. Only one of them is a dialog.
 
-| Style           | Friction      | Use it for                                  |
-| --------------- | ------------- | ------------------------------------------- |
-| Undo            | None up front | Bulk delete, archive, cancel an event       |
-| Click again     | Low           | Archive, discard, remove from a list        |
-| Hold            | Low           | Delete an item, reset settings, revoke      |
-| Dialogs         | Medium        | Leave a team, sign out everywhere, rename   |
-| Type to confirm | High          | Delete a project, repo, account or database |
+| Style           | Friction      | Use it for                                   |
+| --------------- | ------------- | --------------------------------------------- |
+| Undo            | None up front | Bulk delete, archive, cancel an event        |
+| Confirm button  | Low           | Archive, discard, delete an item, revoke     |
+| Confirm dialog  | Medium        | Leave a team, sign out everywhere (optional) |
+| Type to confirm | High          | Delete a project, repo, account or database  |
 
 ## Install
 
 ```bash
-npx shadcn@latest add https://sureui.vercel.app/r/sure.json
-npx shadcn@latest add https://sureui.vercel.app/r/click-again-button.json
-npx shadcn@latest add https://sureui.vercel.app/r/hold-button.json
+npx shadcn@latest add https://sureui.vercel.app/r/confirm-button.json
+npx shadcn@latest add https://sureui.vercel.app/r/type-to-confirm.json
+npx shadcn@latest add https://sureui.vercel.app/r/confirm-dialog.json
+npx shadcn@latest add https://sureui.vercel.app/r/undo-toast.json
 ```
 
-Mount `<Sure />` and `<Toaster />` once in your root layout.
-
-```tsx
-import { Toaster } from "@/components/ui/sonner"
-import { Sure } from "@/components/ui/sure"
-
-<Sure />
-<Toaster />
-```
+Each one installs on its own, into `components/ui/sureui/`. Nothing to mount. `undoToast` uses the shadcn `<Toaster />`.
 
 ## Usage
 
+`ConfirmButton` is one Button with three gestures. Add `undo` to any of them for an inline undo window instead of committing right away:
+
 ```tsx
-import { sure } from "@/components/ui/sure"
+<ConfirmButton onConfirm={archive}>Archive</ConfirmButton>
+<ConfirmButton gesture="click-again" onConfirm={archive}>Archive</ConfirmButton>
+<ConfirmButton gesture="hold" variant="destructive" onConfirm={remove}>
+  Hold to delete
+</ConfirmButton>
+<ConfirmButton undo onConfirm={moveToTrash}>Move to trash</ConfirmButton>
 
-if (await sure.confirm({ title: "Leave the Design team?" })) leaveTeam()
-if (await sure.type({ title: "Delete acme-prod?", phrase: "acme-prod" })) remove()
-if (await sure.undo("Deleted 3 files")) deleteFiles(ids)
+<TypeToConfirm phrase="acme-prod" onConfirm={deleteProject} />
 
-<ClickAgainButton onConfirm={archive}>Archive</ClickAgainButton>
-<HoldButton variant="destructive" onConfirm={remove}>Hold to delete</HoldButton>
+if (await undoToast("Deleted 3 files")) deleteFiles(ids)
 ```
 
-Every promise settles. Cancel, Escape, abort and unmount resolve `false` (or `null` for `sure.prompt`).
+`onConfirm` may return a promise; the control disables itself and sets `data-state="pending"` until it settles.
+
+## Dialogs are optional
+
+`ConfirmDialog` wraps a `ConfirmButton` or a `TypeToConfirm` (with `phrase`) around any trigger, and closes only after `onConfirm` settles:
+
+```tsx
+<ConfirmDialog
+  title="Revoke this key?"
+  gesture="hold"
+  variant="destructive"
+  onConfirm={revoke}
+>
+  <Button variant="outline">Revoke key</Button>
+</ConfirmDialog>
+```
+
+To await it inside a handler, use `useConfirm` and render its `dialog`:
+
+```tsx
+const { confirm, dialog } = useConfirm()
+
+async function onSubmit() {
+  if (await confirm({ title: "Discard changes?" })) discard()
+}
+```
 
 ## Development
 
@@ -52,7 +73,7 @@ pnpm check
 pnpm build
 ```
 
-Registry source lives in `components/ui`. Everything in `app` and `components/site` is the docs site.
+Registry source lives in `components/ui/sureui`. Everything in `app` and `components/site` is the docs site.
 
 ## License
 
