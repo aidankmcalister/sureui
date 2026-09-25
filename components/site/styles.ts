@@ -1,7 +1,7 @@
 export const githubUrl = "https://github.com/aidankmcalister/sureui"
 
 export function installCommand(item: string) {
-  return `npx shadcn@latest add @sureui/${item}`
+  return `npx shadcn add @sureui/${item}`
 }
 
 const onConfirm = ["onConfirm", "() => void | Promise<unknown>", "required"]

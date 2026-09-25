@@ -4,7 +4,6 @@ import { Label } from "@/components/site/frame"
 export function Cell({
   figure,
   gesture,
-  friction,
   title,
   description,
   featured,
@@ -13,7 +12,6 @@ export function Cell({
 }: {
   figure: number
   gesture: string
-  friction: "none" | "low" | "high" | "optional"
   title: string
   description: string
   featured?: boolean
@@ -28,14 +26,9 @@ export function Cell({
         className
       )}
     >
-      <div className="flex items-center justify-between gap-4">
-        <Label>
-          Fig. {String(figure).padStart(2, "0")} · {gesture}
-        </Label>
-        <Label className={cn(friction === "high" && "text-(--mark-text)")}>
-          {friction}
-        </Label>
-      </div>
+      <Label>
+        Fig. {String(figure).padStart(2, "0")} · {gesture}
+      </Label>
       <h3
         className={cn(
           "mt-2 font-semibold tracking-tight text-(--ink)",

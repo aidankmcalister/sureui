@@ -10,7 +10,7 @@ const links = [
 
 export function Footer() {
   return (
-    <Band className="flex flex-col-reverse gap-2 px-3 py-4 text-xs text-(--ink-label) sm:min-h-14 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-10">
+    <Band className="flex flex-col-reverse gap-2 px-3 py-4 text-xs text-(--ink-label) sm:min-h-14 sm:flex-row sm:items-center sm:justify-between sm:px-6">
       <span>© 2026 SureUI · MIT licensed · Built on shadcn/ui</span>
       <nav className="flex items-center gap-4">
         {links.map((link) => (
