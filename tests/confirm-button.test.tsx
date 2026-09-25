@@ -162,6 +162,15 @@ describe("ConfirmButton", () => {
     )
   })
 
+  it("hold: the button does not shift while pressed", () => {
+    render(
+      <ConfirmButton gesture="hold" onConfirm={() => {}}>
+        Hold
+      </ConfirmButton>
+    )
+    expect(screen.getByRole("button").className).not.toContain("translate-y-px")
+  })
+
   it("hold: a consumer onKeyDown and onPointerDown both still run", async () => {
     const onConfirm = vi.fn()
     const consumerKeyDown = vi.fn()

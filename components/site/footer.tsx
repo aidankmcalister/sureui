@@ -1,0 +1,35 @@
+import { Band } from "@/components/site/frame"
+import { GitHubIcon } from "@/components/site/github-icon"
+import { SiteLink } from "@/components/site/site-link"
+import { githubUrl } from "@/components/site/styles"
+
+const links = [
+  { href: "/docs", label: "Docs" },
+  { href: `${githubUrl}/issues`, label: "Issues" },
+]
+
+export function Footer() {
+  return (
+    <Band className="flex flex-col-reverse gap-2 px-3 py-4 text-xs text-(--ink-label) sm:min-h-14 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-10">
+      <span>© 2026 SureUI · MIT licensed · Built on shadcn/ui</span>
+      <nav className="flex items-center gap-4">
+        {links.map((link) => (
+          <SiteLink
+            key={link.label}
+            href={link.href}
+            className="hover:text-(--ink)"
+          >
+            {link.label}
+          </SiteLink>
+        ))}
+        <SiteLink
+          href={githubUrl}
+          aria-label="GitHub"
+          className="hover:text-(--ink)"
+        >
+          <GitHubIcon className="size-4" />
+        </SiteLink>
+      </nav>
+    </Band>
+  )
+}

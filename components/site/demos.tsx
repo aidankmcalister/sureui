@@ -1,5 +1,7 @@
 "use client"
 
+import { ArchiveIcon, CheckIcon } from "lucide-react"
+
 import { Button } from "@/components/ui/button"
 import { ConfirmButton } from "@/components/ui/sureui/confirm-button"
 import {
@@ -10,73 +12,88 @@ import { TypeToConfirm } from "@/components/ui/sureui/type-to-confirm"
 import { undoToast } from "@/components/ui/sureui/undo-toast"
 import { useReport } from "@/components/site/preview"
 
-export function UndoDemo() {
+function UndoDemo() {
   const report = useReport()
 
   return (
-    <Button
-      variant="outline"
-      onClick={async () => {
-        const committed = await undoToast("Moved 3 files to trash")
-        report(`undoToast() → ${committed}`)
-      }}
-    >
-      Move to trash
-    </Button>
-  )
-}
-
-export function ConfirmButtonDemo() {
-  const report = useReport()
-
-  return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap justify-center gap-2">
       <ConfirmButton
-        variant="outline"
         undo
-        onConfirm={() =>
-          report('<ConfirmButton gesture="click" /> → onConfirm')
-        }
-        onCancel={() => report('<ConfirmButton gesture="click" /> → onCancel')}
+        variant="outline"
+        onConfirm={() => report("onConfirm, the undo window closed")}
+        onCancel={() => report("onCancel, undone")}
       >
         Move to trash
       </ConfirmButton>
+      <Button
+        variant="outline"
+        onClick={async () => {
+          const committed = await undoToast("Moved 3 files to trash")
+          report(`undoToast() resolved ${committed}`)
+        }}
+      >
+        Trash with a toast
+      </Button>
+    </div>
+  )
+}
+
+function ClickAgainDemo() {
+  const report = useReport()
+
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-2">
       <ConfirmButton
         gesture="click-again"
         variant="outline"
-        onConfirm={() =>
-          report('<ConfirmButton gesture="click-again" /> → onConfirm')
-        }
-        onCancel={() =>
-          report('<ConfirmButton gesture="click-again" /> → onCancel')
-        }
+        onConfirm={() => report("onConfirm")}
+        onCancel={() => report("onCancel, disarmed")}
       >
         Archive
       </ConfirmButton>
       <ConfirmButton
-        gesture="hold"
-        variant="destructive"
-        onConfirm={() => report('<ConfirmButton gesture="hold" /> → onConfirm')}
-        onCancel={() => report('<ConfirmButton gesture="hold" /> → onCancel')}
+        gesture="click-again"
+        variant="ghost"
+        size="icon"
+        aria-label="Archive"
+        confirmLabel={<CheckIcon />}
+        onConfirm={() => report("onConfirm, icon button")}
+        onCancel={() => report("onCancel, disarmed")}
       >
-        Hold to delete
+        <ArchiveIcon />
       </ConfirmButton>
     </div>
   )
 }
 
-export function ConfirmDialogDemo() {
+function HoldDemo() {
+  const report = useReport()
+
+  return (
+    <ConfirmButton
+      gesture="hold"
+      variant="destructive"
+      onConfirm={() => report("onConfirm")}
+      onCancel={() => report("onCancel, released early")}
+    >
+      Hold to revoke
+    </ConfirmButton>
+  )
+}
+
+function DialogsDemo() {
   const report = useReport()
   const { confirm, dialog } = useConfirm()
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap justify-center gap-2">
       <ConfirmDialog
         title="Leave the Design team?"
         description="An admin can add you back later."
         confirmLabel="Leave team"
         variant="destructive"
-        onConfirm={() => report("<ConfirmDialog /> → onConfirm")}
+        onConfirm={() => report("onConfirm")}
+        onCancel={() => report("onCancel")}
       >
         <Button variant="outline">Leave team</Button>
       </ConfirmDialog>
@@ -88,7 +105,7 @@ export function ConfirmDialogDemo() {
             confirmLabel: "Discard",
             variant: "destructive",
           })
-          report(`useConfirm() → ${ok}`)
+          report(`useConfirm() resolved ${ok}`)
         }}
       >
         Discard draft
@@ -98,7 +115,7 @@ export function ConfirmDialogDemo() {
   )
 }
 
-export function TypeToConfirmDemo() {
+function TypeToConfirmDemo() {
   const report = useReport()
 
   return (
@@ -106,8 +123,21 @@ export function TypeToConfirmDemo() {
       phrase="acme-prod"
       acknowledgements={["I understand active deployments will go offline."]}
       confirmLabel="Delete project"
-      onConfirm={() => report("<TypeToConfirm /> → onConfirm")}
+      onConfirm={() => report("onConfirm")}
       className="w-full max-w-sm"
     />
   )
+}
+
+const demos: Record<string, () => React.ReactNode> = {
+  undo: UndoDemo,
+  "click-again": ClickAgainDemo,
+  hold: HoldDemo,
+  dialogs: DialogsDemo,
+  "type-to-confirm": TypeToConfirmDemo,
+}
+
+export function Demo({ slug }: { slug: string }) {
+  const Component = demos[slug]
+  return <Component />
 }

@@ -152,7 +152,8 @@ function ConfirmButton({
         data-state={state}
         className={cn(
           "relative overflow-hidden",
-          gesture === "hold" && "touch-none",
+          gesture === "hold" &&
+            "touch-none active:not-aria-[haspopup]:translate-y-0",
           className
         )}
         disabled={disabled || state === "pending"}
