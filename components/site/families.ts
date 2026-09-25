@@ -1,135 +1,131 @@
 import {
-  ClickAgainDemo,
-  DialogsDemo,
-  HoldDemo,
-  TypeDemo,
+  ConfirmButtonDemo,
+  ConfirmDialogDemo,
+  TypeToConfirmDemo,
   UndoDemo,
 } from "@/components/site/demos"
 
 export const siteUrl = "https://sureui.vercel.app"
+export const githubUrl = "https://github.com/aidankmcalister/sureui"
 
 export function installCommand(item: string) {
   return `npx shadcn@latest add ${siteUrl}/r/${item}.json`
 }
 
-export type Family = (typeof families)[number]
-
 export const families = [
   {
     slug: "undo",
-    name: "Undo",
-    friction: "None up front",
-    useFor: "Bulk delete, archive, cancel an event.",
+    name: "Undo toast",
+    friction: "No friction up front",
+    description: "Act right away and offer an undo toast.",
     guidance: "The action can be reversed. Don't interrupt at all.",
-    description:
-      "Act now and offer an undo toast. Resolves true when the toast closes and false if the person clicks Undo. Needs the shadcn <Toaster /> mounted.",
-    item: "sure",
+    item: "undo-toast",
     Demo: UndoDemo,
-    usage: `if (await sure.undo("Deleted 3 files")) {
+    usage: `if (await undoToast("Moved 3 files to trash")) {
   await deleteFiles(ids)
 }`,
     props: [
       ["message", "ReactNode", "required"],
+      ["description", "ReactNode", "—"],
       ["duration", "number", "5000 (min 4000)"],
       ["undoLabel", "string", '"Undo"'],
-      ["description", "ReactNode", "—"],
-      ["signal", "AbortSignal", "—"],
     ],
   },
   {
-    slug: "click-again",
-    name: "Click again",
-    friction: "Low",
-    useFor: "Archive, discard, remove from a list.",
-    guidance:
-      "One cheap item. The confirmation stays where the person is already looking.",
+    slug: "confirm-button",
+    name: "Confirm button",
+    friction: "Low friction",
     description:
-      "The first click arms the button and swaps its label. A second click confirms. Timeout or blur cancels, and a double click is ignored. Style the armed state with data-armed.",
-    item: "click-again-button",
-    Demo: ClickAgainDemo,
-    usage: `<ClickAgainButton onConfirm={archive} timeout={3000}>
-  Archive
-</ClickAgainButton>
+      "One Button that confirms with a click, a second click, or a press-and-hold, with optional inline undo.",
+    guidance: "One cheap item, like archiving a message or revoking a key.",
+    item: "confirm-button",
+    Demo: ConfirmButtonDemo,
+    usage: `<ConfirmButton undo onConfirm={moveToTrash}>
+  Move to trash
+</ConfirmButton>
 
-const clickAgain = useClickAgain({ timeout: 3000 })
-if (await clickAgain.request()) archive()`,
+<ConfirmButton gesture="click-again" onConfirm={archive}>
+  Archive
+</ConfirmButton>
+
+<ConfirmButton gesture="hold" variant="destructive" onConfirm={revoke}>
+  Hold to revoke
+</ConfirmButton>`,
     props: [
-      ["onConfirm", "() => void", "required"],
-      ["timeout", "number", "3000"],
+      ["onConfirm", "() => void | Promise<unknown>", "required"],
+      ["gesture", '"click" | "click-again" | "hold"', '"click"'],
+      ["onCancel", "() => void", "—"],
+      ["undo", "boolean | number", "—"],
       ["confirmLabel", "ReactNode", '"Click again to confirm"'],
-      ["...props", "Button props", "—"],
-    ],
-  },
-  {
-    slug: "hold",
-    name: "Hold",
-    friction: "Low",
-    useFor: "Delete an item, reset settings, revoke.",
-    guidance:
-      "One item that is annoying to recreate. Holding takes intent but no reading.",
-    description:
-      "Press and hold until the fill completes. Releasing early drains it and cancels. Works with Space and Enter.",
-    item: "hold-button",
-    Demo: HoldDemo,
-    usage: `<HoldButton variant="destructive" onConfirm={remove} duration={1200}>
-  Hold to delete
-</HoldButton>`,
-    props: [
-      ["onConfirm", "() => void", "required"],
+      ["undoLabel", "ReactNode", '"Undo"'],
+      ["timeout", "number", "3000"],
       ["duration", "number", "1200 (min 800)"],
       ["...props", "Button props", "—"],
     ],
   },
   {
-    slug: "dialogs",
-    name: "Dialogs",
-    friction: "Medium",
-    useFor: "Leave a team, sign out everywhere, rename.",
-    guidance:
-      "It affects other people or needs an explanation of what happens next.",
+    slug: "type-to-confirm",
+    name: "Type to confirm",
+    friction: "High friction",
     description:
-      "Confirm, alert and prompt in a stock alert dialog. Mount <Sure /> once, then await from any handler.",
-    item: "sure",
-    Demo: DialogsDemo,
-    usage: `const ok = await sure.confirm({
-  title: "Leave the Design team?",
-  description: "An admin can add you back later.",
-  confirmLabel: "Leave team",
-  variant: "destructive",
-})
-
-await sure.alert({ title: "Export finished" })
-
-const name = await sure.prompt({ title: "Rename", defaultValue: "Design" })`,
+      "An inline form that unlocks only after the exact phrase is typed.",
+    guidance: "Permanent and large, like deleting a project.",
+    item: "type-to-confirm",
+    Demo: TypeToConfirmDemo,
+    usage: `<TypeToConfirm
+  phrase="acme-prod"
+  acknowledgements={["I understand active deployments will go offline."]}
+  confirmLabel="Delete project"
+  onConfirm={deleteProject}
+/>`,
     props: [
-      ["title", "string", "required"],
-      ["description", "ReactNode", "—"],
+      ["phrase", "string", "required"],
+      ["onConfirm", "() => void | Promise<unknown>", "required"],
+      ["onCancel", "() => void", "—"],
+      ["undo", "boolean | number", "—"],
       ["confirmLabel", "string", '"Confirm"'],
-      ["cancelLabel", "string", '"Cancel"'],
-      ["variant", '"default" | "destructive"', '"default"'],
-      ["signal", "AbortSignal", "—"],
+      ["undoLabel", "string", '"Undo"'],
+      ["variant", "Button variant", '"destructive"'],
+      ["acknowledgements", "string[]", "[]"],
+      ["className", "string", "—"],
     ],
   },
   {
-    slug: "type-to-confirm",
-    name: "Type to confirm",
-    friction: "High",
-    useFor: "Delete a project, repo, account or database.",
-    guidance: "Permanent and large. Typing the name forces a real pause.",
+    slug: "confirm-dialog",
+    name: "Confirm dialog",
+    friction: "Medium friction",
     description:
-      "The confirm button stays disabled until the phrase is typed exactly and every acknowledgement is checked.",
-    item: "sure",
-    Demo: TypeDemo,
-    usage: `const ok = await sure.type({
-  title: "Delete acme-prod?",
-  phrase: "acme-prod",
-  acknowledgements: ["I understand this can't be undone"],
-  variant: "destructive",
-})`,
+      "An optional alert dialog that wraps any trigger. Use useConfirm to await it in a handler.",
+    guidance: "It affects other people and needs a sentence of explanation.",
+    item: "confirm-dialog",
+    Demo: ConfirmDialogDemo,
+    usage: `<ConfirmDialog
+  title="Leave the Design team?"
+  description="An admin can add you back later."
+  confirmLabel="Leave team"
+  variant="destructive"
+  onConfirm={leaveTeam}
+>
+  <Button variant="outline">Leave team</Button>
+</ConfirmDialog>
+
+const { confirm, dialog } = useConfirm()
+
+async function discard() {
+  if (await confirm({ title: "Discard this draft?" })) deleteDraft()
+}`,
     props: [
-      ["phrase", "string", "required"],
+      ["title", "string", "required"],
+      ["onConfirm", "() => void | Promise<unknown>", "required"],
+      ["children", "ReactElement (trigger)", "required"],
+      ["onCancel", "() => void", "—"],
+      ["description", "ReactNode", "—"],
+      ["cancelLabel", "string", '"Cancel"'],
+      ["confirmLabel", "string", '"Confirm"'],
+      ["variant", "Button variant", '"default"'],
+      ["gesture", '"click" | "click-again" | "hold"', '"click"'],
+      ["phrase", "string", "—"],
       ["acknowledgements", "string[]", "—"],
-      ["...options", "sure.confirm options", "—"],
     ],
   },
 ]

@@ -5,7 +5,6 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Header } from "@/components/site/header"
 import { Toaster } from "@/components/ui/sonner"
-import { Sure } from "@/components/ui/sure"
 import { cn } from "@/lib/utils"
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" })
@@ -40,7 +39,6 @@ export default function RootLayout({
         <ThemeProvider>
           <Header />
           {children}
-          <Sure />
           <Toaster />
         </ThemeProvider>
       </body>

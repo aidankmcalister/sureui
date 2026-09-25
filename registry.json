@@ -4,47 +4,91 @@
   "homepage": "https://sureui.vercel.app",
   "items": [
     {
-      "name": "sure",
+      "name": "confirm-button",
       "type": "registry:ui",
-      "title": "Sure",
-      "description": "Awaitable confirmation dialogs. Mount <Sure /> once, then await sure.confirm(), sure.alert(), sure.prompt(), sure.type() (type a phrase to confirm) or sure.undo() (undo toast) from any event handler. Resolves true or false, or the entered value for prompt.",
-      "dependencies": ["sonner"],
-      "registryDependencies": [
-        "alert-dialog",
-        "button",
-        "checkbox",
-        "input",
-        "label",
-        "sonner"
-      ],
-      "files": [{ "path": "components/ui/sure.tsx", "type": "registry:ui" }],
-      "docs": "Add <Sure /> and the shadcn <Toaster /> to your root layout.",
-      "categories": ["confirmation", "dialog", "toast"]
-    },
-    {
-      "name": "click-again-button",
-      "type": "registry:ui",
-      "title": "Click Again Button",
-      "description": "A Button that asks for a second click before it confirms. The first click swaps the label to \"Click again to confirm\" and a second click within the timeout calls onConfirm. Blur or timeout cancels. Includes the useClickAgain hook.",
+      "title": "Confirm Button",
+      "description": "A Button that confirms with a click, a second click, or a press-and-hold, with optional inline undo and an async pending state.",
       "registryDependencies": ["button"],
       "files": [
         {
-          "path": "components/ui/click-again-button.tsx",
-          "type": "registry:ui"
+          "path": "components/ui/sureui/confirmation.ts",
+          "type": "registry:lib",
+          "target": "@ui/sureui/confirmation.ts"
+        },
+        {
+          "path": "components/ui/sureui/confirm-button.tsx",
+          "type": "registry:ui",
+          "target": "@ui/sureui/confirm-button.tsx"
         }
       ],
       "categories": ["confirmation", "button"]
     },
     {
-      "name": "hold-button",
+      "name": "type-to-confirm",
       "type": "registry:ui",
-      "title": "Hold Button",
-      "description": "A Button that confirms after being pressed and held. A fill sweeps across the button while it is held and drains if released early. Works with mouse, touch, Space and Enter.",
-      "registryDependencies": ["button"],
+      "title": "Type to Confirm",
+      "description": "An inline form that only calls onConfirm after the exact phrase is typed and every acknowledgement is checked, with optional inline undo and an async pending state.",
+      "registryDependencies": ["button", "checkbox", "input", "label"],
       "files": [
-        { "path": "components/ui/hold-button.tsx", "type": "registry:ui" }
+        {
+          "path": "components/ui/sureui/confirmation.ts",
+          "type": "registry:lib",
+          "target": "@ui/sureui/confirmation.ts"
+        },
+        {
+          "path": "components/ui/sureui/type-to-confirm.tsx",
+          "type": "registry:ui",
+          "target": "@ui/sureui/type-to-confirm.tsx"
+        }
       ],
-      "categories": ["confirmation", "button"]
+      "categories": ["confirmation", "form"]
+    },
+    {
+      "name": "confirm-dialog",
+      "type": "registry:ui",
+      "title": "Confirm Dialog",
+      "description": "An optional alert dialog that wraps a ConfirmButton or TypeToConfirm as its confirm action, closing only after an async onConfirm settles. Includes useConfirm, which returns an awaitable confirm() and a dialog element you render yourself.",
+      "registryDependencies": ["alert-dialog", "button", "checkbox", "input", "label"],
+      "files": [
+        {
+          "path": "components/ui/sureui/confirmation.ts",
+          "type": "registry:lib",
+          "target": "@ui/sureui/confirmation.ts"
+        },
+        {
+          "path": "components/ui/sureui/confirm-button.tsx",
+          "type": "registry:ui",
+          "target": "@ui/sureui/confirm-button.tsx"
+        },
+        {
+          "path": "components/ui/sureui/type-to-confirm.tsx",
+          "type": "registry:ui",
+          "target": "@ui/sureui/type-to-confirm.tsx"
+        },
+        {
+          "path": "components/ui/sureui/confirm-dialog.tsx",
+          "type": "registry:ui",
+          "target": "@ui/sureui/confirm-dialog.tsx"
+        }
+      ],
+      "categories": ["confirmation", "dialog"]
+    },
+    {
+      "name": "undo-toast",
+      "type": "registry:lib",
+      "title": "Undo Toast",
+      "description": "undoToast(message) shows a Sonner toast with an Undo button and resolves true when it closes or false if Undo is clicked. Run the real action only after it resolves true.",
+      "dependencies": ["sonner"],
+      "registryDependencies": ["sonner"],
+      "files": [
+        {
+          "path": "components/ui/sureui/undo-toast.ts",
+          "type": "registry:lib",
+          "target": "@ui/sureui/undo-toast.ts"
+        }
+      ],
+      "docs": "Needs the shadcn <Toaster /> in your root layout.",
+      "categories": ["confirmation", "toast"]
     }
   ]
 }
