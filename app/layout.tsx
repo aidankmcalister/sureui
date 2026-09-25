@@ -1,7 +1,11 @@
+import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import { Header } from "@/components/site/header"
+import { Toaster } from "@/components/ui/sonner"
+import { Sure } from "@/components/ui/sure"
 import { cn } from "@/lib/utils"
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" })
@@ -10,6 +14,11 @@ const fontMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
 })
+
+export const metadata: Metadata = {
+  title: { default: "SureUI", template: "%s · SureUI" },
+  description: "Confirmation components for shadcn/ui.",
+}
 
 export default function RootLayout({
   children,
@@ -28,7 +37,12 @@ export default function RootLayout({
       )}
     >
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <Header />
+          {children}
+          <Sure />
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   )

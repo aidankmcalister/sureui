@@ -16,7 +16,7 @@ function HoldButton({
   className,
   children,
   ...props
-}) {
+}: HoldButtonProps) {
   const fill = React.useRef<HTMLSpanElement>(null)
   const animation = React.useRef<Animation | null>(null)
   const [confirmed, setConfirmed] = React.useState(false)
@@ -81,7 +81,7 @@ function HoldButton({
         />
         {children}
       </Button>
-      <span id={hintId} className="st-only">
+      <span id={hintId} className="sr-only">
         Press and hold to confirm
       </span>
       <span aria-live="polite" className="sr-only">
