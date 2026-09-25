@@ -1,0 +1,50 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "sureui",
+  "homepage": "https://sureui.vercel.app",
+  "items": [
+    {
+      "name": "sure",
+      "type": "registry:ui",
+      "title": "Sure",
+      "description": "Awaitable confirmation dialogs. Mount <Sure /> once, then await sure.confirm(), sure.alert(), sure.prompt(), sure.type() (type a phrase to confirm) or sure.undo() (undo toast) from any event handler. Resolves true or false, or the entered value for prompt.",
+      "dependencies": ["sonner"],
+      "registryDependencies": [
+        "alert-dialog",
+        "button",
+        "checkbox",
+        "input",
+        "label",
+        "sonner"
+      ],
+      "files": [{ "path": "components/ui/sure.tsx", "type": "registry:ui" }],
+      "docs": "Add <Sure /> and the shadcn <Toaster /> to your root layout.",
+      "categories": ["confirmation", "dialog", "toast"]
+    },
+    {
+      "name": "click-again-button",
+      "type": "registry:ui",
+      "title": "Click Again Button",
+      "description": "A Button that asks for a second click before it confirms. The first click swaps the label to \"Click again to confirm\" and a second click within the timeout calls onConfirm. Blur or timeout cancels. Includes the useClickAgain hook.",
+      "registryDependencies": ["button"],
+      "files": [
+        {
+          "path": "components/ui/click-again-button.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "categories": ["confirmation", "button"]
+    },
+    {
+      "name": "hold-button",
+      "type": "registry:ui",
+      "title": "Hold Button",
+      "description": "A Button that confirms after being pressed and held. A fill sweeps across the button while it is held and drains if released early. Works with mouse, touch, Space and Enter.",
+      "registryDependencies": ["button"],
+      "files": [
+        { "path": "components/ui/hold-button.tsx", "type": "registry:ui" }
+      ],
+      "categories": ["confirmation", "button"]
+    }
+  ]
+}
