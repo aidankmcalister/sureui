@@ -1,4 +1,5 @@
-import { Band } from "@/components/site/frame"
+import { cn } from "@/lib/utils"
+import { Band, tapTarget } from "@/components/site/frame"
 import { GitHubIcon } from "@/components/site/github-icon"
 import { SiteLink } from "@/components/site/site-link"
 import { githubUrl } from "@/components/site/styles"
@@ -17,7 +18,7 @@ export function Footer() {
           <SiteLink
             key={link.label}
             href={link.href}
-            className="hover:text-(--ink)"
+            className={cn(tapTarget, "hover:text-(--ink)")}
           >
             {link.label}
           </SiteLink>
@@ -25,7 +26,7 @@ export function Footer() {
         <SiteLink
           href={githubUrl}
           aria-label="GitHub"
-          className="hover:text-(--ink)"
+          className={cn(tapTarget, "hover:text-(--ink)")}
         >
           <GitHubIcon className="size-4" />
         </SiteLink>

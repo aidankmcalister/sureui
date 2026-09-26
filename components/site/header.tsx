@@ -1,7 +1,8 @@
 import Link from "next/link"
 
 import { buttonVariants } from "@/components/ui/button"
-import { Band } from "@/components/site/frame"
+import { cn } from "@/lib/utils"
+import { Band, tapTarget } from "@/components/site/frame"
 import { GitHubIcon } from "@/components/site/github-icon"
 import { SiteLink } from "@/components/site/site-link"
 import { githubUrl } from "@/components/site/styles"
@@ -13,12 +14,15 @@ export function Header() {
       line={false}
       className="flex h-14 items-center gap-5 px-3 sm:px-6 lg:h-[60px]"
     >
-      <Link href="/" className="mr-auto font-semibold tracking-tight">
+      <Link href="/" className="mr-auto font-display font-bold tracking-tight">
         SureUI<span className="text-(--mark-text)">.</span>
       </Link>
       <Link
         href="/docs"
-        className="font-mono text-[11px] tracking-[0.1em] text-(--ink-muted) uppercase hover:text-(--ink)"
+        className={cn(
+          tapTarget,
+          "font-mono text-[11px] tracking-[0.1em] text-(--ink-muted) uppercase hover:text-(--ink)"
+        )}
       >
         Docs
       </Link>

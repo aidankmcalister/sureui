@@ -13,7 +13,6 @@ const buttonProps = ["...props", "Button props", "—"]
 export type Style = {
   slug: string
   name: string
-  friction: "none" | "low" | "medium" | "high"
   lead: string
   summary: string
   question: string
@@ -31,7 +30,6 @@ export const styles: Style[] = [
   {
     slug: "undo",
     name: "Undo",
-    friction: "none",
     lead: "Act right away and give people a few seconds to take it back.",
     summary: "Runs on click, then offers a few seconds to take it back.",
     question: "Can it be taken back?",
@@ -80,7 +78,6 @@ if (await undoToast("Moved 3 files to trash")) {
   {
     slug: "click-again",
     name: "Click again",
-    friction: "low",
     lead: "The first click arms the button and the second one confirms.",
     summary: "The first click arms it, the second confirms.",
     question: "Is it one small item people act on often?",
@@ -119,7 +116,6 @@ if (await undoToast("Moved 3 files to trash")) {
   {
     slug: "hold",
     name: "Hold",
-    friction: "low",
     lead: "People press and hold until the fill completes. Letting go early cancels.",
     summary: "Press and hold until it fills. Letting go cancels.",
     question: "Could a stray tap trigger it?",
@@ -157,7 +153,6 @@ if (await undoToast("Moved 3 files to trash")) {
   {
     slug: "dialogs",
     name: "Dialogs",
-    friction: "medium",
     lead: "An optional alert dialog for actions that need a sentence of explanation.",
     summary: "Opens a dialog, only when there is something to explain.",
     question: "Does it need explaining, or affect other people?",
@@ -212,7 +207,6 @@ async function discard() {
   {
     slug: "type-to-confirm",
     name: "Type to confirm",
-    friction: "high",
     lead: "An inline form that unlocks only after the exact phrase is typed.",
     summary: "Unlocks only after the exact name is typed.",
     question: "Is it permanent and large?",

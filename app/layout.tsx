@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google"
 
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -7,7 +7,13 @@ import { cn } from "@/lib/utils"
 import { Footer } from "@/components/site/footer"
 import { Header } from "@/components/site/header"
 
-const geist = Geist({ subsets: ["latin"], variable: "--font-sans" })
+const fontSans = Geist({ subsets: ["latin"], variable: "--font-sans" })
+
+const fontDisplay = Space_Grotesk({
+  subsets: ["latin"],
+  weight: "700",
+  variable: "--font-space-grotesk",
+})
 
 const fontMono = Geist_Mono({
   subsets: ["latin"],
@@ -32,7 +38,8 @@ export default function RootLayout({
         "antialiased",
         fontMono.variable,
         "font-sans",
-        geist.variable
+        fontSans.variable,
+        fontDisplay.variable
       )}
     >
       <body>

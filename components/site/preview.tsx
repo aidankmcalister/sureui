@@ -23,7 +23,7 @@ export function Preview({
   const [entry, setEntry] = React.useState("waiting for you to try it")
 
   return (
-    <div className="rounded-[10px] border bg-background text-foreground">
+    <div className="rounded-[10px] border bg-(--well) text-foreground">
       <Tabs defaultValue="preview">
         <div className="flex items-center justify-between gap-4 p-2 pr-4">
           <TabsList>

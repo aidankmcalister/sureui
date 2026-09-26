@@ -79,12 +79,12 @@
       "title": "Undo Toast",
       "description": "undoToast(message) shows a Sonner toast with an Undo button and resolves true when it closes or false if Undo is clicked. Run the real action only after it resolves true.",
       "dependencies": ["sonner"],
-      "registryDependencies": ["sonner"],
+      "registryDependencies": ["button", "sonner"],
       "files": [
         {
-          "path": "components/ui/sureui/undo-toast.ts",
+          "path": "components/ui/sureui/undo-toast.tsx",
           "type": "registry:lib",
-          "target": "@ui/sureui/undo-toast.ts"
+          "target": "@ui/sureui/undo-toast.tsx"
         }
       ],
       "docs": "Needs the shadcn <Toaster /> in your root layout.",

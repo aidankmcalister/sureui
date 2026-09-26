@@ -1,7 +1,7 @@
 import Link from "next/link"
 
 import { cn } from "@/lib/utils"
-import { Label } from "@/components/site/frame"
+import { Label, tapTarget } from "@/components/site/frame"
 
 export function Cell({
   figure,
@@ -25,7 +25,7 @@ export function Cell({
   return (
     <article
       className={cn(
-        "flex flex-col bg-(--paper) p-5 sm:p-6",
+        "flex flex-col bg-(--paper) px-3 py-6 sm:p-6",
         featured && "md:col-span-2",
         className
       )}
@@ -35,14 +35,17 @@ export function Cell({
           Fig. {String(figure).padStart(2, "0")} ·{" "}
           <Link
             href={href}
-            className="underline-offset-4 hover:text-(--ink) hover:underline"
+            className={cn(
+              tapTarget,
+              "underline-offset-4 hover:text-(--ink) hover:underline"
+            )}
           >
             {gesture}
           </Link>
         </Label>
         <h3
           className={cn(
-            "font-semibold tracking-tight text-(--ink)",
+            "font-display font-bold tracking-tight text-(--ink)",
             featured ? "text-2xl leading-8" : "text-lg leading-7"
           )}
         >
@@ -50,7 +53,7 @@ export function Cell({
         </h3>
         <p className="text-sm leading-5 text-(--ink-muted)">{description}</p>
       </div>
-      <div className="rounded-lg border bg-background p-5 text-foreground">
+      <div className="mt-auto rounded-lg border bg-(--well) p-5 text-foreground">
         {children}
       </div>
     </article>

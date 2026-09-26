@@ -1,7 +1,7 @@
 import Link from "next/link"
 
 import { buttonVariants } from "@/components/ui/button"
-import { Band } from "@/components/site/frame"
+import { Band, Label } from "@/components/site/frame"
 import { GitHubIcon } from "@/components/site/github-icon"
 import { SiteLink } from "@/components/site/site-link"
 import { Cell } from "@/components/site/home/cell"
@@ -20,11 +20,57 @@ import { githubUrl } from "@/components/site/styles"
 const grid =
   "grid grid-cols-1 gap-px bg-(--rule) md:grid-cols-2 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)_minmax(0,2fr)]"
 
+const parts = [
+  {
+    name: "ConfirmButton",
+    href: "/docs/click-again",
+    description:
+      "A Button that confirms with a click, a second click or a hold, with optional undo.",
+  },
+  {
+    name: "TypeToConfirm",
+    href: "/docs/type-to-confirm",
+    description:
+      "An inline form that unlocks only after the exact name is typed.",
+  },
+  {
+    name: "ConfirmDialog",
+    href: "/docs/dialogs",
+    description:
+      "An optional dialog around any trigger, plus useConfirm to await it.",
+  },
+  {
+    name: "undoToast",
+    href: "/docs/undo",
+    description: "Act right away and offer an undo in a toast.",
+  },
+]
+
+function Actions() {
+  return (
+    <div className="flex gap-2">
+      <Link
+        href="/docs/installation"
+        className={buttonVariants({ size: "lg" })}
+      >
+        Get started
+      </Link>
+      <SiteLink
+        href={githubUrl}
+        aria-label="GitHub"
+        className={buttonVariants({ variant: "outline", size: "icon-lg" })}
+      >
+        <GitHubIcon />
+      </SiteLink>
+    </div>
+  )
+}
+
 export default function Home() {
   return (
     <main>
       <Band className="grid gap-6 px-3 py-14 sm:px-6 sm:py-16 lg:py-20">
-        <h1 className="text-4xl leading-10 font-bold tracking-[-0.04em] text-balance sm:text-6xl sm:leading-[64px] lg:text-[64px] lg:leading-[68px]">
+        <h1 className="font-display text-4xl leading-10 font-bold tracking-[-0.04em] text-balance sm:text-6xl sm:leading-[64px] lg:text-[64px] lg:leading-[68px]">
           <span className="block text-(--mark)">Confirmation components</span>
           for shadcn/ui.
         </h1>
@@ -32,21 +78,7 @@ export default function Home() {
           Hold, click again, type to confirm and undo. Add them with the shadcn
           CLI. They build on your own shadcn components.
         </p>
-        <div className="flex gap-2">
-          <Link
-            href="/docs/installation"
-            className={buttonVariants({ size: "lg" })}
-          >
-            Get started
-          </Link>
-          <SiteLink
-            href={githubUrl}
-            aria-label="GitHub"
-            className={buttonVariants({ variant: "outline", size: "icon-lg" })}
-          >
-            <GitHubIcon />
-          </SiteLink>
-        </div>
+        <Actions />
       </Band>
       <Band>
         <h2 className="sr-only">Examples</h2>
@@ -130,6 +162,42 @@ export default function Home() {
             <MessageToolbar />
           </Cell>
         </div>
+      </Band>
+      <Band>
+        <div className="grid gap-px bg-(--rule)">
+          <div className="grid gap-1 bg-(--paper) px-3 py-6 sm:p-6">
+            <Label className="mb-2">Parts list</Label>
+            <h2 className="font-display text-lg leading-7 font-bold tracking-tight">
+              Everything in SureUI
+            </h2>
+            <p className="text-sm text-(--ink-muted)">
+              Four parts. Install only the ones you use.
+            </p>
+          </div>
+          {parts.map((part, index) => (
+            <Link
+              key={part.name}
+              href={part.href}
+              className="grid gap-1 bg-(--paper) px-3 py-5 hover:bg-(--well) sm:px-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,4fr)] lg:items-baseline"
+            >
+              <span className="flex items-baseline gap-3">
+                <Label>Part {String(index + 1).padStart(2, "0")}</Label>
+                <span className="font-mono text-sm font-medium text-(--mark-text)">
+                  {part.name}
+                </span>
+              </span>
+              <span className="text-sm text-pretty text-(--ink-muted) lg:pl-6">
+                {part.description}
+              </span>
+            </Link>
+          ))}
+        </div>
+      </Band>
+      <Band className="flex flex-wrap items-center justify-between gap-6 px-3 py-12 sm:px-6">
+        <p className="font-display text-2xl font-bold tracking-tight">
+          Start with the one you need.
+        </p>
+        <Actions />
       </Band>
     </main>
   )

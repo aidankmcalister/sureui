@@ -1,6 +1,7 @@
 "use client"
 
 import { ArchiveIcon, CheckIcon } from "lucide-react"
+import dynamic from "next/dynamic"
 
 import { Button } from "@/components/ui/button"
 import { ConfirmButton } from "@/components/ui/sureui/confirm-button"
@@ -9,8 +10,12 @@ import {
   useConfirm,
 } from "@/components/ui/sureui/confirm-dialog"
 import { TypeToConfirm } from "@/components/ui/sureui/type-to-confirm"
-import { undoToast } from "@/components/ui/sureui/undo-toast"
 import { useReport } from "@/components/site/preview"
+
+const Toaster = dynamic(
+  () => import("@/components/ui/sonner").then((mod) => mod.Toaster),
+  { ssr: false }
+)
 
 function UndoDemo() {
   const report = useReport()
@@ -28,12 +33,15 @@ function UndoDemo() {
       <Button
         variant="outline"
         onClick={async () => {
+          const { undoToast } =
+            await import("@/components/ui/sureui/undo-toast")
           const committed = await undoToast("Moved 3 files to trash")
           report(`undoToast() resolved ${committed}`)
         }}
       >
         Trash with a toast
       </Button>
+      <Toaster />
     </div>
   )
 }

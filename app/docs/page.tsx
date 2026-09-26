@@ -6,7 +6,6 @@ import {
   DocsHeader,
   DocsSection,
   FramedList,
-  Friction,
   Prose,
 } from "@/components/site/docs"
 import { Label } from "@/components/site/frame"
@@ -41,9 +40,9 @@ export default function Introduction() {
             same click as the fifty that didn&apos;t.
           </p>
           <p>
-            SureUI matches friction to risk. Reversible actions happen right
-            away with an undo. Small ones take a second click or a hold. Only
-            permanent actions, or ones that affect other people, ask for more.
+            SureUI gives you more ways to ask: an undo, a second click, a hold,
+            a typed name, or a dialog when you want one. Pick whichever fits the
+            moment.
           </p>
         </Prose>
       </DocsSection>
@@ -53,9 +52,9 @@ export default function Introduction() {
             <Link
               key={style.slug}
               href={`/docs/${style.slug}`}
-              className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-baseline gap-x-4 gap-y-1 bg-(--paper) px-4 py-4 hover:bg-background sm:px-5"
+              className="grid grid-cols-1 items-baseline gap-x-4 gap-y-1 bg-(--paper) px-4 py-4 hover:bg-(--well) sm:grid-cols-[auto_minmax(0,1fr)] sm:px-5"
             >
-              <Label className="text-(--mark-text)">
+              <Label className="text-(--mark-text) max-sm:hidden">
                 Fig. {String(index + 1).padStart(2, "0")}
               </Label>
               <span className="grid gap-1">
@@ -64,7 +63,6 @@ export default function Introduction() {
                   {style.summary}
                 </span>
               </span>
-              <Friction value={style.friction} />
             </Link>
           ))}
         </FramedList>
