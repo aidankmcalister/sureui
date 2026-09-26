@@ -52,7 +52,7 @@ export default function Introduction() {
             <Link
               key={style.slug}
               href={`/docs/${style.slug}`}
-              className="grid grid-cols-1 items-baseline gap-x-4 gap-y-1 bg-(--paper) px-4 py-4 hover:bg-background sm:grid-cols-[auto_minmax(0,1fr)] sm:px-5"
+              className="grid grid-cols-1 items-baseline gap-x-4 gap-y-1 bg-(--paper) px-4 py-4 hover:bg-(--well) sm:grid-cols-[auto_minmax(0,1fr)] sm:px-5"
             >
               <Label className="text-(--mark-text) max-sm:hidden">
                 Fig. {String(index + 1).padStart(2, "0")}

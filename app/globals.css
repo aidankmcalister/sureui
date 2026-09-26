@@ -136,6 +136,7 @@
   --rule: #d4d4d0;
   --mark: #ea580c;
   --mark-text: #c2410c;
+  --well: #ffffff;
   --code-foreground: #18181b;
   --code-background: transparent;
   --code-sureui: #c2410c;
@@ -158,6 +159,7 @@
   --rule: #2a2a2e;
   --mark: #f97316;
   --mark-text: #f97316;
+  --well: #19191b;
   --code-foreground: #f4f4f5;
   --code-background: transparent;
   --code-sureui: #fb923c;

@@ -39,7 +39,7 @@ function DocsNav({ onNavigate }: { onNavigate?: () => void }) {
                   className={cn(
                     "flex items-center gap-2.5 rounded-md border border-transparent px-2.5 py-2 text-sm text-(--ink-muted) hover:text-(--ink)",
                     current &&
-                      "border-(--rule) bg-background font-medium text-(--ink)"
+                      "border-(--rule) bg-(--well) font-medium text-(--ink)"
                   )}
                 >
                   <span
@@ -134,7 +134,7 @@ function PagerLink({
     <Link
       href={page.href}
       className={cn(
-        "grid gap-2 bg-(--paper) px-3 py-8 hover:bg-background sm:px-6 lg:px-14",
+        "grid gap-2 bg-(--paper) px-3 py-8 hover:bg-(--well) sm:px-6 lg:px-14",
         className
       )}
     >

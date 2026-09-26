@@ -38,7 +38,7 @@ export function Code({
   })
 
   return (
-    <div className="relative rounded-[10px] border bg-background text-(--code-foreground)">
+    <div className="relative rounded-[10px] border bg-(--well) text-(--code-foreground)">
       <pre className="overflow-x-auto py-4 font-mono text-[13px] leading-6">
         <code className="grid min-w-fit">
           {tokens.map((line, index) => (
@@ -77,7 +77,7 @@ export function Code({
 
 export function Command({ children }: { children: string }) {
   return (
-    <div className="flex min-h-9 items-center justify-between gap-2 rounded-md border bg-background pr-1 pl-3 font-mono text-xs text-foreground">
+    <div className="flex min-h-9 items-center justify-between gap-2 rounded-md border bg-(--well) pr-1 pl-3 font-mono text-xs text-foreground">
       <span className="min-w-0 py-2 leading-5 sm:[scrollbar-width:none] sm:overflow-x-auto sm:whitespace-nowrap">
         {children}
       </span>

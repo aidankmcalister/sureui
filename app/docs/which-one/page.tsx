@@ -51,7 +51,7 @@ export default function WhichOne() {
         </FramedList>
       </DocsSection>
       <DocsSection label="At a glance">
-        <div className="hidden rounded-[10px] border bg-background px-2 text-foreground sm:block">
+        <div className="hidden rounded-[10px] border bg-(--well) px-2 text-foreground sm:block">
           <Table>
             <TableHeader>
               <TableRow>

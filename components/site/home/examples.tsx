@@ -5,8 +5,11 @@ import {
   ArchiveIcon,
   CheckIcon,
   FileIcon,
+  KeyRoundIcon,
   LogOutIcon,
+  RotateCcwIcon,
   Trash2Icon,
+  UserMinusIcon,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -71,14 +74,6 @@ function Outcome({
   )
 }
 
-function Restore({ onClick }: { onClick: () => void }) {
-  return (
-    <Button variant="ghost" size="sm" autoFocus onClick={onClick}>
-      Restore
-    </Button>
-  )
-}
-
 function Details({ rows }: { rows: [string, React.ReactNode][] }) {
   return (
     <dl className="grid gap-1.5 text-sm">
@@ -102,6 +97,8 @@ function useToggle() {
           ? prev.filter((other) => other !== item)
           : [...prev, item]
       ),
+    count: items.length,
+    reset: () => setItems([]),
   }
 }
 
@@ -170,26 +167,29 @@ export function DangerZone() {
   }
 
   return (
-    <div className="grid w-full divide-y text-sm">
-      {dangers.map((danger) => (
-        <div
-          key={danger.id}
-          className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0"
-        >
-          <div className="grid gap-0.5">
-            <span className="font-medium">{danger.title}</span>
-            <span className="text-muted-foreground">
-              {done.has(danger.id) ? danger.done : danger.description}
-            </span>
+    <Outcome
+      done={done.count === dangers.length}
+      icon={<CheckIcon />}
+      title="All three actions ran"
+      onReset={done.reset}
+    >
+      <div className="grid w-full divide-y text-sm">
+        {dangers.map((danger) => (
+          <div
+            key={danger.id}
+            className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0"
+          >
+            <div className="grid gap-0.5">
+              <span className="font-medium">{danger.title}</span>
+              <span className="text-muted-foreground">
+                {done.has(danger.id) ? danger.done : danger.description}
+              </span>
+            </div>
+            {!done.has(danger.id) && control(danger.id)}
           </div>
-          {done.has(danger.id) ? (
-            <Restore onClick={() => done.toggle(danger.id)} />
-          ) : (
-            control(danger.id)
-          )}
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+    </Outcome>
   )
 }
 
@@ -224,38 +224,43 @@ export function ApiKeys() {
   const revoked = useToggle()
 
   return (
-    <div className="grid w-full divide-y">
-      {keys.map((key) => (
-        <div
-          key={key.name}
-          className="flex items-center justify-between gap-3 py-2.5 first:pt-0 last:pb-0"
-        >
-          <div className="grid gap-0.5 text-sm">
-            <span className="flex items-center gap-2 font-medium">
-              {key.name}
-              {revoked.has(key.name) && (
-                <Badge variant="outline">Revoked</Badge>
-              )}
-            </span>
-            <span className="font-mono text-xs text-muted-foreground">
-              {key.value}
-            </span>
+    <Outcome
+      done={revoked.count === keys.length}
+      icon={<KeyRoundIcon />}
+      title="Every key is revoked"
+      onReset={revoked.reset}
+    >
+      <div className="grid w-full divide-y">
+        {keys.map((key) => (
+          <div
+            key={key.name}
+            className="flex items-center justify-between gap-3 py-2.5 first:pt-0 last:pb-0"
+          >
+            <div className="grid gap-0.5 text-sm">
+              <span className="flex items-center gap-2 font-medium">
+                {key.name}
+                {revoked.has(key.name) && (
+                  <Badge variant="outline">Revoked</Badge>
+                )}
+              </span>
+              <span className="font-mono text-xs text-muted-foreground">
+                {key.value}
+              </span>
+            </div>
+            {!revoked.has(key.name) && (
+              <ConfirmButton
+                gesture="hold"
+                variant="destructive"
+                size="sm"
+                onConfirm={() => revoked.toggle(key.name)}
+              >
+                Hold to revoke
+              </ConfirmButton>
+            )}
           </div>
-          {revoked.has(key.name) ? (
-            <Restore onClick={() => revoked.toggle(key.name)} />
-          ) : (
-            <ConfirmButton
-              gesture="hold"
-              variant="destructive"
-              size="sm"
-              onConfirm={() => revoked.toggle(key.name)}
-            >
-              Revoke
-            </ConfirmButton>
-          )}
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+    </Outcome>
   )
 }
 
@@ -291,30 +296,30 @@ export function Workspace() {
   )
 }
 
-const custom = { Theme: "Dark", Alerts: "Mentions", Keys: "Custom" }
-const defaults = { Theme: "System", Alerts: "All", Keys: "Default" }
+const preferences = { Theme: "Dark", Alerts: "Mentions", Keys: "Custom" }
 
 export function Preferences() {
-  const [settings, setSettings] = React.useState(custom)
+  const [reset, setReset] = React.useState(false)
 
   return (
-    <div className="grid w-full gap-3 text-sm">
-      <Details rows={Object.entries(settings)} />
-      {settings === defaults ? (
-        <Button variant="ghost" onClick={() => setSettings(custom)}>
-          Restore mine
-        </Button>
-      ) : (
+    <Outcome
+      done={reset}
+      icon={<RotateCcwIcon />}
+      title="Preferences reset"
+      onReset={() => setReset(false)}
+    >
+      <div className="grid w-full gap-3 text-sm">
+        <Details rows={Object.entries(preferences)} />
         <ConfirmButton
           gesture="hold"
           duration={2000}
           variant="outline"
-          onConfirm={() => setSettings(defaults)}
+          onConfirm={() => setReset(true)}
         >
           Hold to reset
         </ConfirmButton>
-      )}
-    </div>
+      </div>
+    </Outcome>
   )
 }
 
@@ -329,67 +334,66 @@ export function Files() {
   const [trashed, setTrashed] = React.useState<string[]>([])
 
   return (
-    <div className="group grid w-full gap-3">
-      <div className="divide-y text-sm">
-        {files.map((file) => (
-          <label
-            key={file.name}
-            className={cn(
-              "flex items-center gap-3 py-2 first:pt-0",
-              trashed.includes(file.name) &&
-                "text-muted-foreground line-through",
-              selected.includes(file.name) &&
-                "group-has-data-[state=undo]:text-muted-foreground group-has-data-[state=undo]:line-through"
-            )}
-          >
-            <Checkbox
-              checked={selected.includes(file.name)}
-              disabled={trashed.includes(file.name)}
-              onCheckedChange={(on) =>
-                setSelected((prev) =>
-                  on
-                    ? [...prev, file.name]
-                    : prev.filter((name) => name !== file.name)
-                )
-              }
-            />
-            <FileIcon className="size-4 text-muted-foreground" />
-            <span className="flex-1 truncate">{file.name}</span>
-            <span className="hidden font-mono text-xs text-muted-foreground sm:inline">
-              {file.size}
-            </span>
-            <span className="w-20 text-right text-muted-foreground">
-              {file.modified}
-            </span>
-          </label>
-        ))}
-      </div>
-      <div className="flex justify-end gap-2">
-        {trashed.length > 0 && (
-          <Button
-            variant="ghost"
-            onClick={() => {
-              setSelected((prev) => [...prev, ...trashed])
-              setTrashed([])
+    <Outcome
+      done={trashed.length === files.length}
+      icon={<Trash2Icon />}
+      title="Moved to trash"
+      onReset={() => {
+        setTrashed([])
+        setSelected(files.map((file) => file.name))
+      }}
+    >
+      <div className="group grid w-full gap-3">
+        <div className="divide-y text-sm">
+          {files.map((file) => (
+            <label
+              key={file.name}
+              className={cn(
+                "flex items-center gap-3 py-2 first:pt-0",
+                trashed.includes(file.name) &&
+                  "text-muted-foreground line-through",
+                selected.includes(file.name) &&
+                  "group-has-data-[state=undo]:text-muted-foreground group-has-data-[state=undo]:line-through"
+              )}
+            >
+              <Checkbox
+                checked={selected.includes(file.name)}
+                disabled={trashed.includes(file.name)}
+                onCheckedChange={(on) =>
+                  setSelected((prev) =>
+                    on
+                      ? [...prev, file.name]
+                      : prev.filter((name) => name !== file.name)
+                  )
+                }
+              />
+              <FileIcon className="size-4 text-muted-foreground" />
+              <span className="flex-1 truncate">{file.name}</span>
+              <span className="hidden font-mono text-xs text-muted-foreground sm:inline">
+                {file.size}
+              </span>
+              <span className="w-20 text-right text-muted-foreground">
+                {file.modified}
+              </span>
+            </label>
+          ))}
+        </div>
+        <div className="flex justify-end">
+          <ConfirmButton
+            undo
+            variant="outline"
+            disabled={selected.length === 0}
+            onConfirm={() => {
+              setTrashed((prev) => [...prev, ...selected])
+              setSelected([])
             }}
           >
-            Restore {trashed.length}
-          </Button>
-        )}
-        <ConfirmButton
-          undo
-          variant="outline"
-          disabled={selected.length === 0}
-          onConfirm={() => {
-            setTrashed((prev) => [...prev, ...selected])
-            setSelected([])
-          }}
-        >
-          <Trash2Icon />
-          Move {selected.length} to trash
-        </ConfirmButton>
+            <Trash2Icon />
+            Move {selected.length} to trash
+          </ConfirmButton>
+        </div>
       </div>
-    </div>
+    </Outcome>
   )
 }
 
@@ -403,49 +407,54 @@ export function Members() {
   const removed = useToggle()
 
   return (
-    <div className="grid w-full gap-1">
-      {people.map((person) => (
-        <div
-          key={person.name}
-          className="flex items-center gap-3 py-1.5 first:pt-0 last:pb-0"
-        >
-          <Avatar size="sm">
-            <AvatarFallback>{person.initials}</AvatarFallback>
-          </Avatar>
+    <Outcome
+      done={removed.count === people.length}
+      icon={<UserMinusIcon />}
+      title="Everyone was removed"
+      onReset={removed.reset}
+    >
+      <div className="grid w-full gap-1">
+        {people.map((person) => (
           <div
-            className={cn(
-              "grid flex-1 text-sm",
-              removed.has(person.name) && "text-muted-foreground"
-            )}
+            key={person.name}
+            className="flex items-center gap-3 py-1.5 first:pt-0 last:pb-0"
           >
-            <span
+            <Avatar size="sm">
+              <AvatarFallback>{person.initials}</AvatarFallback>
+            </Avatar>
+            <div
               className={cn(
-                "font-medium",
-                removed.has(person.name) && "line-through"
+                "grid flex-1 text-sm",
+                removed.has(person.name) && "text-muted-foreground"
               )}
             >
-              {person.name}
-            </span>
-            <span className="text-xs text-muted-foreground">
-              {removed.has(person.name) ? "Removed" : person.role}
-            </span>
+              <span
+                className={cn(
+                  "font-medium",
+                  removed.has(person.name) && "line-through"
+                )}
+              >
+                {person.name}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {removed.has(person.name) ? "Removed" : person.role}
+              </span>
+            </div>
+            {!removed.has(person.name) && (
+              <ConfirmButton
+                gesture="click-again"
+                variant="outline"
+                size="sm"
+                confirmLabel="Are you sure?"
+                onConfirm={() => removed.toggle(person.name)}
+              >
+                Remove
+              </ConfirmButton>
+            )}
           </div>
-          {removed.has(person.name) ? (
-            <Restore onClick={() => removed.toggle(person.name)} />
-          ) : (
-            <ConfirmButton
-              gesture="click-again"
-              variant="outline"
-              size="sm"
-              confirmLabel="Are you sure?"
-              onConfirm={() => removed.toggle(person.name)}
-            >
-              Remove
-            </ConfirmButton>
-          )}
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+    </Outcome>
   )
 }
 
@@ -485,7 +494,8 @@ export function MessageToolbar() {
               gesture="hold"
               variant="ghost"
               size="icon-sm"
-              aria-label="Delete"
+              aria-label="Hold to delete"
+              title="Hold to delete"
               onConfirm={() => setStatus("deleted")}
             >
               <Trash2Icon />

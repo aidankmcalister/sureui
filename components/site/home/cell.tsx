@@ -25,7 +25,7 @@ export function Cell({
   return (
     <article
       className={cn(
-        "flex flex-col bg-(--paper) p-5 sm:p-6",
+        "flex flex-col bg-(--paper) px-3 py-6 sm:p-6",
         featured && "md:col-span-2",
         className
       )}
@@ -53,7 +53,7 @@ export function Cell({
         </h3>
         <p className="text-sm leading-5 text-(--ink-muted)">{description}</p>
       </div>
-      <div className="rounded-lg border bg-background p-5 font-sans text-foreground">
+      <div className="mt-auto rounded-lg border bg-(--well) p-5 text-foreground">
         {children}
       </div>
     </article>
