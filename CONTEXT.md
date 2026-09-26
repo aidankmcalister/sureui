@@ -6,8 +6,6 @@ SureUI is a shadcn/ui registry of confirmation controls. These terms are the sha
 
 **Gesture**: how a person proves intent. `click` (one click), `click-again` (arm, then click again within a timeout), `hold` (press and hold for a duration), `type` (type a phrase, handled by TypeToConfirm).
 
-**Friction**: how much effort a gesture costs. Match friction to risk: reversible actions get none, permanent ones get the most.
-
 **Surface**: where a confirmation appears. Inline is the default. A dialog is an optional surface that wraps an inline control, never the default.
 
 **Undo window**: an optional delay after confirming, before `onConfirm` runs. The control shows "Undo" while it drains. Undoing cancels. Unmounting during the window cancels too.

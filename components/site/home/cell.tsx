@@ -1,7 +1,7 @@
 import Link from "next/link"
 
 import { cn } from "@/lib/utils"
-import { Label } from "@/components/site/frame"
+import { Label, tapTarget } from "@/components/site/frame"
 
 export function Cell({
   figure,
@@ -35,7 +35,10 @@ export function Cell({
           Fig. {String(figure).padStart(2, "0")} ·{" "}
           <Link
             href={href}
-            className="underline-offset-4 hover:text-(--ink) hover:underline"
+            className={cn(
+              tapTarget,
+              "underline-offset-4 hover:text-(--ink) hover:underline"
+            )}
           >
             {gesture}
           </Link>

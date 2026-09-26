@@ -1,7 +1,8 @@
 import Link from "next/link"
 
 import { buttonVariants } from "@/components/ui/button"
-import { Band } from "@/components/site/frame"
+import { cn } from "@/lib/utils"
+import { Band, tapTarget } from "@/components/site/frame"
 import { GitHubIcon } from "@/components/site/github-icon"
 import { SiteLink } from "@/components/site/site-link"
 import { githubUrl } from "@/components/site/styles"
@@ -18,7 +19,10 @@ export function Header() {
       </Link>
       <Link
         href="/docs"
-        className="font-mono text-[11px] tracking-[0.1em] text-(--ink-muted) uppercase hover:text-(--ink)"
+        className={cn(
+          tapTarget,
+          "font-mono text-[11px] tracking-[0.1em] text-(--ink-muted) uppercase hover:text-(--ink)"
+        )}
       >
         Docs
       </Link>

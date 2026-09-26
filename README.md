@@ -2,12 +2,12 @@
 
 Confirmation components for [shadcn/ui](https://ui.shadcn.com). Every control shares one contract: `onConfirm`, `onCancel`, `undo`, an async pending state and full Button passthrough. Only one of them is a dialog.
 
-| Style           | Friction      | Use it for                                   |
-| --------------- | ------------- | --------------------------------------------- |
-| Undo            | None up front | Bulk delete, archive, cancel an event        |
-| Confirm button  | Low           | Archive, discard, delete an item, revoke     |
-| Confirm dialog  | Medium        | Leave a team, sign out everywhere (optional) |
-| Type to confirm | High          | Delete a project, repo, account or database  |
+| Style           | Use it for                                   |
+| --------------- | -------------------------------------------- |
+| Undo            | Bulk delete, archive, cancel an event        |
+| Confirm button  | Archive, discard, delete an item, revoke     |
+| Confirm dialog  | Leave a team, sign out everywhere (optional) |
+| Type to confirm | Delete a project, repo, account or database  |
 
 ## Install
 

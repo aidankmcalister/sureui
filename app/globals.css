@@ -138,11 +138,11 @@
 }
 
 .dark {
-  --paper: #161617;
+  --paper: #121213;
   --ink: #f4f4f5;
   --ink-muted: #a1a1aa;
   --ink-label: #8b8b93;
-  --rule: #2e2e32;
+  --rule: #2a2a2e;
   --mark: #f97316;
   --mark-text: #f97316;
 }

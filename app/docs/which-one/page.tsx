@@ -12,7 +12,6 @@ import {
   DocsHeader,
   DocsSection,
   FramedList,
-  Friction,
   StyleLink,
 } from "@/components/site/docs"
 import { Label } from "@/components/site/frame"
@@ -31,9 +30,9 @@ export default function WhichOne() {
     <>
       <DocsHeader
         href="/docs/which-one"
-        lead="Five questions, lightest first. Stop at the first yes."
+        lead="A quick guide, if you're not sure where to start."
       />
-      <DocsSection label="Ask in order">
+      <DocsSection label="Questions to ask">
         <FramedList>
           {styles.map((style, index) => (
             <div
@@ -57,7 +56,6 @@ export default function WhichOne() {
             <TableHeader>
               <TableRow>
                 <TableHead>Style</TableHead>
-                <TableHead>Friction</TableHead>
                 {columns.map((column) => (
                   <TableHead key={column.key}>{column.label}</TableHead>
                 ))}
@@ -67,9 +65,6 @@ export default function WhichOne() {
               {styles.map((style) => (
                 <TableRow key={style.slug}>
                   <TableCell className="font-medium">{style.name}</TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {style.friction}
-                  </TableCell>
                   {columns.map((column) => (
                     <TableCell
                       key={column.key}
@@ -89,10 +84,7 @@ export default function WhichOne() {
               key={style.slug}
               className="grid gap-2 bg-(--paper) p-4 text-sm"
             >
-              <div className="flex items-center justify-between gap-4">
-                <dt className="font-semibold">{style.name}</dt>
-                <Friction value={style.friction} />
-              </div>
+              <dt className="font-semibold">{style.name}</dt>
               {columns.map((column) => (
                 <div key={column.key} className="flex justify-between gap-4">
                   <dt className="text-(--ink-label)">{column.label}</dt>

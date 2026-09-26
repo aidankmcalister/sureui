@@ -1,8 +1,8 @@
 import Link from "next/link"
 
 import { cn } from "@/lib/utils"
-import { Label, Plus } from "@/components/site/frame"
-import { getPage, type Style } from "@/components/site/styles"
+import { Label, Plus, tapTarget } from "@/components/site/frame"
+import { getPage } from "@/components/site/styles"
 
 export function DocsSection({
   label,
@@ -39,12 +39,10 @@ export function DocsSection({
 export function DocsHeader({
   href,
   lead,
-  friction,
   children,
 }: {
   href: string
   lead: string
-  friction?: Style["friction"]
   children?: React.ReactNode
 }) {
   const page = getPage(href)
@@ -56,38 +54,15 @@ export function DocsHeader({
           Sheet {page?.sheet}{" "}
           <span className="text-(--ink-label)">· {page?.group}</span>
         </Label>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-          <h1 className="text-[34px] leading-10 font-bold tracking-[-0.035em] lg:text-[44px] lg:leading-[52px]">
-            {page?.title}
-          </h1>
-          {friction && <Friction value={friction} bordered />}
-        </div>
+        <h1 className="text-[34px] leading-10 font-bold tracking-[-0.035em] lg:text-[44px] lg:leading-[52px]">
+          {page?.title}
+        </h1>
         <p className="max-w-[640px] text-base leading-7 text-(--ink-muted) lg:text-lg lg:leading-8">
           {lead}
         </p>
       </div>
       {children}
     </DocsSection>
-  )
-}
-
-export function Friction({
-  value,
-  bordered,
-}: {
-  value: string
-  bordered?: boolean
-}) {
-  return (
-    <Label
-      className={cn(
-        "shrink-0",
-        bordered && "rounded-sm border border-(--rule) px-2 py-1",
-        value === "high" && "text-(--mark-text)"
-      )}
-    >
-      {value}
-    </Label>
   )
 }
 
@@ -128,7 +103,10 @@ export function StyleLink({
   return (
     <Link
       href={`/docs/${slug}`}
-      className="font-medium text-(--mark-text) underline-offset-4 hover:underline"
+      className={cn(
+        tapTarget,
+        "font-medium text-(--mark-text) underline-offset-4 hover:underline"
+      )}
     >
       {children}
     </Link>
