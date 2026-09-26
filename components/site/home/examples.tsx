@@ -10,21 +10,9 @@ import {
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarGroup,
-  AvatarGroupCount,
-} from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   Empty,
@@ -93,7 +81,7 @@ function Restore({ onClick }: { onClick: () => void }) {
 
 function Details({ rows }: { rows: [string, React.ReactNode][] }) {
   return (
-    <dl className="grid gap-1.5">
+    <dl className="grid gap-1.5 text-sm">
       {rows.map(([name, value]) => (
         <div key={name} className="flex items-center justify-between gap-3">
           <dt className="text-muted-foreground">{name}</dt>
@@ -117,7 +105,95 @@ function useToggle() {
   }
 }
 
-export function DeleteProject() {
+const dangers = [
+  {
+    id: "pause",
+    title: "Pause deployments",
+    description: "New pushes stop deploying until you resume.",
+    done: "Deployments paused.",
+  },
+  {
+    id: "transfer",
+    title: "Transfer project",
+    description: "Move acme-prod to another team.",
+    done: "Transferred to Design.",
+  },
+  {
+    id: "delete",
+    title: "Delete project",
+    description: "Removes every deployment and its data for good.",
+    done: "Deleted, with every deployment.",
+  },
+]
+
+export function DangerZone() {
+  const done = useToggle()
+
+  function control(id: string) {
+    const finish = () => done.toggle(id)
+    if (id === "pause") {
+      return (
+        <ConfirmButton undo variant="outline" size="sm" onConfirm={finish}>
+          Pause
+        </ConfirmButton>
+      )
+    }
+    if (id === "transfer") {
+      return (
+        <ConfirmDialog
+          title="Transfer acme-prod?"
+          description="Members of Acme lose access. Owners of Design get it."
+          confirmLabel="Transfer"
+          onConfirm={finish}
+        >
+          <Button variant="outline" size="sm">
+            Transfer
+          </Button>
+        </ConfirmDialog>
+      )
+    }
+    return (
+      <ConfirmDialog
+        title="Delete acme-prod?"
+        description="This removes the project, its deployments and its data for good."
+        phrase="acme-prod"
+        acknowledgements={["Active deployments will go offline."]}
+        confirmLabel="Delete project"
+        variant="destructive"
+        onConfirm={finish}
+      >
+        <Button variant="destructive" size="sm">
+          Delete
+        </Button>
+      </ConfirmDialog>
+    )
+  }
+
+  return (
+    <div className="grid w-full divide-y text-sm">
+      {dangers.map((danger) => (
+        <div
+          key={danger.id}
+          className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0"
+        >
+          <div className="grid gap-0.5">
+            <span className="font-medium">{danger.title}</span>
+            <span className="text-muted-foreground">
+              {done.has(danger.id) ? danger.done : danger.description}
+            </span>
+          </div>
+          {done.has(danger.id) ? (
+            <Restore onClick={() => done.toggle(danger.id)} />
+          ) : (
+            control(danger.id)
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+export function ConfirmByName() {
   const [deleted, setDeleted] = React.useState(false)
 
   return (
@@ -125,34 +201,15 @@ export function DeleteProject() {
       done={deleted}
       icon={<Trash2Icon />}
       title="acme-prod was deleted"
-      description="Its deployments and data are gone for good. This one is only a demo."
       onReset={() => setDeleted(false)}
     >
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>Delete acme-prod?</CardTitle>
-          <CardDescription>
-            This removes the project, its deployments and its data for good.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-6">
-          <Details
-            rows={[
-              ["Project", "acme-prod"],
-              ["Region", "Washington, D.C."],
-              ["Deployments", "14 active"],
-            ]}
-          />
-          <TypeToConfirm
-            phrase="acme-prod"
-            acknowledgements={[
-              "I understand active deployments will go offline.",
-            ]}
-            confirmLabel="Delete project"
-            onConfirm={() => setDeleted(true)}
-          />
-        </CardContent>
-      </Card>
+      <TypeToConfirm
+        phrase="acme-prod"
+        acknowledgements={["I understand active deployments will go offline."]}
+        confirmLabel="Delete project"
+        onConfirm={() => setDeleted(true)}
+        className="w-full"
+      />
     </Outcome>
   )
 }
@@ -171,7 +228,7 @@ export function ApiKeys() {
       {keys.map((key) => (
         <div
           key={key.name}
-          className="flex items-center justify-between gap-3 py-2.5"
+          className="flex items-center justify-between gap-3 py-2.5 first:pt-0 last:pb-0"
         >
           <div className="grid gap-0.5 text-sm">
             <span className="flex items-center gap-2 font-medium">
@@ -202,50 +259,6 @@ export function ApiKeys() {
   )
 }
 
-const messages = [
-  "Q3 planning",
-  "Design review notes",
-  "Invoice #1042",
-  "Offsite agenda",
-]
-
-export function Inbox() {
-  const archived = useToggle()
-
-  return (
-    <div className="grid w-full divide-y">
-      {messages.map((subject) => (
-        <div
-          key={subject}
-          className="flex items-center justify-between gap-3 py-2.5 text-sm"
-        >
-          <span
-            className={cn(
-              "truncate font-medium",
-              archived.has(subject) && "text-muted-foreground line-through"
-            )}
-          >
-            {subject}
-          </span>
-          {archived.has(subject) ? (
-            <Restore onClick={() => archived.toggle(subject)} />
-          ) : (
-            <ConfirmButton
-              gesture="click-again"
-              variant="outline"
-              size="sm"
-              confirmLabel="Archive?"
-              onConfirm={() => archived.toggle(subject)}
-            >
-              Archive
-            </ConfirmButton>
-          )}
-        </div>
-      ))}
-    </div>
-  )
-}
-
 export function Workspace() {
   const [left, setLeft] = React.useState(false)
 
@@ -261,17 +274,7 @@ export function Workspace() {
           rows={[
             ["Workspace", "Acme"],
             ["Plan", "Team"],
-            [
-              "Members",
-              <AvatarGroup key="members">
-                {["PS", "LP", "AD"].map((initials) => (
-                  <Avatar key={initials}>
-                    <AvatarFallback>{initials}</AvatarFallback>
-                  </Avatar>
-                ))}
-                <AvatarGroupCount>+9</AvatarGroupCount>
-              </AvatarGroup>,
-            ],
+            ["Members", "12"],
           ]}
         />
         <ConfirmDialog
@@ -327,12 +330,12 @@ export function Files() {
 
   return (
     <div className="group grid w-full gap-3">
-      <div className="divide-y rounded-lg border text-sm">
+      <div className="divide-y text-sm">
         {files.map((file) => (
           <label
             key={file.name}
             className={cn(
-              "flex items-center gap-3 px-3 py-2",
+              "flex items-center gap-3 py-2 first:pt-0",
               trashed.includes(file.name) &&
                 "text-muted-foreground line-through",
               selected.includes(file.name) &&
@@ -404,7 +407,7 @@ export function Members() {
       {people.map((person) => (
         <div
           key={person.name}
-          className="flex items-center gap-3 rounded-md px-2 py-1.5 has-data-[state=armed]:bg-destructive/10"
+          className="flex items-center gap-3 py-1.5 first:pt-0 last:pb-0"
         >
           <Avatar size="sm">
             <AvatarFallback>{person.initials}</AvatarFallback>
@@ -432,9 +435,9 @@ export function Members() {
           ) : (
             <ConfirmButton
               gesture="click-again"
-              variant="ghost"
+              variant="outline"
               size="sm"
-              confirmLabel="Sure?"
+              confirmLabel="Are you sure?"
               onConfirm={() => removed.toggle(person.name)}
             >
               Remove
