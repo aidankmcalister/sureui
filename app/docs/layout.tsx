@@ -1,4 +1,3 @@
-import { Toaster } from "@/components/ui/sonner"
 import { DocsBar, DocsPager, DocsSidebar } from "@/components/site/docs-nav"
 import { Band } from "@/components/site/frame"
 
@@ -21,7 +20,6 @@ export default function DocsLayout({
           <DocsPager />
         </main>
       </Band>
-      <Toaster />
     </>
   )
 }

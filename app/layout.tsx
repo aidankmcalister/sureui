@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { Geist, Geist_Mono, Rubik, Space_Grotesk } from "next/font/google"
+import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google"
 
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -9,10 +9,9 @@ import { Header } from "@/components/site/header"
 
 const fontSans = Geist({ subsets: ["latin"], variable: "--font-sans" })
 
-const fontBody = Rubik({ subsets: ["latin"], variable: "--font-rubik" })
-
 const fontDisplay = Space_Grotesk({
   subsets: ["latin"],
+  weight: "700",
   variable: "--font-space-grotesk",
 })
 
@@ -40,13 +39,12 @@ export default function RootLayout({
         fontMono.variable,
         "font-sans",
         fontSans.variable,
-        fontBody.variable,
         fontDisplay.variable
       )}
     >
       <body>
         <ThemeProvider>
-          <div className="flex min-h-svh flex-col bg-(--paper) font-body text-(--ink)">
+          <div className="flex min-h-svh flex-col bg-(--paper) text-(--ink)">
             <Header />
             {children}
             <Footer />
