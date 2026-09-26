@@ -7,6 +7,8 @@
 @theme inline {
     --font-heading: var(--font-sans);
     --font-sans: var(--font-sans);
+    --font-display: var(--font-space-grotesk);
+    --font-body: var(--font-rubik);
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -123,6 +125,13 @@
   body {
     @apply bg-background text-foreground;
     }
+  button,
+  input,
+  textarea,
+  select,
+  .group\/button {
+    @apply font-sans;
+  }
   html {
     @apply font-sans;
     }
@@ -135,6 +144,18 @@
   --rule: #d4d4d0;
   --mark: #ea580c;
   --mark-text: #c2410c;
+  --code-foreground: #18181b;
+  --code-background: transparent;
+  --code-sureui: #c2410c;
+  --code-token-keyword: #52525b;
+  --code-token-string: #2f5b85;
+  --code-token-string-expression: #2f5b85;
+  --code-token-constant: #18181b;
+  --code-token-function: #52525b;
+  --code-token-parameter: #52525b;
+  --code-token-punctuation: #71717a;
+  --code-token-comment: #6b6b73;
+  --code-token-link: #2f5b85;
 }
 
 .dark {
@@ -145,4 +166,16 @@
   --rule: #2a2a2e;
   --mark: #f97316;
   --mark-text: #f97316;
+  --code-foreground: #f4f4f5;
+  --code-background: transparent;
+  --code-sureui: #fb923c;
+  --code-token-keyword: #a1a1aa;
+  --code-token-string: #93b8dc;
+  --code-token-string-expression: #93b8dc;
+  --code-token-constant: #fafafa;
+  --code-token-function: #a1a1aa;
+  --code-token-parameter: #a1a1aa;
+  --code-token-punctuation: #8b8b93;
+  --code-token-comment: #8b8b93;
+  --code-token-link: #93b8dc;
 }

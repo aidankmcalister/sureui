@@ -141,7 +141,9 @@ function PagerLink({
       <Label>
         {label} · <span className="text-(--mark-text)">{page.sheet}</span>
       </Label>
-      <span className="text-lg font-semibold tracking-tight">{page.title}</span>
+      <span className="font-display text-lg font-bold tracking-tight">
+        {page.title}
+      </span>
     </Link>
   )
 }

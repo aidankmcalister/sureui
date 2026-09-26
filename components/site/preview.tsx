@@ -34,7 +34,7 @@ export function Preview({
         </div>
         <TabsContent value="preview">
           <ReportContext value={setEntry}>
-            <div className="flex min-h-64 items-center justify-center p-6">
+            <div className="flex min-h-64 items-center justify-center p-6 font-sans">
               {children}
             </div>
           </ReportContext>

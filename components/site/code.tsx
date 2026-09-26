@@ -1,5 +1,29 @@
+import { createCssVariablesTheme, createHighlighterCoreSync } from "shiki/core"
+import { createJavaScriptRegexEngine } from "shiki/engine/javascript"
+import tsx from "shiki/langs/tsx.mjs"
+
 import { cn } from "@/lib/utils"
 import { CopyButton } from "@/components/site/copy-button"
+
+const sureui = new Set([
+  "ConfirmButton",
+  "TypeToConfirm",
+  "ConfirmDialog",
+  "undoToast",
+  "useConfirm",
+])
+
+const highlighter = createHighlighterCoreSync({
+  themes: [
+    createCssVariablesTheme({
+      name: "sureui",
+      variablePrefix: "--code-",
+      fontStyle: true,
+    }),
+  ],
+  langs: [tsx],
+  engine: createJavaScriptRegexEngine(),
+})
 
 export function Code({
   highlight = [],
@@ -8,11 +32,16 @@ export function Code({
   highlight?: number[]
   children: string
 }) {
+  const { tokens } = highlighter.codeToTokens(children, {
+    lang: "tsx",
+    theme: "sureui",
+  })
+
   return (
-    <div className="relative rounded-[10px] border bg-background text-foreground">
+    <div className="relative rounded-[10px] border bg-background text-(--code-foreground)">
       <pre className="overflow-x-auto py-4 font-mono text-[13px] leading-6">
         <code className="grid min-w-fit">
-          {children.split("\n").map((line, index) => (
+          {tokens.map((line, index) => (
             <span
               key={index}
               className={cn(
@@ -21,7 +50,22 @@ export function Code({
                   "border-l-2 border-(--mark) bg-(--mark)/10 pl-3.5"
               )}
             >
-              {line}
+              {line.map((token, offset) => (
+                <span
+                  key={offset}
+                  style={
+                    sureui.has(token.content)
+                      ? { color: "var(--code-sureui)", fontWeight: 500 }
+                      : {
+                          color: token.color,
+                          fontStyle:
+                            token.fontStyle === 1 ? "italic" : undefined,
+                        }
+                  }
+                >
+                  {token.content}
+                </span>
+              ))}
             </span>
           ))}
         </code>

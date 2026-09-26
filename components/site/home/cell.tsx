@@ -45,7 +45,7 @@ export function Cell({
         </Label>
         <h3
           className={cn(
-            "font-semibold tracking-tight text-(--ink)",
+            "font-display font-bold tracking-tight text-(--ink)",
             featured ? "text-2xl leading-8" : "text-lg leading-7"
           )}
         >
@@ -53,7 +53,7 @@ export function Cell({
         </h3>
         <p className="text-sm leading-5 text-(--ink-muted)">{description}</p>
       </div>
-      <div className="rounded-lg border bg-background p-5 text-foreground">
+      <div className="rounded-lg border bg-background p-5 font-sans text-foreground">
         {children}
       </div>
     </article>

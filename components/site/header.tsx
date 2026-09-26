@@ -14,7 +14,7 @@ export function Header() {
       line={false}
       className="flex h-14 items-center gap-5 px-3 sm:px-6 lg:h-[60px]"
     >
-      <Link href="/" className="mr-auto font-semibold tracking-tight">
+      <Link href="/" className="mr-auto font-display font-bold tracking-tight">
         SureUI<span className="text-(--mark-text)">.</span>
       </Link>
       <Link
