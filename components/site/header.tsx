@@ -1,29 +1,37 @@
 import Link from "next/link"
 
-import { githubUrl } from "@/components/site/families"
+import { buttonVariants } from "@/components/ui/button"
+import { Band } from "@/components/site/frame"
+import { GitHubIcon } from "@/components/site/github-icon"
+import { SiteLink } from "@/components/site/site-link"
+import { githubUrl } from "@/components/site/styles"
 import { ThemeToggle } from "@/components/site/theme-toggle"
 
 export function Header() {
   return (
-    <header className="border-b">
-      <div className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4 text-sm">
-        <Link href="/" className="mr-auto font-medium">
-          SureUI
-        </Link>
-        <Link
-          href="/docs"
-          className="text-muted-foreground hover:text-foreground"
-        >
-          Docs
-        </Link>
-        <a
+    <Band
+      line={false}
+      className="flex h-14 items-center gap-5 px-3 sm:px-6 lg:h-[60px]"
+    >
+      <Link href="/" className="mr-auto font-semibold tracking-tight">
+        SureUI<span className="text-(--mark-text)">.</span>
+      </Link>
+      <Link
+        href="/docs"
+        className="font-mono text-[11px] tracking-[0.1em] text-(--ink-muted) uppercase hover:text-(--ink)"
+      >
+        Docs
+      </Link>
+      <div className="-mr-1 -ml-2 flex items-center">
+        <SiteLink
           href={githubUrl}
-          className="text-muted-foreground hover:text-foreground"
+          aria-label="GitHub"
+          className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
         >
-          GitHub
-        </a>
+          <GitHubIcon />
+        </SiteLink>
         <ThemeToggle />
       </div>
-    </header>
+    </Band>
   )
 }

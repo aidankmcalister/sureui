@@ -139,6 +139,15 @@ function ConfirmButton({
     []
   )
 
+  const shown = state === "armed" || state === "undo" ? state : "idle"
+  const labels = [
+    { state: "idle", node: children },
+    ...(gesture === "click-again"
+      ? [{ state: "armed", node: confirmLabel }]
+      : []),
+    ...(undo ? [{ state: "undo", node: undoLabel }] : []),
+  ]
+
   const holdDescribedBy =
     gesture === "hold"
       ? [hintId, describedBy].filter(Boolean).join(" ")
@@ -152,7 +161,8 @@ function ConfirmButton({
         data-state={state}
         className={cn(
           "relative overflow-hidden",
-          gesture === "hold" && "touch-none",
+          gesture === "hold" &&
+            "touch-none active:not-aria-[haspopup]:translate-y-0",
           className
         )}
         disabled={disabled || state === "pending"}
@@ -199,11 +209,20 @@ function ConfirmButton({
           aria-hidden
           className="absolute inset-0 origin-left scale-x-0 bg-current opacity-20"
         />
-        {state === "armed"
-          ? confirmLabel
-          : state === "undo"
-            ? undoLabel
-            : children}
+        <span className="grid gap-[inherit]">
+          {labels.map((label) => (
+            <span
+              key={label.state}
+              aria-hidden={label.state !== shown || undefined}
+              className={cn(
+                "col-start-1 row-start-1 inline-flex items-center justify-center gap-[inherit]",
+                label.state !== shown && "invisible"
+              )}
+            >
+              {label.node}
+            </span>
+          ))}
+        </span>
       </Button>
       {gesture === "hold" && (
         <span id={hintId} className="sr-only">

@@ -34,7 +34,9 @@ describe("ConfirmButton", () => {
     const button = screen.getByRole("button")
     await click(button)
     expect(button.getAttribute("data-state")).toBe("armed")
-    expect(button.textContent).toBe("Click again to confirm")
+    expect(button).toBe(
+      screen.getByRole("button", { name: "Click again to confirm" })
+    )
     vi.advanceTimersByTime(500)
     await click(button)
     expect(onConfirm).toHaveBeenCalledOnce()
@@ -162,6 +164,37 @@ describe("ConfirmButton", () => {
     )
   })
 
+  it("keeps every label in the layout so the width never changes", async () => {
+    render(
+      <ConfirmButton
+        gesture="click-again"
+        undo
+        confirmLabel="Are you sure?"
+        onConfirm={() => {}}
+      >
+        Remove
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button", { name: "Remove" })
+    const hidden = () =>
+      [...button.querySelectorAll("[aria-hidden=true].invisible")].map(
+        (label) => label.textContent
+      )
+    expect(hidden()).toEqual(["Are you sure?", "Undo"])
+    await click(button)
+    expect(screen.getByRole("button", { name: "Are you sure?" })).toBe(button)
+    expect(hidden()).toEqual(["Remove", "Undo"])
+  })
+
+  it("hold: the button does not shift while pressed", () => {
+    render(
+      <ConfirmButton gesture="hold" onConfirm={() => {}}>
+        Hold
+      </ConfirmButton>
+    )
+    expect(screen.getByRole("button").className).not.toContain("translate-y-px")
+  })
+
   it("hold: a consumer onKeyDown and onPointerDown both still run", async () => {
     const onConfirm = vi.fn()
     const consumerKeyDown = vi.fn()
@@ -283,7 +316,7 @@ describe("ConfirmButton", () => {
     const button = screen.getByRole("button")
     await click(button)
     expect(button.getAttribute("data-state")).toBe("undo")
-    expect(button.textContent).toBe("Undo")
+    expect(button).toBe(screen.getByRole("button", { name: "Undo" }))
     await click(button)
     expect(onCancel).toHaveBeenCalledOnce()
     await act(async () => vi.advanceTimersByTime(6000))

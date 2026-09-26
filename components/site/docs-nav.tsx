@@ -1,57 +1,99 @@
 "use client"
 
+import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 import { cn } from "@/lib/utils"
-import { families } from "@/components/site/families"
-
-type DocsPage = { href: string; title: string; group: string }
-
-const pages: DocsPage[] = [
-  { href: "/docs", title: "Introduction", group: "Getting started" },
-  {
-    href: "/docs/installation",
-    title: "Installation",
-    group: "Getting started",
-  },
-  ...families.map((family) => ({
-    href: `/docs/${family.slug}`,
-    title: family.name,
-    group: "Components",
-  })),
-]
+import { Button } from "@/components/ui/button"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+import { Label, Plus } from "@/components/site/frame"
+import { getPage, pages, type Page } from "@/components/site/styles"
 
 const groups = [...new Set(pages.map((page) => page.group))]
 
-export function DocsNav() {
+function DocsNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname()
 
   return (
-    <nav className="grid gap-6 text-sm">
+    <nav className="grid gap-7">
       {groups.map((group) => (
         <div key={group} className="grid gap-1">
-          <p className="px-2 pb-1 text-xs font-medium text-muted-foreground">
-            {group}
-          </p>
+          <Label className="px-[11px] pb-2">{group}</Label>
           {pages
             .filter((page) => page.group === group)
-            .map((page) => (
-              <Link
-                key={page.href}
-                href={page.href}
-                className={cn(
-                  "rounded-md px-2 py-1.5 text-muted-foreground hover:text-foreground",
-                  pathname === page.href &&
-                    "bg-muted font-medium text-foreground"
-                )}
-              >
-                {page.title}
-              </Link>
-            ))}
+            .map((page) => {
+              const current = pathname === page.href
+              return (
+                <Link
+                  key={page.href}
+                  href={page.href}
+                  aria-current={current ? "page" : undefined}
+                  onClick={onNavigate}
+                  className={cn(
+                    "flex items-center gap-2.5 rounded-md border border-transparent px-2.5 py-2 text-sm text-(--ink-muted) hover:text-(--ink)",
+                    current &&
+                      "border-(--rule) bg-background font-medium text-(--ink)"
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "font-mono text-[11px] text-(--ink-label)",
+                      current && "text-(--mark-text)"
+                    )}
+                  >
+                    {page.sheet}
+                  </span>
+                  {page.title}
+                </Link>
+              )
+            })}
         </div>
       ))}
     </nav>
+  )
+}
+
+export function DocsSidebar() {
+  return (
+    <aside className="hidden border-r border-(--rule) lg:block">
+      <div className="sticky top-0 max-h-svh overflow-y-auto px-4 py-6">
+        <DocsNav />
+      </div>
+    </aside>
+  )
+}
+
+export function DocsBar() {
+  const [open, setOpen] = React.useState(false)
+  const page = getPage(usePathname())
+
+  return (
+    <div className="flex h-14 items-center justify-between gap-4 px-3 sm:px-6">
+      <Label className="truncate">
+        <span className="text-(--mark-text)">{page?.sheet}</span> ·{" "}
+        {page?.title}
+      </Label>
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetTrigger render={<Button variant="outline" size="sm" />}>
+          Contents
+        </SheetTrigger>
+        <SheetContent side="left">
+          <SheetHeader>
+            <SheetTitle>Contents</SheetTitle>
+          </SheetHeader>
+          <div className="overflow-y-auto px-4 pb-6">
+            <DocsNav onNavigate={() => setOpen(false)} />
+          </div>
+        </SheetContent>
+      </Sheet>
+    </div>
   )
 }
 
@@ -62,9 +104,19 @@ export function DocsPager() {
   const next = pages[index + 1]
 
   return (
-    <nav className="grid grid-cols-2 gap-4">
-      {previous ? <PagerLink page={previous} label="Previous" /> : <span />}
-      {next && <PagerLink page={next} label="Next" className="text-right" />}
+    <nav className="relative grid gap-px border-t border-(--rule) bg-(--rule) sm:grid-cols-2">
+      <Plus side="left" className="lg:hidden" />
+      <Plus side="right" />
+      {previous ? (
+        <PagerLink page={previous} label="Previous" />
+      ) : (
+        <span className="hidden bg-(--paper) sm:block" />
+      )}
+      {next ? (
+        <PagerLink page={next} label="Next" className="sm:text-right" />
+      ) : (
+        <span className="hidden bg-(--paper) sm:block" />
+      )}
     </nav>
   )
 }
@@ -74,7 +126,7 @@ function PagerLink({
   label,
   className,
 }: {
-  page: DocsPage
+  page: Page
   label: string
   className?: string
 }) {
@@ -82,12 +134,14 @@ function PagerLink({
     <Link
       href={page.href}
       className={cn(
-        "grid gap-1 rounded-lg border p-4 hover:bg-muted/50",
+        "grid gap-2 bg-(--paper) px-3 py-8 hover:bg-background sm:px-6 lg:px-14",
         className
       )}
     >
-      <span className="text-xs text-muted-foreground">{label}</span>
-      <span className="font-medium">{page.title}</span>
+      <Label>
+        {label} · <span className="text-(--mark-text)">{page.sheet}</span>
+      </Label>
+      <span className="text-lg font-semibold tracking-tight">{page.title}</span>
     </Link>
   )
 }

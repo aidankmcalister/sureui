@@ -127,3 +127,22 @@
     @apply font-sans;
     }
 }
+:root {
+  --paper: #f4f4f2;
+  --ink: #18181b;
+  --ink-muted: #52525b;
+  --ink-label: #6b6b73;
+  --rule: #d4d4d0;
+  --mark: #ea580c;
+  --mark-text: #c2410c;
+}
+
+.dark {
+  --paper: #161617;
+  --ink: #f4f4f5;
+  --ink-muted: #a1a1aa;
+  --ink-label: #8b8b93;
+  --rule: #2e2e32;
+  --mark: #f97316;
+  --mark-text: #f97316;
+}

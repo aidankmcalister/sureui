@@ -1,24 +1,44 @@
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+
 export function PropsTable({ rows }: { rows: string[][] }) {
   return (
-    <div className="overflow-x-auto rounded-lg border">
-      <table className="w-full text-left text-sm">
-        <thead className="border-b bg-muted/50">
-          <tr>
-            <th className="p-3 font-medium">Name</th>
-            <th className="p-3 font-medium">Type</th>
-            <th className="p-3 font-medium">Default</th>
-          </tr>
-        </thead>
-        <tbody className="font-mono">
-          {rows.map(([name, type, value]) => (
-            <tr key={name} className="border-b last:border-0">
-              <td className="p-3">{name}</td>
-              <td className="p-3 text-muted-foreground">{type}</td>
-              <td className="p-3 text-muted-foreground">{value}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="rounded-[10px] border bg-background text-foreground">
+      <div className="hidden px-2 sm:block">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Default</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody className="font-mono">
+            {rows.map(([name, type, value]) => (
+              <TableRow key={name}>
+                <TableCell>{name}</TableCell>
+                <TableCell className="text-muted-foreground">{type}</TableCell>
+                <TableCell className="text-muted-foreground">{value}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+      <dl className="divide-y text-sm sm:hidden">
+        {rows.map(([name, type, value]) => (
+          <div key={name} className="grid gap-1 p-4 font-mono">
+            <dt className="font-medium">{name}</dt>
+            <dd className="text-muted-foreground">{type}</dd>
+            <dd className="text-xs text-muted-foreground">Default: {value}</dd>
+          </div>
+        ))}
+      </dl>
     </div>
   )
 }

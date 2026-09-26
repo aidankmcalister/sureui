@@ -1,4 +1,6 @@
-import { DocsNav, DocsPager } from "@/components/site/docs-nav"
+import { Toaster } from "@/components/ui/sonner"
+import { DocsBar, DocsPager, DocsSidebar } from "@/components/site/docs-nav"
+import { Band } from "@/components/site/frame"
 
 export default function DocsLayout({
   children,
@@ -6,22 +8,20 @@ export default function DocsLayout({
   children: React.ReactNode
 }>) {
   return (
-    <div className="mx-auto grid max-w-6xl gap-10 px-4 py-10 md:grid-cols-[12rem_1fr]">
-      <aside className="hidden md:block">
-        <div className="sticky top-10">
-          <DocsNav />
-        </div>
-      </aside>
-      <details className="rounded-lg border px-4 py-3 md:hidden">
-        <summary className="text-sm font-medium">Menu</summary>
-        <div className="pt-4">
-          <DocsNav />
-        </div>
-      </details>
-      <main className="grid max-w-3xl min-w-0 content-start gap-10">
-        {children}
-        <DocsPager />
-      </main>
-    </div>
+    <>
+      <div className="lg:hidden">
+        <Band>
+          <DocsBar />
+        </Band>
+      </div>
+      <Band grow className="grid lg:grid-cols-[240px_minmax(0,1fr)]">
+        <DocsSidebar />
+        <main className="flex min-w-0 flex-col">
+          <div className="flex-1">{children}</div>
+          <DocsPager />
+        </main>
+      </Band>
+      <Toaster />
+    </>
   )
 }
