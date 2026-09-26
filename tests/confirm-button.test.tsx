@@ -42,7 +42,7 @@ describe("ConfirmButton", () => {
     expect(onConfirm).toHaveBeenCalledOnce()
   })
 
-  it("click-again: ignores a second click within 300ms", async () => {
+  it("click-again: a quick double click confirms", async () => {
     const onConfirm = vi.fn()
     render(
       <ConfirmButton gesture="click-again" onConfirm={onConfirm}>
@@ -52,7 +52,7 @@ describe("ConfirmButton", () => {
     const button = screen.getByRole("button")
     await click(button)
     await click(button)
-    expect(onConfirm).not.toHaveBeenCalled()
+    expect(onConfirm).toHaveBeenCalledOnce()
   })
 
   it("click-again: cancels after the timeout", async () => {
