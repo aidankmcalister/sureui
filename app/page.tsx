@@ -1,9 +1,7 @@
 import Link from "next/link"
 
-import { buttonVariants } from "@/components/ui/button"
+import { Actions } from "@/components/site/actions"
 import { Band, Label } from "@/components/site/frame"
-import { GitHubIcon } from "@/components/site/github-icon"
-import { SiteLink } from "@/components/site/site-link"
 import { Cell } from "@/components/site/home/cell"
 import {
   ApiKeys,
@@ -15,7 +13,6 @@ import {
   Preferences,
   Workspace,
 } from "@/components/site/home/examples"
-import { githubUrl } from "@/components/site/styles"
 
 const grid =
   "grid grid-cols-1 gap-px bg-(--rule) md:grid-cols-2 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)_minmax(0,2fr)]"
@@ -45,26 +42,6 @@ const parts = [
     description: "Act right away and offer an undo in a toast.",
   },
 ]
-
-function Actions() {
-  return (
-    <div className="flex gap-2">
-      <Link
-        href="/docs/installation"
-        className={buttonVariants({ size: "lg" })}
-      >
-        Get started
-      </Link>
-      <SiteLink
-        href={githubUrl}
-        aria-label="GitHub"
-        className={buttonVariants({ variant: "outline", size: "icon-lg" })}
-      >
-        <GitHubIcon />
-      </SiteLink>
-    </div>
-  )
-}
 
 export default function Home() {
   return (

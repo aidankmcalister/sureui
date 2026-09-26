@@ -332,6 +332,7 @@ const files = [
 export function Files() {
   const [selected, setSelected] = React.useState(files.map((file) => file.name))
   const [trashed, setTrashed] = React.useState<string[]>([])
+  const [pending, setPending] = React.useState(false)
 
   return (
     <Outcome
@@ -358,7 +359,7 @@ export function Files() {
             >
               <Checkbox
                 checked={selected.includes(file.name)}
-                disabled={trashed.includes(file.name)}
+                disabled={pending || trashed.includes(file.name)}
                 onCheckedChange={(on) =>
                   setSelected((prev) =>
                     on
@@ -383,7 +384,10 @@ export function Files() {
             undo
             variant="outline"
             disabled={selected.length === 0}
+            onClick={() => setPending(true)}
+            onCancel={() => setPending(false)}
             onConfirm={() => {
+              setPending(false)
               setTrashed((prev) => [...prev, ...selected])
               setSelected([])
             }}

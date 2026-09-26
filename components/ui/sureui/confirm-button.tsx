@@ -46,7 +46,6 @@ function ConfirmButton({
   const { state, fillRef, arm, hold, release, confirm, cancel, announcement } =
     useConfirmation({ onConfirm, onCancel, undo })
   const hintId = React.useId()
-  const armedAtRef = React.useRef<number | null>(null)
 
   React.useEffect(() => {
     if (state !== "armed") return
@@ -65,16 +64,8 @@ function ConfirmButton({
       return
     }
     if (gesture === "click-again") {
-      if (state !== "armed") {
-        armedAtRef.current = performance.now()
-        arm()
-      } else if (
-        armedAtRef.current !== null &&
-        performance.now() - armedAtRef.current > 300
-      ) {
-        armedAtRef.current = null
-        confirm()
-      }
+      if (state === "armed") confirm()
+      else arm()
     }
   }, [state, gesture, cancel, confirm, arm])
 

@@ -8,6 +8,11 @@ import { SiteLink } from "@/components/site/site-link"
 import { githubUrl } from "@/components/site/styles"
 import { ThemeToggle } from "@/components/site/theme-toggle"
 
+const links = [
+  { href: "/docs", label: "Docs" },
+  { href: "/blocks", label: "Blocks" },
+]
+
 export function Header() {
   return (
     <Band
@@ -17,15 +22,18 @@ export function Header() {
       <Link href="/" className="mr-auto font-display font-bold tracking-tight">
         SureUI<span className="text-(--mark-text)">.</span>
       </Link>
-      <Link
-        href="/docs"
-        className={cn(
-          tapTarget,
-          "font-mono text-[11px] tracking-[0.1em] text-(--ink-muted) uppercase hover:text-(--ink)"
-        )}
-      >
-        Docs
-      </Link>
+      {links.map((link) => (
+        <Link
+          key={link.href}
+          href={link.href}
+          className={cn(
+            tapTarget,
+            "font-mono text-[11px] tracking-[0.1em] text-(--ink-muted) uppercase hover:text-(--ink)"
+          )}
+        >
+          {link.label}
+        </Link>
+      ))}
       <div className="-mr-1 -ml-2 flex items-center">
         <SiteLink
           href={githubUrl}
