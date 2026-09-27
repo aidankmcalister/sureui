@@ -29,6 +29,8 @@ function ConfirmButton({
   onConfirm,
   onCancel,
   undo,
+  pauseUndoOnHover,
+  pauseUndoOnFocus,
   gesture = "click",
   confirmLabel = "Click again to confirm",
   undoLabel = "Undo",
@@ -62,7 +64,13 @@ function ConfirmButton({
     cancel,
     pauseUndo,
     resumeUndo,
-  } = useConfirmation({ onConfirm, onCancel, undo })
+  } = useConfirmation({
+    onConfirm,
+    onCancel,
+    undo,
+    pauseUndoOnHover,
+    pauseUndoOnFocus,
+  })
   const hintId = React.useId()
 
   React.useEffect(() => {

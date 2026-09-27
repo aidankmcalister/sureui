@@ -32,8 +32,7 @@ export default function Home() {
       <Band>
         <div className="grid gap-4 border-b border-(--rule) px-3 py-12 sm:px-6 sm:py-14">
           <h2 className="font-display text-3xl leading-9 font-bold tracking-[-0.04em] text-balance sm:text-[40px] sm:leading-[44px]">
-            <span className="block text-(--mark)">Eight real screens.</span>
-            Try every one.
+            Try it out.
           </h2>
           <p className="max-w-[560px] text-[17px] leading-7 text-pretty text-(--ink-muted)">
             Each asks in its own way, from a quick undo to a typed name. They
@@ -123,7 +122,7 @@ export default function Home() {
       </Band>
       <Band className="flex flex-wrap items-center justify-between gap-6 px-3 py-12 sm:px-6">
         <p className="font-display text-2xl font-bold tracking-tight">
-          Start with the one you need.
+          Free and open source. MIT licensed.
         </p>
         <Actions />
       </Band>

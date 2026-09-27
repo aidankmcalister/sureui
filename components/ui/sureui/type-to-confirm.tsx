@@ -30,6 +30,8 @@ function TypeToConfirm({
   onConfirm,
   onCancel,
   undo,
+  pauseUndoOnHover,
+  pauseUndoOnFocus,
   phrase,
   label,
   announcements,
@@ -44,6 +46,8 @@ function TypeToConfirm({
       onConfirm,
       onCancel,
       undo,
+      pauseUndoOnHover,
+      pauseUndoOnFocus,
     })
   const [value, setValue] = React.useState("")
   const [checked, setChecked] = React.useState<number[]>([])
