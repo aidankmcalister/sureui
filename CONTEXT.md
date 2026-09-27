@@ -10,7 +10,7 @@ SureUI is a shadcn/ui registry of confirmation controls. These terms are the sha
 
 **Surface**: where a confirmation appears. Inline is the default. A dialog is an optional surface that wraps an inline control, never the default.
 
-**Undo window**: an optional delay after confirming, before `onConfirm` runs. The control shows "Undo" while it drains. Undoing cancels. Unmounting during the window discards the confirmation without calling either handler.
+**Undo window**: an optional delay after confirming, before `onConfirm` runs. The control shows "Undo" while it drains. Undoing cancels. Leaving the control and coming back to it, by pointer or focus, pauses the window until you leave again. Unmounting during the window, including closing the tab, discards the confirmation without calling either handler.
 
 **Pending**: the state while an async `onConfirm` is running. The control is disabled until it settles.
 

@@ -27,6 +27,7 @@ export type Style = {
   items: string[]
   usage: string
   api: { name: string; rows: string[][] }[]
+  behavior?: string[]
   useWhen: string[]
   instead: { when: string; slug: string }[]
 }
@@ -70,6 +71,14 @@ if (await undoToast("Moved 3 files to trash")) {
           ["undoLabel", "string", '"Undo"'],
         ],
       },
+    ],
+    behavior: [
+      "Nothing runs until the window ends: 5 seconds by default, or the number you pass, at least 4 seconds.",
+      "Undo calls onCancel, and onConfirm never runs.",
+      "If someone leaves the button and comes back to it, by pointer or keyboard, the window pauses until they leave again.",
+      "Unmounting the control during the window drops the action without calling either handler. Closing the tab does the same.",
+      "undoToast pauses while the toast is hovered, like any Sonner toast.",
+      "Keep a trash or history view too, so people can still restore things after the window closes.",
     ],
     useWhen: [
       "Moving files to trash, archiving mail, hiding a post.",
