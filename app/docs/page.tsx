@@ -30,19 +30,19 @@ export default function Introduction() {
     <>
       <DocsHeader
         href="/docs"
-        lead="What SureUI is, and how it decides how much to ask of people."
+        lead="What SureUI is, and how to choose how much to ask of people."
       />
       <DocsSection label="The idea">
         <Prose>
           <p>
-            When every action opens an “Are you sure?” dialog, people stop
-            reading and confirm on reflex. The one dialog that matters gets the
-            same click as the fifty that didn&apos;t.
+            When every action opens an &quot;Are you sure?&quot; dialog, people
+            stop reading and confirm on reflex, so the one dialog that matters
+            gets the same click as the fifty before it.
           </p>
           <p>
             SureUI gives you more ways to ask: an undo, a second click, a hold,
-            a typed name, or a dialog when you want one. Pick whichever fits the
-            moment.
+            a typed name, or a dialog when you want one. If you&apos;re not sure
+            which fits, the Which one page has a question for each.
           </p>
         </Prose>
       </DocsSection>

@@ -17,8 +17,9 @@ export default function Blocks() {
           coming soon.
         </h1>
         <p className="max-w-140 text-[19px] leading-7.5 text-pretty text-(--ink-muted)">
-          Full sections built from SureUI components, like a settings danger
-          zone or an account deletion flow, ready to drop into your app.
+          Full screens built from SureUI components, like a settings danger zone
+          or an account deletion flow. You&apos;ll add them with the shadcn CLI,
+          the same way as the components.
         </p>
         <Actions />
       </Band>

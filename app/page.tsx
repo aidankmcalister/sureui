@@ -24,8 +24,9 @@ export default function Home() {
           for shadcn/ui.
         </h1>
         <p className="max-w-140 text-[19px] leading-7.5 text-pretty text-(--ink-muted)">
-          Hold, click again, type to confirm and undo. Add them with the shadcn
-          CLI. They build on your own shadcn components.
+          Hold, click again, type to confirm, undo and dialogs. You add them
+          with the shadcn CLI, and they build on the shadcn components already
+          in your app.
         </p>
         <Actions />
       </Band>
@@ -35,8 +36,8 @@ export default function Home() {
             Try it out.
           </h2>
           <p className="max-w-140 text-[17px] leading-7 text-pretty text-(--ink-muted)">
-            SureUI in the kind of apps you already build, from dashboards to
-            messaging. Every example works.
+            Each example is a working screen from an everyday app, like project
+            settings or a message inbox.
           </p>
         </div>
         <div className={grid}>
@@ -46,7 +47,7 @@ export default function Home() {
             gesture="Which one"
             href="/docs/which-one"
             title="A project danger zone"
-            description="Three actions, three levels of risk, three ways to ask."
+            description="Pause, transfer and delete, each asking a different amount."
           >
             <DangerZone />
           </Cell>
@@ -73,7 +74,7 @@ export default function Home() {
             gesture="Dialog"
             href="/docs/dialogs"
             title="Leaving a shared workspace"
-            description="A dialog, only when there is something to explain."
+            description="A dialog, because leaving affects everyone else in it."
           >
             <Workspace />
           </Cell>
@@ -105,7 +106,7 @@ export default function Home() {
             gesture="Click again"
             href="/docs/click-again"
             title="Removing a teammate"
-            description="Each row asks again in place before removing."
+            description="Each row asks again in place before it removes anyone."
           >
             <Members />
           </Cell>

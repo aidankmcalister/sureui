@@ -89,7 +89,7 @@ if (await undoToast("Moved 3 files to trash")) {
     useWhen: [
       "Moving files to trash, archiving mail, hiding a post.",
       "People do it many times a day and expect it to be instant.",
-      "A mistake is noticed right after it happens.",
+      "People usually spot the mistake right away.",
     ],
     instead: [
       { when: "Nothing can bring it back", slug: "type-to-confirm" },
@@ -129,7 +129,6 @@ if (await undoToast("Moved 3 files to trash")) {
     useWhen: [
       "Archiving one message or removing one row.",
       "Space is tight and a dialog would be too much.",
-      "Keyboard users need the same quick path as mouse users.",
     ],
     instead: [
       { when: "It's easy to reverse", slug: "undo" },
@@ -168,11 +167,9 @@ if (await undoToast("Moved 3 files to trash")) {
     useWhen: [
       "Revoking an API key or resetting preferences.",
       "Touch screens, where a second tap happens by accident.",
-      "The effort should feel deliberate without opening anything.",
     ],
     instead: [
       { when: "People need to read what happens first", slug: "dialogs" },
-      { when: "It's easy to reverse", slug: "undo" },
       { when: "It's permanent and large", slug: "type-to-confirm" },
     ],
   },
@@ -180,7 +177,7 @@ if (await undoToast("Moved 3 files to trash")) {
     slug: "dialogs",
     name: "Dialogs",
     lead: "An optional alert dialog for actions that need a sentence of explanation.",
-    summary: "Opens a dialog, only when there is something to explain.",
+    summary: "Opens a dialog when there's something to explain.",
     question: "Does it need explaining, or affect other people?",
     interrupts: "Yes",
     reads: "Yes",
