@@ -19,11 +19,11 @@ export default function Home() {
   return (
     <main>
       <Band className="grid gap-6 px-3 py-14 sm:px-6 sm:py-16 lg:py-20">
-        <h1 className="font-display text-4xl leading-10 font-bold tracking-[-0.04em] text-balance sm:text-[44px] sm:leading-[48px] lg:text-[64px] lg:leading-[68px]">
+        <h1 className="font-display text-4xl leading-10 font-bold tracking-[-0.04em] text-balance sm:text-[44px] sm:leading-12 lg:text-[64px] lg:leading-17">
           <span className="block text-(--mark)">Confirmation components</span>
           for shadcn/ui.
         </h1>
-        <p className="max-w-[560px] text-[19px] leading-[30px] text-pretty text-(--ink-muted)">
+        <p className="max-w-140 text-[19px] leading-7.5 text-pretty text-(--ink-muted)">
           Hold, click again, type to confirm and undo. Add them with the shadcn
           CLI. They build on your own shadcn components.
         </p>
@@ -31,10 +31,10 @@ export default function Home() {
       </Band>
       <Band>
         <div className="grid gap-4 border-b border-(--rule) px-3 py-12 sm:px-6 sm:py-14">
-          <h2 className="font-display text-3xl leading-9 font-bold tracking-[-0.04em] text-balance sm:text-[40px] sm:leading-[44px]">
+          <h2 className="font-display text-3xl leading-9 font-bold tracking-[-0.04em] text-balance sm:text-[40px] sm:leading-11">
             Try it out.
           </h2>
-          <p className="max-w-[560px] text-[17px] leading-7 text-pretty text-(--ink-muted)">
+          <p className="max-w-140 text-[17px] leading-7 text-pretty text-(--ink-muted)">
             Each asks in its own way, from a quick undo to a typed name. They
             all work, and each one resets when you&apos;re done.
           </p>

@@ -25,7 +25,7 @@ function DocsNav({ onNavigate }: { onNavigate?: () => void }) {
     <nav className="grid gap-7">
       {groups.map((group) => (
         <div key={group} className="grid gap-1">
-          <Label className="px-[11px] pb-2">{group}</Label>
+          <Label className="px-2.75 pb-2">{group}</Label>
           {pages
             .filter((page) => page.group === group)
             .map((page) => {

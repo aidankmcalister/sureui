@@ -17,7 +17,7 @@ export function Header() {
   return (
     <Band
       line={false}
-      className="flex h-14 items-center gap-5 px-3 sm:px-6 lg:h-[60px]"
+      className="flex h-14 items-center gap-5 px-3 sm:px-6 lg:h-15"
     >
       <Link href="/" className="mr-auto font-display font-bold tracking-tight">
         SureUI<span className="text-(--mark-text)">.</span>

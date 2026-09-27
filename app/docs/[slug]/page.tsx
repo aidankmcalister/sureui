@@ -47,7 +47,7 @@ export default async function StylePage({ params }: Props) {
       </DocsSection>
       {style.behavior && (
         <DocsSection label="How it behaves">
-          <ul className="grid max-w-[640px] list-disc gap-3 pl-5 text-sm text-pretty marker:text-(--ink-label)">
+          <ul className="grid max-w-160 list-disc gap-3 pl-5 text-sm text-pretty marker:text-(--ink-label)">
             {style.behavior.map((item) => (
               <li key={item}>{item}</li>
             ))}
