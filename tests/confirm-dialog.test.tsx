@@ -97,6 +97,62 @@ describe("ConfirmDialog", () => {
     await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
   })
 
+  it("phrase: Cancel and Confirm share the footer", async () => {
+    render(
+      <ConfirmDialog title="Delete project?" phrase="acme" onConfirm={vi.fn()}>
+        <Button>Delete project</Button>
+      </ConfirmDialog>
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Delete project" }))
+    const cancel = await screen.findByRole("button", { name: "Cancel" })
+    const footer = cancel.parentElement!
+    expect(footer.getAttribute("data-slot")).toBe("alert-dialog-footer")
+    expect(screen.getByRole("button", { name: "Confirm" }).parentElement).toBe(
+      footer
+    )
+  })
+
+  it("phrase: Enter in the input confirms and closes", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmDialog
+        title="Delete project?"
+        phrase="acme"
+        onConfirm={onConfirm}
+      >
+        <Button>Delete project</Button>
+      </ConfirmDialog>
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Delete project" }))
+    const input = await screen.findByRole("textbox")
+    fireEvent.change(input, { target: { value: "acme" } })
+    fireEvent.submit(input)
+    await waitFor(() => expect(onConfirm).toHaveBeenCalledOnce())
+    await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
+  })
+
+  it("phrase: Cancel closes without confirming", async () => {
+    const onConfirm = vi.fn()
+    const onCancel = vi.fn()
+    render(
+      <ConfirmDialog
+        title="Delete project?"
+        phrase="acme"
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+      >
+        <Button>Delete project</Button>
+      </ConfirmDialog>
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Delete project" }))
+    const input = await screen.findByRole("textbox")
+    fireEvent.change(input, { target: { value: "acme" } })
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }))
+    await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
+    expect(onCancel).toHaveBeenCalledOnce()
+    expect(onConfirm).not.toHaveBeenCalled()
+  })
+
   it("async: stays open while pending and closes once resolved", async () => {
     let resolve!: () => void
     const onConfirm = vi.fn(() => new Promise<void>((res) => (resolve = res)))

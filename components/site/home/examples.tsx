@@ -369,7 +369,7 @@ export function Files() {
                 }
               />
               <FileIcon className="size-4 text-muted-foreground" />
-              <span className="flex-1 truncate">{file.name}</span>
+              <span className="flex-1 truncate font-medium">{file.name}</span>
               <span className="hidden font-mono text-xs text-muted-foreground sm:inline">
                 {file.size}
               </span>

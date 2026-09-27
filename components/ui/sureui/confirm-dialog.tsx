@@ -140,6 +140,10 @@ function ConfirmContent({
   pending?: boolean
   onConfirm: () => void | Promise<unknown>
 }) {
+  const cancel = (
+    <AlertDialogCancel disabled={pending}>{cancelLabel}</AlertDialogCancel>
+  )
+
   return (
     <AlertDialogContent>
       <AlertDialogHeader>
@@ -148,18 +152,23 @@ function ConfirmContent({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         )}
       </AlertDialogHeader>
-      {phrase && (
+      {phrase ? (
         <TypeToConfirm
           phrase={phrase}
           acknowledgements={acknowledgements}
           confirmLabel={confirmLabel}
           variant={variant}
           onConfirm={onConfirm}
+          renderActions={(confirmButton) => (
+            <AlertDialogFooter>
+              {cancel}
+              {confirmButton}
+            </AlertDialogFooter>
+          )}
         />
-      )}
-      <AlertDialogFooter>
-        <AlertDialogCancel disabled={pending}>{cancelLabel}</AlertDialogCancel>
-        {!phrase && (
+      ) : (
+        <AlertDialogFooter>
+          {cancel}
           <ConfirmButton
             gesture={gesture}
             variant={variant}
@@ -167,8 +176,8 @@ function ConfirmContent({
           >
             {confirmLabel}
           </ConfirmButton>
-        )}
-      </AlertDialogFooter>
+        </AlertDialogFooter>
+      )}
     </AlertDialogContent>
   )
 }

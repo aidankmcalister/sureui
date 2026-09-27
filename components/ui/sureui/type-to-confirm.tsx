@@ -23,6 +23,7 @@ type TypeToConfirmProps = ConfirmationOptions & {
   undoLabel?: string
   variant?: React.ComponentProps<typeof Button>["variant"]
   acknowledgements?: string[]
+  renderActions?: (confirmButton: React.ReactElement) => React.ReactNode
   className?: string
 }
 
@@ -39,6 +40,7 @@ function TypeToConfirm({
   undoLabel = "Undo",
   variant = "destructive",
   acknowledgements = [],
+  renderActions,
   className,
 }: TypeToConfirmProps) {
   const { state, fillRef, confirm, cancel, pauseUndo, resumeUndo } =
@@ -55,6 +57,28 @@ function TypeToConfirm({
 
   const matches = value === phrase
   const ready = matches && checked.length === acknowledgements.length
+
+  const confirmButton = (
+    <Button
+      type={state === "undo" ? "button" : "submit"}
+      variant={variant}
+      data-state={state}
+      disabled={state === "undo" ? false : !ready || state === "pending"}
+      className="relative justify-self-start overflow-hidden"
+      onClick={state === "undo" ? cancel : undefined}
+      onPointerEnter={() => pauseUndo("hover")}
+      onPointerLeave={() => resumeUndo("hover")}
+      onFocus={() => pauseUndo("focus")}
+      onBlur={() => resumeUndo("focus")}
+    >
+      <span
+        ref={fillRef}
+        aria-hidden
+        className="absolute inset-0 origin-left scale-x-0 bg-current opacity-20"
+      />
+      {state === "undo" ? undoLabel : confirmLabel}
+    </Button>
+  )
 
   return (
     <form
@@ -92,7 +116,7 @@ function TypeToConfirm({
         </p>
       </div>
       {acknowledgements.map((text, index) => (
-        <Label key={index} className="font-normal">
+        <Label key={index} className="leading-normal font-normal">
           <Checkbox
             checked={checked.includes(index)}
             disabled={state === "pending"}
@@ -105,25 +129,7 @@ function TypeToConfirm({
           {text}
         </Label>
       ))}
-      <Button
-        type={state === "undo" ? "button" : "submit"}
-        variant={variant}
-        data-state={state}
-        disabled={state === "undo" ? false : !ready || state === "pending"}
-        className="relative justify-self-start overflow-hidden"
-        onClick={state === "undo" ? cancel : undefined}
-        onPointerEnter={() => pauseUndo("hover")}
-        onPointerLeave={() => resumeUndo("hover")}
-        onFocus={() => pauseUndo("focus")}
-        onBlur={() => resumeUndo("focus")}
-      >
-        <span
-          ref={fillRef}
-          aria-hidden
-          className="absolute inset-0 origin-left scale-x-0 bg-current opacity-20"
-        />
-        {state === "undo" ? undoLabel : confirmLabel}
-      </Button>
+      {renderActions ? renderActions(confirmButton) : confirmButton}
     </form>
   )
 }

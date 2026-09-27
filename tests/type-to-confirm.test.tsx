@@ -236,4 +236,57 @@ describe("TypeToConfirm", () => {
     })
     expect(onConfirm).toHaveBeenCalledOnce()
   })
+
+  it("inline: the confirm button sits in the form by default", () => {
+    render(<TypeToConfirm phrase="acme" onConfirm={vi.fn()} />)
+    const form = screen.getByRole("textbox").closest("form")
+    expect(screen.getByRole("button", { name: "Confirm" }).parentElement).toBe(
+      form
+    )
+  })
+
+  it("renderActions places the confirm button and Enter still submits", () => {
+    const onConfirm = vi.fn()
+    render(
+      <TypeToConfirm
+        phrase="acme"
+        onConfirm={onConfirm}
+        renderActions={(confirmButton) => (
+          <div data-testid="actions">
+            <button type="button">Back</button>
+            {confirmButton}
+          </div>
+        )}
+      />
+    )
+    const actions = screen.getByTestId("actions")
+    expect(screen.getByRole("button", { name: "Confirm" }).parentElement).toBe(
+      actions
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Back" }))
+    type("acme")
+    fireEvent.submit(screen.getByRole("textbox"))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("renderActions: undo still pauses on hover", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <TypeToConfirm
+        phrase="acme"
+        undo
+        onConfirm={onConfirm}
+        renderActions={(confirmButton) => <div>{confirmButton}</div>}
+      />
+    )
+    type("acme")
+    await act(async () => fireEvent.submit(screen.getByRole("textbox")))
+    const undoButton = screen.getByRole("button", { name: "Undo" })
+    fireEvent.pointerLeave(undoButton)
+    fireEvent.pointerEnter(undoButton)
+    await act(async () => vi.advanceTimersByTime(10000))
+    expect(onConfirm).not.toHaveBeenCalled()
+    fireEvent.click(undoButton)
+    expect(screen.getByRole("button", { name: "Confirm" })).toBeTruthy()
+  })
 })

@@ -59,7 +59,7 @@ export default function Introduction() {
               </Label>
               <span className="grid gap-1">
                 <span className="font-semibold">{style.name}</span>
-                <span className="text-sm text-(--ink-muted)">
+                <span className="text-sm text-pretty text-(--ink-muted)">
                   {style.summary}
                 </span>
               </span>

@@ -64,7 +64,9 @@ export default function Installation() {
               <div className="grid grid-cols-1 gap-4">
                 <div className="grid gap-1">
                   <h2 className="font-semibold">{step.title}</h2>
-                  <p className="text-sm text-(--ink-muted)">{step.body}</p>
+                  <p className="text-sm text-pretty text-(--ink-muted)">
+                    {step.body}
+                  </p>
                 </div>
                 {step.content}
               </div>

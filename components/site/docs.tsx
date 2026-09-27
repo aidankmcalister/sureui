@@ -57,7 +57,7 @@ export function DocsHeader({
         <h1 className="font-display text-[34px] leading-10 font-bold tracking-[-0.04em] lg:text-[44px] lg:leading-[52px]">
           {page?.title}
         </h1>
-        <p className="max-w-[640px] text-base leading-7 text-(--ink-muted) lg:text-lg lg:leading-8">
+        <p className="max-w-[640px] text-base leading-7 text-pretty text-(--ink-muted) lg:text-lg lg:leading-8">
           {lead}
         </p>
       </div>
@@ -68,7 +68,7 @@ export function DocsHeader({
 
 export function Prose({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid max-w-[680px] gap-4 text-base leading-7 text-(--ink-muted) [&_code]:font-mono [&_code]:text-[0.9em] [&_code]:text-(--ink)">
+    <div className="grid max-w-[560px] gap-4 text-base leading-7 text-pretty text-(--ink-muted) [&_code]:font-mono [&_code]:text-[0.9em] [&_code]:text-(--ink)">
       {children}
     </div>
   )

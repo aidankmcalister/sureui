@@ -2,7 +2,7 @@ import Link from "next/link"
 
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { Band, tapTarget } from "@/components/site/frame"
+import { Band, Label, tapTarget } from "@/components/site/frame"
 import { GitHubIcon } from "@/components/site/github-icon"
 import { SiteLink } from "@/components/site/site-link"
 import { githubUrl } from "@/components/site/styles"
@@ -28,10 +28,10 @@ export function Header() {
           href={link.href}
           className={cn(
             tapTarget,
-            "font-mono text-[11px] tracking-[0.1em] text-(--ink-muted) uppercase hover:text-(--ink)"
+            "flex text-(--ink-muted) hover:text-(--ink)"
           )}
         >
-          {link.label}
+          <Label className="text-inherit">{link.label}</Label>
         </Link>
       ))}
       <div className="-mr-1 -ml-2 flex items-center">

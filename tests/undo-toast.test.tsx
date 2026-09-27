@@ -57,3 +57,104 @@ describe("undoToast", () => {
     expect(warn).toHaveBeenCalledOnce()
   })
 })
+
+describe("undoToast pausing", () => {
+  function track(promise: Promise<boolean>) {
+    const state: { value?: boolean } = {}
+    promise.then((value) => (state.value = value))
+    return state
+  }
+
+  async function advance(ms: number) {
+    await act(async () => vi.advanceTimersByTime(ms))
+  }
+
+  async function show(options?: Parameters<typeof undoToast>[1]) {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "performance"] })
+    render(<Toaster />)
+    let result!: Promise<boolean>
+    act(() => {
+      result = undoToast("Deleted", options)
+    })
+    await advance(0)
+    return {
+      state: track(result),
+      undo: screen.getByRole("button", { name: "Undo" }),
+    }
+  }
+
+  it("pauses while focus is inside the toast", async () => {
+    const { state, undo } = await show()
+    await advance(1000)
+    act(() => undo.focus())
+    await advance(20000)
+    expect(state.value).toBeUndefined()
+    act(() => undo.blur())
+    await advance(3999)
+    expect(state.value).toBeUndefined()
+    await advance(1)
+    expect(state.value).toBe(true)
+  })
+
+  it("stays paused while focus moves within the toaster", async () => {
+    const { state, undo } = await show()
+    act(() => undo.focus())
+    const toaster = undo.closest<HTMLElement>("[data-sonner-toaster]")!
+    act(() => toaster.focus())
+    await advance(20000)
+    expect(state.value).toBeUndefined()
+    act(() => toaster.blur())
+    await advance(5000)
+    expect(state.value).toBe(true)
+  })
+
+  it("pauses when the Sonner hotkey focuses the toaster", async () => {
+    const { state } = await show()
+    act(() => {
+      fireEvent.keyDown(document, { altKey: true, code: "KeyT" })
+    })
+    await advance(20000)
+    expect(state.value).toBeUndefined()
+  })
+
+  it("keeps running on focus when pauseOnFocus is false", async () => {
+    const { state, undo } = await show({ pauseOnFocus: false })
+    act(() => undo.focus())
+    await advance(4999)
+    expect(state.value).toBeUndefined()
+    await advance(1)
+    expect(state.value).toBe(true)
+  })
+
+  it("pauses while the toaster is hovered", async () => {
+    const { state, undo } = await show()
+    const toaster = undo.closest("[data-sonner-toaster]")!
+    await advance(2000)
+    fireEvent.pointerEnter(toaster)
+    await advance(20000)
+    expect(state.value).toBeUndefined()
+    fireEvent.pointerLeave(toaster)
+    await advance(2999)
+    expect(state.value).toBeUndefined()
+    await advance(1)
+    expect(state.value).toBe(true)
+  })
+
+  it("keeps running on hover when pauseOnHover is false", async () => {
+    const { state, undo } = await show({ pauseOnHover: false })
+    fireEvent.pointerEnter(undo.closest("[data-sonner-toaster]")!)
+    await advance(4999)
+    expect(state.value).toBeUndefined()
+    await advance(1)
+    expect(state.value).toBe(true)
+  })
+
+  it("resolves false when undo is pressed from the keyboard", async () => {
+    const { state, undo } = await show()
+    act(() => undo.focus())
+    await advance(20000)
+    fireEvent.click(undo)
+    await advance(0)
+    expect(state.value).toBe(false)
+  })
+})
