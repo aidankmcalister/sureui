@@ -12,6 +12,8 @@ Confirmation components for [shadcn/ui](https://ui.shadcn.com). `ConfirmButton`,
 
 ## Install
 
+SureUI is built for [Base UI](https://base-ui.com), the shadcn/ui default.
+
 ```bash
 npx shadcn add @sureui/confirm-button
 npx shadcn add @sureui/type-to-confirm

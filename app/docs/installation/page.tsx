@@ -49,7 +49,7 @@ export default function Installation() {
     <>
       <DocsHeader
         href="/docs/installation"
-        lead="Add only the pieces you use with the shadcn CLI."
+        lead="Add only the pieces you use with the shadcn CLI. SureUI is built for Base UI, the shadcn default."
       />
       <DocsSection label="Steps">
         <ol className="divide-y divide-(--rule) border border-(--rule)">

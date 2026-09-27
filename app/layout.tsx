@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils"
 import { Footer } from "@/components/site/footer"
 import { Header } from "@/components/site/header"
+import { siteUrl } from "@/components/site/styles"
 
 const fontSans = Geist({ subsets: ["latin"], variable: "--font-sans" })
 
@@ -21,6 +22,7 @@ const fontMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: { default: "SureUI", template: "%s · SureUI" },
   description: "Confirmation components for shadcn/ui.",
 }
