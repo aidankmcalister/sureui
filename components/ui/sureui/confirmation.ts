@@ -52,40 +52,53 @@ function useConfirmation(options: ConfirmationOptions) {
     }
   }, [clearTimer, cancelAnimation])
 
-  const commit = React.useCallback(() => {
-    clearTimer()
-    cancelAnimation()
-    const result = optionsRef.current.onConfirm()
-    if (result && typeof (result as PromiseLike<unknown>).then === "function") {
-      setState("pending")
-      ;(async () => {
-        try {
-          await result
-        } finally {
-          setState("idle")
-        }
-      })()
-    } else {
-      setState("idle")
-    }
-  }, [clearTimer, cancelAnimation])
+  const commit = React.useCallback(
+    (run: ConfirmationOptions["onConfirm"]) => {
+      clearTimer()
+      cancelAnimation()
+      let result: ReturnType<ConfirmationOptions["onConfirm"]>
+      try {
+        result = run()
+      } catch (error) {
+        setState("idle")
+        throw error
+      }
+      if (
+        result &&
+        typeof (result as PromiseLike<unknown>).then === "function"
+      ) {
+        setState("pending")
+        ;(async () => {
+          try {
+            await result
+          } finally {
+            setState("idle")
+          }
+        })()
+      } else {
+        setState("idle")
+      }
+    },
+    [clearTimer, cancelAnimation]
+  )
 
   const confirm = React.useCallback(() => {
-    const undo = optionsRef.current.undo
+    const { undo, onConfirm } = optionsRef.current
+    clearTimer()
     if (undo) {
       const undoMs = undo === true ? 5000 : Math.max(undo, 4000)
       cancelAnimation()
       setState("undo")
-      timerRef.current = setTimeout(commit, undoMs)
+      timerRef.current = setTimeout(() => commit(onConfirm), undoMs)
       animationRef.current =
         fillRef.current?.animate?.([{ scale: "1 1" }, { scale: "0 1" }], {
           duration: undoMs,
           easing: "linear",
         }) ?? null
     } else {
-      commit()
+      commit(onConfirm)
     }
-  }, [commit, cancelAnimation])
+  }, [commit, clearTimer, cancelAnimation])
 
   const arm = React.useCallback(() => {
     setState("armed")

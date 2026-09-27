@@ -86,6 +86,32 @@ describe("TypeToConfirm", () => {
     expect(onConfirm).not.toHaveBeenCalled()
   })
 
+  it("undo: re-submitting during the window does not commit twice or survive Undo", async () => {
+    const onConfirm = vi.fn()
+    render(<TypeToConfirm phrase="acme" undo onConfirm={onConfirm} />)
+    const form = screen.getByRole("textbox").closest("form")!
+    type("acme")
+    await act(async () => fireEvent.submit(form))
+    type("acme")
+    await act(async () => fireEvent.submit(form))
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }))
+    await act(async () => vi.advanceTimersByTime(10000))
+    expect(onConfirm).not.toHaveBeenCalled()
+  })
+
+  it("undo: commits once after the window", async () => {
+    const onConfirm = vi.fn()
+    render(<TypeToConfirm phrase="acme" undo onConfirm={onConfirm} />)
+    type("acme")
+    await act(async () =>
+      fireEvent.submit(screen.getByRole("textbox").closest("form")!)
+    )
+    await act(async () => vi.advanceTimersByTime(5000))
+    expect(onConfirm).toHaveBeenCalledOnce()
+    await act(async () => vi.advanceTimersByTime(10000))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
   it("async: pending onConfirm disables the button", async () => {
     let resolve!: () => void
     const onConfirm = vi.fn(() => new Promise<void>((res) => (resolve = res)))

@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button"
 import {
   ConfirmDialog,
   useConfirm,
-  type ConfirmDialogOptions,
 } from "@/components/ui/sureui/confirm-dialog"
 
 afterEach(() => {
@@ -121,32 +120,75 @@ describe("ConfirmDialog", () => {
     await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
     expect(onConfirm).toHaveBeenCalledOnce()
   })
+
+  it("calls onCancel on Cancel but not after confirming", async () => {
+    const onConfirm = vi.fn()
+    const onCancel = vi.fn()
+    render(
+      <ConfirmDialog title="Delete?" onConfirm={onConfirm} onCancel={onCancel}>
+        <Button>Delete</Button>
+      </ConfirmDialog>
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Delete" }))
+    fireEvent.click(await screen.findByRole("button", { name: "Cancel" }))
+    expect(onCancel).toHaveBeenCalledOnce()
+    await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
+    fireEvent.click(screen.getByRole("button", { name: "Delete" }))
+    fireEvent.click(await screen.findByRole("button", { name: "Confirm" }))
+    await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
+    expect(onConfirm).toHaveBeenCalledOnce()
+    expect(onCancel).toHaveBeenCalledOnce()
+  })
+
+  it("ignores Cancel and Escape while onConfirm is pending", async () => {
+    let resolve!: () => void
+    const onConfirm = vi.fn(() => new Promise<void>((res) => (resolve = res)))
+    const onCancel = vi.fn()
+    render(
+      <ConfirmDialog
+        title="Leave team?"
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+      >
+        <Button>Leave</Button>
+      </ConfirmDialog>
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Leave" }))
+    fireEvent.click(await screen.findByRole("button", { name: "Confirm" }))
+    const cancel = screen.getByRole("button", { name: "Cancel" })
+    await waitFor(() => expect(cancel).toHaveProperty("disabled", true))
+    fireEvent.keyDown(document.activeElement ?? document.body, {
+      key: "Escape",
+    })
+    await act(async () => {})
+    expect(screen.getByRole("alertdialog")).toBeTruthy()
+    expect(onCancel).not.toHaveBeenCalled()
+    await act(async () => {
+      resolve()
+      await Promise.resolve()
+      await Promise.resolve()
+    })
+    await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
+    expect(onCancel).not.toHaveBeenCalled()
+  })
 })
 
-function Harness({
-  onReady,
-}: {
-  onReady: (
-    confirm: (
-      options: Omit<ConfirmDialogOptions, "onConfirm" | "onCancel">
-    ) => Promise<boolean>
-  ) => void
-}) {
+type Confirm = ReturnType<typeof useConfirm>["confirm"]
+
+function Harness({ onReady }: { onReady: (confirm: Confirm) => void }) {
   const { confirm, dialog } = useConfirm()
   onReady(confirm)
   return dialog
 }
 
-function renderHook() {
-  let confirm!: (
-    options: Omit<ConfirmDialogOptions, "onConfirm" | "onCancel">
-  ) => Promise<boolean>
+function renderHook(options: Parameters<Confirm>[0] = { title: "Discard?" }) {
+  let confirm!: Confirm
   const view = render(<Harness onReady={(fn) => (confirm = fn)} />)
   let result!: Promise<boolean>
   act(() => {
-    result = confirm({ title: "Discard?" })
+    result = confirm(options)
   })
-  return { result, view }
+  return { result, view, confirm }
 }
 
 describe("useConfirm", () => {
@@ -166,6 +208,34 @@ describe("useConfirm", () => {
     renderHook()
     const cancel = await screen.findByRole("button", { name: "Cancel" })
     await waitFor(() => expect(document.activeElement).toBe(cancel))
+  })
+
+  it("resolves true only after an async onConfirm settles", async () => {
+    let resolve!: () => void
+    const onConfirm = vi.fn(() => new Promise<void>((res) => (resolve = res)))
+    const { result } = renderHook({ title: "Discard?", onConfirm })
+    let settled: boolean | undefined
+    result.then((value) => (settled = value))
+    fireEvent.click(await screen.findByRole("button", { name: "Confirm" }))
+    await act(async () => {})
+    expect(onConfirm).toHaveBeenCalledOnce()
+    expect(settled).toBeUndefined()
+    expect(screen.getByRole("alertdialog")).toBeTruthy()
+    await act(async () => {
+      resolve()
+      await Promise.resolve()
+      await Promise.resolve()
+    })
+    await expect(result).resolves.toBe(true)
+    await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
+  })
+
+  it("a second confirm resolves the first with false", async () => {
+    const { result, confirm } = renderHook()
+    act(() => {
+      confirm({ title: "Again?" })
+    })
+    await expect(result).resolves.toBe(false)
   })
 
   it("resolves false on unmount", async () => {

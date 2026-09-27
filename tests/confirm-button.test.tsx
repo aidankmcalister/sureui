@@ -365,6 +365,80 @@ describe("ConfirmButton", () => {
     expect(onCancel).not.toHaveBeenCalled()
   })
 
+  it("undo: commits the onConfirm that was confirmed, not a later one", async () => {
+    const first = vi.fn()
+    const second = vi.fn()
+    const { rerender } = render(
+      <ConfirmButton undo onConfirm={first}>
+        Go
+      </ConfirmButton>
+    )
+    await click(screen.getByRole("button"))
+    rerender(
+      <ConfirmButton undo onConfirm={second}>
+        Go
+      </ConfirmButton>
+    )
+    await act(async () => vi.advanceTimersByTime(5000))
+    expect(first).toHaveBeenCalledOnce()
+    expect(second).not.toHaveBeenCalled()
+  })
+
+  it("undo: a throwing onConfirm returns to idle and rethrows", async () => {
+    render(
+      <ConfirmButton
+        undo
+        onConfirm={() => {
+          throw new Error("boom")
+        }}
+      >
+        Delete
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await click(button)
+    let error: unknown
+    act(() => {
+      try {
+        vi.advanceTimersByTime(5000)
+      } catch (caught) {
+        error = caught
+      }
+    })
+    expect((error as Error).message).toBe("boom")
+    expect(screen.getByRole("button", { name: "Delete" })).toBe(button)
+    expect(button.getAttribute("data-state")).toBe("idle")
+  })
+
+  it("hold: a throwing onConfirm returns to idle", () => {
+    const onCancel = vi.fn()
+    render(
+      <ConfirmButton
+        gesture="hold"
+        onCancel={onCancel}
+        onConfirm={() => {
+          throw new Error("boom")
+        }}
+      >
+        Hold to delete
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    fireEvent.pointerDown(button, { button: 0 })
+    let error: unknown
+    act(() => {
+      try {
+        vi.advanceTimersByTime(1200)
+      } catch (caught) {
+        error = caught
+      }
+    })
+    expect((error as Error).message).toBe("boom")
+    expect(button.getAttribute("data-state")).toBe("idle")
+    fireEvent.pointerUp(button)
+    expect(onCancel).not.toHaveBeenCalled()
+  })
+
   it("async: pending onConfirm disables the button until it resolves", async () => {
     let resolve!: () => void
     const onConfirm = vi.fn(() => new Promise<void>((res) => (resolve = res)))
