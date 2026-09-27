@@ -14,6 +14,10 @@ import {
 
 type TypeToConfirmProps = ConfirmationOptions & {
   phrase: string
+  label?: React.ReactNode
+  announcements?: {
+    match?: string
+  }
   confirmLabel?: string
   undoLabel?: string
   variant?: React.ComponentProps<typeof Button>["variant"]
@@ -26,17 +30,20 @@ function TypeToConfirm({
   onCancel,
   undo,
   phrase,
+  label,
+  announcements,
   confirmLabel = "Confirm",
   undoLabel = "Undo",
   variant = "destructive",
   acknowledgements = [],
   className,
 }: TypeToConfirmProps) {
-  const { state, fillRef, confirm, cancel } = useConfirmation({
-    onConfirm,
-    onCancel,
-    undo,
-  })
+  const { state, fillRef, confirm, cancel, pauseUndo, resumeUndo } =
+    useConfirmation({
+      onConfirm,
+      onCancel,
+      undo,
+    })
   const [value, setValue] = React.useState("")
   const [checked, setChecked] = React.useState<number[]>([])
   const inputId = React.useId()
@@ -57,7 +64,11 @@ function TypeToConfirm({
     >
       <div className="grid gap-2">
         <Label htmlFor={inputId} className="block leading-normal">
-          Type <span className="font-mono">{phrase}</span> to confirm
+          {label ?? (
+            <>
+              Type <span className="font-mono">{phrase}</span> to confirm
+            </>
+          )}
         </Label>
         <Input
           id={inputId}
@@ -68,7 +79,7 @@ function TypeToConfirm({
           onChange={(event) => setValue(event.target.value)}
         />
         <p aria-live="polite" className="sr-only">
-          {matches ? "Phrase matches" : ""}
+          {matches ? (announcements?.match ?? "Phrase matches") : ""}
         </p>
       </div>
       {acknowledgements.map((text, index) => (
@@ -92,6 +103,10 @@ function TypeToConfirm({
         disabled={state === "undo" ? false : !ready || state === "pending"}
         className="relative justify-self-start overflow-hidden"
         onClick={state === "undo" ? cancel : undefined}
+        onPointerEnter={() => pauseUndo("hover")}
+        onPointerLeave={() => resumeUndo("hover")}
+        onFocus={() => pauseUndo("focus")}
+        onBlur={() => resumeUndo("focus")}
       >
         <span
           ref={fillRef}

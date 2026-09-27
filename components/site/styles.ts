@@ -50,6 +50,7 @@ if (await undoToast("Moved 3 files to trash")) {
         rows: [
           ["undo", "boolean | number", "5000 when true, min 4000"],
           ["undoLabel", "ReactNode", '"Undo"'],
+          ["announcements.undo", "string", '"Done. Undo is available."'],
           onConfirm,
           onCancel,
         ],
@@ -95,6 +96,7 @@ if (await undoToast("Moved 3 files to trash")) {
           onConfirm,
           gesture,
           ["confirmLabel", "ReactNode", '"Click again to confirm"'],
+          ["announcements.armed", "string", "confirmLabel when it's a string"],
           ["timeout", "number", "3000"],
           onCancel,
           undo,
@@ -133,6 +135,7 @@ if (await undoToast("Moved 3 files to trash")) {
           onConfirm,
           gesture,
           ["duration", "number", "1200, min 800"],
+          ["announcements.hold", "string", '"Press and hold to confirm"'],
           onCancel,
           undo,
           buttonProps,
@@ -225,6 +228,8 @@ async function discard() {
         name: "TypeToConfirm",
         rows: [
           ["phrase", "string", "required"],
+          ["label", "ReactNode", '"Type {phrase} to confirm"'],
+          ["announcements.match", "string", '"Phrase matches"'],
           onConfirm,
           onCancel,
           undo,

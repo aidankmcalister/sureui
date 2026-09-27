@@ -112,6 +112,37 @@ describe("TypeToConfirm", () => {
     expect(onConfirm).toHaveBeenCalledOnce()
   })
 
+  it("undo: hovering the Undo button after leaving pauses the window", async () => {
+    const onConfirm = vi.fn()
+    render(<TypeToConfirm phrase="acme" undo onConfirm={onConfirm} />)
+    type("acme")
+    await act(async () =>
+      fireEvent.submit(screen.getByRole("textbox").closest("form")!)
+    )
+    const undoButton = screen.getByRole("button", { name: "Undo" })
+    fireEvent.pointerLeave(undoButton)
+    fireEvent.pointerEnter(undoButton)
+    await act(async () => vi.advanceTimersByTime(10000))
+    expect(onConfirm).not.toHaveBeenCalled()
+    fireEvent.pointerLeave(undoButton)
+    await act(async () => vi.advanceTimersByTime(5000))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("label and announcements can be replaced", () => {
+    render(
+      <TypeToConfirm
+        phrase="acme"
+        label="Escribe acme para confirmar"
+        announcements={{ match: "Coincide" }}
+        onConfirm={() => {}}
+      />
+    )
+    expect(screen.getByLabelText("Escribe acme para confirmar")).toBeTruthy()
+    type("acme")
+    expect(screen.getByText("Coincide")).toBeTruthy()
+  })
+
   it("async: pending onConfirm disables the button", async () => {
     let resolve!: () => void
     const onConfirm = vi.fn(() => new Promise<void>((res) => (resolve = res)))

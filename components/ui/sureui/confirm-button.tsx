@@ -15,6 +15,11 @@ type ConfirmButtonProps = React.ComponentProps<typeof Button> &
     gesture?: "click" | "click-again" | "hold"
     confirmLabel?: React.ReactNode
     undoLabel?: React.ReactNode
+    announcements?: {
+      hold?: string
+      armed?: string
+      undo?: string
+    }
     timeout?: number
     duration?: number
   }
@@ -26,6 +31,7 @@ function ConfirmButton({
   gesture = "click",
   confirmLabel = "Click again to confirm",
   undoLabel = "Undo",
+  announcements,
   timeout = 3000,
   duration = 1200,
   className,
@@ -33,8 +39,10 @@ function ConfirmButton({
   disabled,
   onClick,
   onBlur,
+  onFocus,
   onPointerDown,
   onPointerUp,
+  onPointerEnter,
   onPointerLeave,
   onPointerCancel,
   onKeyDown,
@@ -43,8 +51,17 @@ function ConfirmButton({
   "aria-describedby": describedBy,
   ...props
 }: ConfirmButtonProps) {
-  const { state, fillRef, arm, hold, release, confirm, cancel, announcement } =
-    useConfirmation({ onConfirm, onCancel, undo })
+  const {
+    state,
+    fillRef,
+    arm,
+    hold,
+    release,
+    confirm,
+    cancel,
+    pauseUndo,
+    resumeUndo,
+  } = useConfirmation({ onConfirm, onCancel, undo })
   const hintId = React.useId()
 
   React.useEffect(() => {
@@ -70,12 +87,13 @@ function ConfirmButton({
   }, [state, gesture, cancel, confirm, arm])
 
   const handleBlur = React.useCallback(() => {
+    resumeUndo("focus")
     if (gesture === "hold") {
       if (state === "holding") release()
     } else if (gesture === "click-again" && state === "armed") {
       cancel()
     }
-  }, [gesture, state, release, cancel])
+  }, [gesture, state, release, cancel, resumeUndo])
 
   const handlePointerDown = React.useCallback(
     (event: React.PointerEvent<HTMLButtonElement>) => {
@@ -94,8 +112,9 @@ function ConfirmButton({
   }, [state, release])
 
   const handlePointerLeave = React.useCallback(() => {
+    resumeUndo("hover")
     if (state === "holding") release()
-  }, [state, release])
+  }, [state, release, resumeUndo])
 
   const handlePointerCancel = React.useCallback(() => {
     if (state === "holding") release()
@@ -159,6 +178,12 @@ function ConfirmButton({
         disabled={disabled || state === "pending"}
         onClick={(event) => composeHandlers(onClick, handleClick)(event)}
         onBlur={(event) => composeHandlers(onBlur, handleBlur)(event)}
+        onFocus={(event) =>
+          composeHandlers(onFocus, () => pauseUndo("focus"))(event)
+        }
+        onPointerEnter={(event) =>
+          composeHandlers(onPointerEnter, () => pauseUndo("hover"))(event)
+        }
         onPointerDown={(event) =>
           gesture === "hold"
             ? composeHandlers(onPointerDown, handlePointerDown)(event)
@@ -170,9 +195,7 @@ function ConfirmButton({
             : onPointerUp?.(event)
         }
         onPointerLeave={(event) =>
-          gesture === "hold"
-            ? composeHandlers(onPointerLeave, handlePointerLeave)(event)
-            : onPointerLeave?.(event)
+          composeHandlers(onPointerLeave, handlePointerLeave)(event)
         }
         onPointerCancel={(event) =>
           gesture === "hold"
@@ -217,13 +240,18 @@ function ConfirmButton({
       </Button>
       {gesture === "hold" && (
         <span id={hintId} className="sr-only">
-          Press and hold to confirm
+          {announcements?.hold ?? "Press and hold to confirm"}
         </span>
       )}
       <span aria-live="polite" className="sr-only">
-        {state === "armed" && typeof confirmLabel === "string"
-          ? confirmLabel
-          : announcement}
+        {state === "armed"
+          ? (announcements?.armed ??
+            (typeof confirmLabel === "string"
+              ? confirmLabel
+              : "Click again to confirm"))
+          : state === "undo"
+            ? (announcements?.undo ?? "Done. Undo is available.")
+            : ""}
       </span>
     </>
   )

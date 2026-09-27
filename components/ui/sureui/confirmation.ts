@@ -4,6 +4,16 @@ import * as React from "react"
 
 type ConfirmationState = "idle" | "armed" | "holding" | "undo" | "pending"
 
+type PauseReason = "hover" | "focus"
+
+type UndoWindow = {
+  run: ConfirmationOptions["onConfirm"]
+  remaining: number
+  startedAt: number
+  pausable: Set<PauseReason>
+  pausedBy: Set<PauseReason>
+}
+
 type ConfirmationOptions = {
   onConfirm: () => void | Promise<unknown>
   onCancel?: () => void
@@ -27,6 +37,7 @@ function useConfirmation(options: ConfirmationOptions) {
   const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
   const holdStartRef = React.useRef(0)
   const holdDurationRef = React.useRef(0)
+  const undoRef = React.useRef<UndoWindow | null>(null)
   const optionsRef = React.useRef(options)
 
   React.useEffect(() => {
@@ -34,6 +45,7 @@ function useConfirmation(options: ConfirmationOptions) {
   })
 
   const clearTimer = React.useCallback(() => {
+    undoRef.current = null
     if (timerRef.current !== null) {
       clearTimeout(timerRef.current)
       timerRef.current = null
@@ -82,6 +94,17 @@ function useConfirmation(options: ConfirmationOptions) {
     [clearTimer, cancelAnimation]
   )
 
+  const runUndo = React.useCallback(
+    (undoWindow: UndoWindow) => {
+      undoWindow.startedAt = performance.now()
+      timerRef.current = setTimeout(
+        () => commit(undoWindow.run),
+        undoWindow.remaining
+      )
+    },
+    [commit]
+  )
+
   const confirm = React.useCallback(() => {
     const { undo, onConfirm } = optionsRef.current
     clearTimer()
@@ -89,7 +112,15 @@ function useConfirmation(options: ConfirmationOptions) {
       const undoMs = undo === true ? 5000 : Math.max(undo, 4000)
       cancelAnimation()
       setState("undo")
-      timerRef.current = setTimeout(() => commit(onConfirm), undoMs)
+      const undoWindow: UndoWindow = {
+        run: onConfirm,
+        remaining: undoMs,
+        startedAt: 0,
+        pausable: new Set(),
+        pausedBy: new Set(),
+      }
+      undoRef.current = undoWindow
+      runUndo(undoWindow)
       animationRef.current =
         fillRef.current?.animate?.([{ scale: "1 1" }, { scale: "0 1" }], {
           duration: undoMs,
@@ -98,7 +129,33 @@ function useConfirmation(options: ConfirmationOptions) {
     } else {
       commit(onConfirm)
     }
-  }, [commit, clearTimer, cancelAnimation])
+  }, [commit, clearTimer, cancelAnimation, runUndo])
+
+  const pauseUndo = React.useCallback((reason: PauseReason) => {
+    const undoWindow = undoRef.current
+    if (!undoWindow?.pausable.has(reason) || undoWindow.pausedBy.has(reason))
+      return
+    if (undoWindow.pausedBy.size === 0) {
+      if (timerRef.current !== null) clearTimeout(timerRef.current)
+      timerRef.current = null
+      undoWindow.remaining -= performance.now() - undoWindow.startedAt
+      animationRef.current?.pause?.()
+    }
+    undoWindow.pausedBy.add(reason)
+  }, [])
+
+  const resumeUndo = React.useCallback(
+    (reason: PauseReason) => {
+      const undoWindow = undoRef.current
+      if (!undoWindow) return
+      undoWindow.pausable.add(reason)
+      if (!undoWindow.pausedBy.delete(reason) || undoWindow.pausedBy.size > 0)
+        return
+      runUndo(undoWindow)
+      animationRef.current?.play?.()
+    },
+    [runUndo]
+  )
 
   const arm = React.useCallback(() => {
     setState("armed")
@@ -143,14 +200,17 @@ function useConfirmation(options: ConfirmationOptions) {
     optionsRef.current.onCancel?.()
   }, [clearTimer, cancelAnimation])
 
-  const announcement =
-    state === "armed"
-      ? "Click again to confirm"
-      : state === "undo"
-        ? "Done. Undo is available."
-        : ""
-
-  return { state, fillRef, arm, hold, release, confirm, cancel, announcement }
+  return {
+    state,
+    fillRef,
+    arm,
+    hold,
+    release,
+    confirm,
+    cancel,
+    pauseUndo,
+    resumeUndo,
+  }
 }
 
 export {

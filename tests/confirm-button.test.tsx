@@ -439,6 +439,115 @@ describe("ConfirmButton", () => {
     expect(onCancel).not.toHaveBeenCalled()
   })
 
+  it("undo: hovering again after leaving pauses the window", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmButton undo onConfirm={onConfirm}>
+        Archive
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await click(button)
+    await act(async () => vi.advanceTimersByTime(1000))
+    fireEvent.pointerLeave(button)
+    fireEvent.pointerEnter(button)
+    await act(async () => vi.advanceTimersByTime(10000))
+    expect(onConfirm).not.toHaveBeenCalled()
+    expect(button.getAttribute("data-state")).toBe("undo")
+    fireEvent.pointerLeave(button)
+    await act(async () => vi.advanceTimersByTime(3999))
+    expect(onConfirm).not.toHaveBeenCalled()
+    await act(async () => vi.advanceTimersByTime(1))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("undo: focusing again after blurring pauses the window", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmButton undo onConfirm={onConfirm}>
+        Archive
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await click(button)
+    fireEvent.blur(button)
+    fireEvent.focus(button)
+    await act(async () => vi.advanceTimersByTime(10000))
+    expect(onConfirm).not.toHaveBeenCalled()
+    fireEvent.blur(button)
+    await act(async () => vi.advanceTimersByTime(5000))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("undo: staying on the button after clicking does not pause", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmButton undo onConfirm={onConfirm}>
+        Archive
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    fireEvent.pointerEnter(button)
+    fireEvent.focus(button)
+    await click(button)
+    fireEvent.pointerEnter(button)
+    fireEvent.focus(button)
+    await act(async () => vi.advanceTimersByTime(5000))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("undo: stays paused while either hover or focus holds it", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmButton undo onConfirm={onConfirm}>
+        Archive
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await click(button)
+    fireEvent.pointerLeave(button)
+    fireEvent.blur(button)
+    fireEvent.pointerEnter(button)
+    fireEvent.focus(button)
+    fireEvent.pointerLeave(button)
+    await act(async () => vi.advanceTimersByTime(10000))
+    expect(onConfirm).not.toHaveBeenCalled()
+    fireEvent.blur(button)
+    await act(async () => vi.advanceTimersByTime(5000))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("announcements: every screen reader string can be replaced", async () => {
+    const { rerender } = render(
+      <ConfirmButton
+        gesture="hold"
+        announcements={{ hold: "Mantén pulsado para confirmar" }}
+        onConfirm={() => {}}
+      >
+        Borrar
+      </ConfirmButton>
+    )
+    expect(
+      screen.getByText("Mantén pulsado para confirmar").className
+    ).toContain("sr-only")
+    rerender(
+      <ConfirmButton
+        gesture="click-again"
+        confirmLabel={<span aria-hidden>?</span>}
+        announcements={{ armed: "Pulsa otra vez", undo: "Hecho" }}
+        undo
+        onConfirm={() => {}}
+      >
+        Borrar
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await click(button)
+    expect(screen.getByText("Pulsa otra vez")).toBeTruthy()
+    await click(button)
+    expect(screen.getByText("Hecho")).toBeTruthy()
+  })
+
   it("async: pending onConfirm disables the button until it resolves", async () => {
     let resolve!: () => void
     const onConfirm = vi.fn(() => new Promise<void>((res) => (resolve = res)))
