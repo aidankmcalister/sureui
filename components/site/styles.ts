@@ -9,6 +9,11 @@ const onCancel = ["onCancel", "() => void", "—"]
 const undo = ["undo", "boolean | number", "—"]
 const gesture = ["gesture", '"click" | "click-again" | "hold"', '"click"']
 const buttonProps = ["...props", "Button props", "—"]
+const dataState = [
+  "data-state",
+  '"idle" | "armed" | "holding" | "undo" | "pending"',
+  '"idle"',
+]
 
 export type Style = {
   slug: string
@@ -53,6 +58,7 @@ if (await undoToast("Moved 3 files to trash")) {
           ["announcements.undo", "string", '"Done. Undo is available."'],
           onConfirm,
           onCancel,
+          dataState,
         ],
       },
       {
@@ -101,6 +107,7 @@ if (await undoToast("Moved 3 files to trash")) {
           onCancel,
           undo,
           buttonProps,
+          dataState,
         ],
       },
     ],
@@ -139,6 +146,7 @@ if (await undoToast("Moved 3 files to trash")) {
           onCancel,
           undo,
           buttonProps,
+          dataState,
         ],
       },
     ],
@@ -195,6 +203,19 @@ async function discard() {
           ["acknowledgements", "string[]", "—"],
         ],
       },
+      {
+        name: "useConfirm()",
+        rows: [
+          ["returns", "{ confirm, dialog }", "—"],
+          [
+            "confirm(options)",
+            "ConfirmDialog props, minus children and onCancel",
+            "—",
+          ],
+          ["options.onConfirm", "() => void | Promise<unknown>", "—"],
+          ["confirm() resolves", "Promise<boolean>", "—"],
+        ],
+      },
     ],
     useWhen: [
       "Leaving a team or removing someone else's access.",
@@ -238,6 +259,7 @@ async function discard() {
           ["variant", "Button variant", '"destructive"'],
           ["acknowledgements", "string[]", "[]"],
           ["className", "string", "—"],
+          dataState,
         ],
       },
     ],

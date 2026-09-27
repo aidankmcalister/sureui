@@ -1,21 +1,22 @@
 # SureUI
 
-Confirmation components for [shadcn/ui](https://ui.shadcn.com). Every control shares one contract: `onConfirm`, `onCancel`, `undo`, an async pending state and full Button passthrough. Only one of them is a dialog.
+Confirmation components for [shadcn/ui](https://ui.shadcn.com). `ConfirmButton`, `TypeToConfirm` and `ConfirmDialog` share one contract: `onConfirm` (which may return a promise and shows a pending state), `onCancel`, and, for the inline controls, `undo`. `ConfirmButton` also takes every Button prop. Dialogs are optional.
 
-| Style           | Use it for                                   |
-| --------------- | -------------------------------------------- |
-| Undo            | Bulk delete, archive, cancel an event        |
-| Confirm button  | Archive, discard, delete an item, revoke     |
-| Confirm dialog  | Leave a team, sign out everywhere (optional) |
-| Type to confirm | Delete a project, repo, account or database  |
+| Style           | Use it for                                |
+| --------------- | ----------------------------------------- |
+| Undo            | Trash, archive, anything you can restore  |
+| Click again     | Single rows in a list                     |
+| Hold            | Touch screens and small resets            |
+| Dialogs         | Actions that affect other people          |
+| Type to confirm | Deleting projects, databases and accounts |
 
 ## Install
 
 ```bash
-npx shadcn@latest add https://sureui.vercel.app/r/confirm-button.json
-npx shadcn@latest add https://sureui.vercel.app/r/type-to-confirm.json
-npx shadcn@latest add https://sureui.vercel.app/r/confirm-dialog.json
-npx shadcn@latest add https://sureui.vercel.app/r/undo-toast.json
+npx shadcn add @sureui/confirm-button
+npx shadcn add @sureui/type-to-confirm
+npx shadcn add @sureui/confirm-dialog
+npx shadcn add @sureui/undo-toast
 ```
 
 Each one installs on its own, into `components/ui/sureui/`. Nothing to mount. `undoToast` uses the shadcn `<Toaster />`.
@@ -37,7 +38,9 @@ Each one installs on its own, into `components/ui/sureui/`. Nothing to mount. `u
 if (await undoToast("Deleted 3 files")) deleteFiles(ids)
 ```
 
-`onConfirm` may return a promise; the control disables itself and sets `data-state="pending"` until it settles.
+`onConfirm` may return a promise; the control disables itself and sets `data-state="pending"` until it settles. Every control sets `data-state` to `idle`, `armed`, `holding`, `undo` or `pending`, so you can style around it.
+
+If `onConfirm` throws or rejects, the control returns to idle and the error reaches your app unchanged.
 
 ## Dialogs are optional
 
@@ -62,6 +65,12 @@ const { confirm, dialog } = useConfirm()
 async function onSubmit() {
   if (await confirm({ title: "Discard changes?" })) discard()
 }
+```
+
+Pass `onConfirm` to keep the dialog open and pending until the work finishes. `confirm` then resolves `true` only if it succeeds:
+
+```tsx
+await confirm({ title: "Leave the team?", onConfirm: leaveTeam })
 ```
 
 ## Development
