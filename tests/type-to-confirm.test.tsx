@@ -143,6 +143,15 @@ describe("TypeToConfirm", () => {
     expect(screen.getByText("Coincide")).toBeTruthy()
   })
 
+  it("undo: announces that undo is available", async () => {
+    render(<TypeToConfirm phrase="acme" undo onConfirm={vi.fn()} />)
+    type("acme")
+    await act(async () =>
+      fireEvent.submit(screen.getByRole("textbox").closest("form")!)
+    )
+    expect(screen.getByText("Done. Undo is available.")).toBeTruthy()
+  })
+
   it("async: pending onConfirm disables the button", async () => {
     let resolve!: () => void
     const onConfirm = vi.fn(() => new Promise<void>((res) => (resolve = res)))

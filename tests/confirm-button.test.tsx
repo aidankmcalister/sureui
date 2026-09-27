@@ -548,6 +548,37 @@ describe("ConfirmButton", () => {
     expect(screen.getByText("Hecho")).toBeTruthy()
   })
 
+  it("undo: an aria-label is replaced by undoLabel during the window", async () => {
+    render(
+      <ConfirmButton undo aria-label="Archive" onConfirm={vi.fn()}>
+        icon
+      </ConfirmButton>
+    )
+    await click(screen.getByRole("button", { name: "Archive" }))
+    expect(screen.getByRole("button", { name: "Undo" })).toBeTruthy()
+  })
+
+  it("click-again: key-repeat clicks neither arm nor confirm", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmButton gesture="click-again" onConfirm={onConfirm}>
+        Archive
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    fireEvent.keyDown(button, { key: "Enter" })
+    await click(button)
+    expect(button.getAttribute("data-state")).toBe("armed")
+    await act(async () => vi.advanceTimersByTime(400))
+    fireEvent.keyDown(button, { key: "Enter", repeat: true })
+    await click(button)
+    expect(onConfirm).not.toHaveBeenCalled()
+    expect(button.getAttribute("data-state")).toBe("armed")
+    fireEvent.keyUp(button, { key: "Enter" })
+    await click(button)
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
   it("async: pending onConfirm disables the button until it resolves", async () => {
     let resolve!: () => void
     const onConfirm = vi.fn(() => new Promise<void>((res) => (resolve = res)))
