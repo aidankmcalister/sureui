@@ -16,7 +16,8 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "check": "pnpm lint && pnpm typecheck && pnpm test",
-    "registry:build": "shadcn build"
+    "registry:build": "shadcn build",
+    "smoke:install": "./scripts/smoke-install.sh"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
