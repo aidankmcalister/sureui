@@ -201,6 +201,27 @@ describe("TypeToConfirm", () => {
     expect(screen.getByText("Phrase matches")).toBeTruthy()
   })
 
+  it("undo: pauseUndoOnHover={false} keeps the window running", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <TypeToConfirm
+        phrase="acme"
+        undo
+        pauseUndoOnHover={false}
+        onConfirm={onConfirm}
+      />
+    )
+    type("acme")
+    await act(async () =>
+      fireEvent.submit(screen.getByRole("textbox").closest("form")!)
+    )
+    const undoButton = screen.getByRole("button", { name: "Undo" })
+    fireEvent.pointerLeave(undoButton)
+    fireEvent.pointerEnter(undoButton)
+    await act(async () => vi.advanceTimersByTime(5000))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
   it("async: pending onConfirm disables the button", async () => {
     let resolve!: () => void
     const onConfirm = vi.fn(() => new Promise<void>((res) => (resolve = res)))

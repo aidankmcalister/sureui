@@ -18,6 +18,8 @@ type ConfirmationOptions = {
   onConfirm: () => void | Promise<unknown>
   onCancel?: () => void
   undo?: boolean | number
+  pauseUndoOnHover?: boolean
+  pauseUndoOnFocus?: boolean
 }
 
 function toMs(value: number, fallback: number, min: number) {
@@ -138,6 +140,9 @@ function useConfirmation(options: ConfirmationOptions) {
   }, [commit, clearTimer, cancelAnimation, runUndo])
 
   const pauseUndo = React.useCallback((reason: PauseReason) => {
+    const { pauseUndoOnHover = true, pauseUndoOnFocus = true } =
+      optionsRef.current
+    if (reason === "hover" ? !pauseUndoOnHover : !pauseUndoOnFocus) return
     const undoWindow = undoRef.current
     if (!undoWindow?.pausable.has(reason) || undoWindow.pausedBy.has(reason))
       return

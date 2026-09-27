@@ -806,6 +806,36 @@ describe("ConfirmButton", () => {
     expect(screen.getByRole("button")).toHaveProperty("disabled", true)
   })
 
+  it("undo: pauseUndoOnHover={false} keeps the window running on hover", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmButton undo pauseUndoOnHover={false} onConfirm={onConfirm}>
+        Archive
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await click(button)
+    fireEvent.pointerLeave(button)
+    fireEvent.pointerEnter(button)
+    await act(async () => vi.advanceTimersByTime(5000))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("undo: pauseUndoOnFocus={false} keeps the window running on focus", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmButton undo pauseUndoOnFocus={false} onConfirm={onConfirm}>
+        Archive
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await click(button)
+    fireEvent.blur(button)
+    fireEvent.focus(button)
+    await act(async () => vi.advanceTimersByTime(5000))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
   it("async: pending onConfirm disables the button until it resolves", async () => {
     let resolve!: () => void
     const onConfirm = vi.fn(() => new Promise<void>((res) => (resolve = res)))
