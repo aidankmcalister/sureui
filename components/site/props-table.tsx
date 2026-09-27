@@ -9,7 +9,7 @@ import {
 
 export function PropsTable({ rows }: { rows: string[][] }) {
   return (
-    <div className="rounded-[10px] border bg-(--well) text-foreground">
+    <div className="min-w-0 rounded-[10px] border bg-(--well) text-foreground">
       <div className="hidden px-2 sm:block">
         <Table>
           <TableHeader>
