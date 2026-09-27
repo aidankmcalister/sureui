@@ -32,11 +32,12 @@ function TypeToConfirm({
   acknowledgements = [],
   className,
 }: TypeToConfirmProps) {
-  const { state, fillRef, confirm, cancel } = useConfirmation({
-    onConfirm,
-    onCancel,
-    undo,
-  })
+  const { state, fillRef, confirm, cancel, pauseUndo, resumeUndo } =
+    useConfirmation({
+      onConfirm,
+      onCancel,
+      undo,
+    })
   const [value, setValue] = React.useState("")
   const [checked, setChecked] = React.useState<number[]>([])
   const inputId = React.useId()
@@ -92,6 +93,10 @@ function TypeToConfirm({
         disabled={state === "undo" ? false : !ready || state === "pending"}
         className="relative justify-self-start overflow-hidden"
         onClick={state === "undo" ? cancel : undefined}
+        onPointerEnter={() => pauseUndo("hover")}
+        onPointerLeave={() => resumeUndo("hover")}
+        onFocus={() => pauseUndo("focus")}
+        onBlur={() => resumeUndo("focus")}
       >
         <span
           ref={fillRef}
