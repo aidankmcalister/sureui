@@ -49,7 +49,7 @@ function TypeToConfirm({
       className={cn("grid gap-4", className)}
       onSubmit={(event) => {
         event.preventDefault()
-        if (!ready) return
+        if (!ready || state !== "idle") return
         confirm()
         setValue("")
         setChecked([])

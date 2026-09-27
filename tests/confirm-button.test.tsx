@@ -365,6 +365,25 @@ describe("ConfirmButton", () => {
     expect(onCancel).not.toHaveBeenCalled()
   })
 
+  it("undo: commits the onConfirm that was confirmed, not a later one", async () => {
+    const first = vi.fn()
+    const second = vi.fn()
+    const { rerender } = render(
+      <ConfirmButton undo onConfirm={first}>
+        Go
+      </ConfirmButton>
+    )
+    await click(screen.getByRole("button"))
+    rerender(
+      <ConfirmButton undo onConfirm={second}>
+        Go
+      </ConfirmButton>
+    )
+    await act(async () => vi.advanceTimersByTime(5000))
+    expect(first).toHaveBeenCalledOnce()
+    expect(second).not.toHaveBeenCalled()
+  })
+
   it("async: pending onConfirm disables the button until it resolves", async () => {
     let resolve!: () => void
     const onConfirm = vi.fn(() => new Promise<void>((res) => (resolve = res)))
