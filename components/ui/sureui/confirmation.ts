@@ -56,7 +56,13 @@ function useConfirmation(options: ConfirmationOptions) {
     (run: ConfirmationOptions["onConfirm"]) => {
       clearTimer()
       cancelAnimation()
-      const result = run()
+      let result: ReturnType<ConfirmationOptions["onConfirm"]>
+      try {
+        result = run()
+      } catch (error) {
+        setState("idle")
+        throw error
+      }
       if (
         result &&
         typeof (result as PromiseLike<unknown>).then === "function"
