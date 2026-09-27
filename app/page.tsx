@@ -122,7 +122,7 @@ export default function Home() {
       </Band>
       <Band className="flex flex-wrap items-center justify-between gap-6 px-3 py-12 sm:px-6">
         <p className="font-display text-2xl font-bold tracking-tight">
-          Start with the one you need.
+          Free and open source. MIT licensed.
         </p>
         <Actions />
       </Band>
