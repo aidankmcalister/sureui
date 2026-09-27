@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   composeHandlers,
+  toMs,
   useConfirmation,
   type ConfirmationOptions,
 } from "@/components/ui/sureui/confirmation"
@@ -66,7 +67,7 @@ function ConfirmButton({
 
   React.useEffect(() => {
     if (state !== "armed") return
-    const timer = setTimeout(cancel, timeout)
+    const timer = setTimeout(cancel, toMs(timeout, 3000, 0))
     return () => clearTimeout(timer)
   }, [state, timeout, cancel])
 

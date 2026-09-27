@@ -579,6 +579,70 @@ describe("ConfirmButton", () => {
     expect(onConfirm).toHaveBeenCalledOnce()
   })
 
+  it("durations: non-finite values fall back to the defaults", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmButton undo={Number.POSITIVE_INFINITY} onConfirm={onConfirm}>
+        Archive
+      </ConfirmButton>
+    )
+    await click(screen.getByRole("button"))
+    await act(async () => vi.advanceTimersByTime(4999))
+    expect(onConfirm).not.toHaveBeenCalled()
+    await act(async () => vi.advanceTimersByTime(1))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("durations: oversized values are capped at a minute", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmButton undo={1e12} onConfirm={onConfirm}>
+        Archive
+      </ConfirmButton>
+    )
+    await click(screen.getByRole("button"))
+    await act(async () => vi.advanceTimersByTime(59999))
+    expect(onConfirm).not.toHaveBeenCalled()
+    await act(async () => vi.advanceTimersByTime(1))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("durations: a non-finite hold duration uses the default", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmButton
+        gesture="hold"
+        duration={Number.POSITIVE_INFINITY}
+        onConfirm={onConfirm}
+      >
+        Hold to delete
+      </ConfirmButton>
+    )
+    fireEvent.pointerDown(screen.getByRole("button"), { button: 0 })
+    await act(async () => vi.advanceTimersByTime(1199))
+    expect(onConfirm).not.toHaveBeenCalled()
+    await act(async () => vi.advanceTimersByTime(1))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("durations: a non-finite timeout uses the default", async () => {
+    render(
+      <ConfirmButton
+        gesture="click-again"
+        timeout={Number.NaN}
+        onConfirm={vi.fn()}
+      >
+        Archive
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await click(button)
+    await act(async () => vi.advanceTimersByTime(2999))
+    expect(button.getAttribute("data-state")).toBe("armed")
+    await act(async () => vi.advanceTimersByTime(1))
+    expect(button.getAttribute("data-state")).toBe("idle")
+  })
+
   it("async: pending onConfirm disables the button until it resolves", async () => {
     let resolve!: () => void
     const onConfirm = vi.fn(() => new Promise<void>((res) => (resolve = res)))
