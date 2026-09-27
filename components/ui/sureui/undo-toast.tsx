@@ -44,6 +44,12 @@ function undoToast(
   const ms = Math.max(duration, 4000)
 
   return new Promise<boolean>((resolve) => {
+    let settled = false
+    const settle = (value: boolean) => {
+      if (settled) return
+      settled = true
+      resolve(value)
+    }
     const id = toast(message, {
       description,
       duration: ms,
@@ -52,7 +58,7 @@ function undoToast(
           size="sm"
           className="relative ml-auto overflow-hidden"
           onClick={() => {
-            resolve(false)
+            settle(false)
             toast.dismiss(id)
           }}
         >
@@ -60,9 +66,19 @@ function undoToast(
           {undoLabel}
         </Button>
       ),
-      onAutoClose: () => resolve(true),
-      onDismiss: () => resolve(true),
+      onAutoClose: () => settle(true),
+      onDismiss: () => settle(true),
     })
+    setTimeout(() => {
+      if (settled || document.querySelector("[data-sonner-toaster]")) return
+      if (process.env.NODE_ENV !== "production") {
+        console.warn(
+          "undoToast needs the shadcn <Toaster /> in your root layout. It resolved true without showing an Undo."
+        )
+      }
+      toast.dismiss(id)
+      settle(true)
+    }, ms)
   })
 }
 
