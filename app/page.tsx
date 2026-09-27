@@ -1,5 +1,3 @@
-import Link from "next/link"
-
 import { Actions } from "@/components/site/actions"
 import { Band, Label } from "@/components/site/frame"
 import { Cell } from "@/components/site/home/cell"
@@ -17,32 +15,6 @@ import {
 const grid =
   "grid grid-cols-1 gap-px bg-(--rule) md:grid-cols-2 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)_minmax(0,2fr)]"
 
-const parts = [
-  {
-    name: "ConfirmButton",
-    href: "/docs/click-again",
-    description:
-      "A Button that confirms with a click, a second click or a hold, with optional undo.",
-  },
-  {
-    name: "TypeToConfirm",
-    href: "/docs/type-to-confirm",
-    description:
-      "An inline form that unlocks only after the exact name is typed.",
-  },
-  {
-    name: "ConfirmDialog",
-    href: "/docs/dialogs",
-    description:
-      "An optional dialog around any trigger, plus useConfirm to await it.",
-  },
-  {
-    name: "undoToast",
-    href: "/docs/undo",
-    description: "Act right away and offer an undo in a toast.",
-  },
-]
-
 export default function Home() {
   return (
     <main>
@@ -58,7 +30,15 @@ export default function Home() {
         <Actions />
       </Band>
       <Band>
-        <h2 className="sr-only">Examples</h2>
+        <div className="grid gap-1 border-b border-(--rule) px-3 py-6 sm:p-6">
+          <Label className="mb-2">Figures</Label>
+          <h2 className="font-display text-lg leading-7 font-bold tracking-tight">
+            See them in use
+          </h2>
+          <p className="text-sm text-(--ink-muted)">
+            Eight live examples. Every button works.
+          </p>
+        </div>
         <div className={grid}>
           <Cell
             featured
@@ -138,36 +118,6 @@ export default function Home() {
           >
             <MessageToolbar />
           </Cell>
-        </div>
-      </Band>
-      <Band>
-        <div className="grid gap-px bg-(--rule)">
-          <div className="grid gap-1 bg-(--paper) px-3 py-6 sm:p-6">
-            <Label className="mb-2">Parts list</Label>
-            <h2 className="font-display text-lg leading-7 font-bold tracking-tight">
-              Everything in SureUI
-            </h2>
-            <p className="text-sm text-(--ink-muted)">
-              Four parts. Install only the ones you use.
-            </p>
-          </div>
-          {parts.map((part, index) => (
-            <Link
-              key={part.name}
-              href={part.href}
-              className="grid gap-1 bg-(--paper) px-3 py-5 hover:bg-(--well) sm:px-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,4fr)] lg:items-baseline"
-            >
-              <span className="flex items-baseline gap-3">
-                <Label>Part {String(index + 1).padStart(2, "0")}</Label>
-                <span className="font-mono text-sm font-medium text-(--mark-text)">
-                  {part.name}
-                </span>
-              </span>
-              <span className="text-sm text-pretty text-(--ink-muted) lg:pl-6">
-                {part.description}
-              </span>
-            </Link>
-          ))}
         </div>
       </Band>
       <Band className="flex flex-wrap items-center justify-between gap-6 px-3 py-12 sm:px-6">
