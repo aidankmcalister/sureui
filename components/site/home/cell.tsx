@@ -51,7 +51,9 @@ export function Cell({
         >
           {title}
         </h3>
-        <p className="text-sm leading-5 text-(--ink-muted)">{description}</p>
+        <p className="text-sm leading-5 text-pretty text-(--ink-muted)">
+          {description}
+        </p>
       </div>
       <div className="mt-auto rounded-lg border bg-(--well) p-5 text-foreground">
         {children}
