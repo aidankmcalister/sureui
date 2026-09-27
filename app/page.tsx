@@ -19,24 +19,25 @@ export default function Home() {
   return (
     <main>
       <Band className="grid gap-6 px-3 py-14 sm:px-6 sm:py-16 lg:py-20">
-        <h1 className="font-display text-4xl leading-10 font-bold tracking-[-0.04em] text-balance sm:text-[44px] sm:leading-[48px] lg:text-[64px] lg:leading-[68px]">
+        <h1 className="font-display text-4xl leading-10 font-bold tracking-[-0.04em] text-balance sm:text-[44px] sm:leading-12 lg:text-[64px] lg:leading-17">
           <span className="block text-(--mark)">Confirmation components</span>
           for shadcn/ui.
         </h1>
-        <p className="max-w-[560px] text-[19px] leading-[30px] text-pretty text-(--ink-muted)">
-          Hold, click again, type to confirm and undo. Add them with the shadcn
-          CLI. They build on your own shadcn components.
+        <p className="max-w-140 text-[19px] leading-7.5 text-pretty text-(--ink-muted)">
+          Hold, click again, type to confirm, undo and dialogs. You add them
+          with the shadcn CLI, and they build on the shadcn components already
+          in your app.
         </p>
         <Actions />
       </Band>
       <Band>
         <div className="grid gap-4 border-b border-(--rule) px-3 py-12 sm:px-6 sm:py-14">
-          <h2 className="font-display text-3xl leading-9 font-bold tracking-[-0.04em] text-balance sm:text-[40px] sm:leading-[44px]">
+          <h2 className="font-display text-3xl leading-9 font-bold tracking-[-0.04em] text-balance sm:text-[40px] sm:leading-11">
             Try it out.
           </h2>
-          <p className="max-w-[560px] text-[17px] leading-7 text-pretty text-(--ink-muted)">
-            Each asks in its own way, from a quick undo to a typed name. They
-            all work, and each one resets when you&apos;re done.
+          <p className="max-w-140 text-[17px] leading-7 text-pretty text-(--ink-muted)">
+            Each example is a working screen from an everyday app, like project
+            settings or a message inbox.
           </p>
         </div>
         <div className={grid}>
@@ -46,7 +47,7 @@ export default function Home() {
             gesture="Which one"
             href="/docs/which-one"
             title="A project danger zone"
-            description="Three actions, three levels of risk, three ways to ask."
+            description="Pause, transfer and delete, each asking a different amount."
           >
             <DangerZone />
           </Cell>
@@ -73,7 +74,7 @@ export default function Home() {
             gesture="Dialog"
             href="/docs/dialogs"
             title="Leaving a shared workspace"
-            description="A dialog, only when there is something to explain."
+            description="A dialog, because leaving affects everyone else in it."
           >
             <Workspace />
           </Cell>
@@ -105,7 +106,7 @@ export default function Home() {
             gesture="Click again"
             href="/docs/click-again"
             title="Removing a teammate"
-            description="Each row asks again in place before removing."
+            description="Each row asks again in place before it removes anyone."
           >
             <Members />
           </Cell>

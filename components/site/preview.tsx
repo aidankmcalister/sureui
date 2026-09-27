@@ -42,7 +42,7 @@ export function Preview({
             aria-live="polite"
             className="border-t px-4 py-2.5 font-mono text-xs text-muted-foreground"
           >
-            <span className="tracking-[0.1em] uppercase">Await log</span>{" "}
+            <span className="tracking-widest uppercase">Await log</span>{" "}
             <span className="text-foreground">{entry}</span>
           </p>
         </TabsContent>

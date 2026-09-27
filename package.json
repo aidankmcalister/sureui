@@ -17,10 +17,13 @@
     "test": "vitest run",
     "check": "pnpm lint && pnpm typecheck && pnpm test",
     "registry:build": "shadcn build",
-    "smoke:install": "./scripts/smoke-install.sh"
+    "smoke:install": "./scripts/smoke-install.sh",
+    "fix-tailwind": "tailwind-suggest-canonical-classes \"{app,components/site,components/ui/sureui}/**/*.{tsx,ts}\" --css ./app/globals.css"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.4.0",
     "lucide-react": "^1.48.0",
@@ -34,7 +37,8 @@
     "tw-animate-css": "^1.4.0"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
+    "@laststance/tailwind-suggest-canonical-classes": "^0.1.2",
+    "@tailwindcss/postcss": "^4.3.3",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/react": "^16.3.3",
     "@types/node": "^22.20.4",
@@ -45,7 +49,7 @@
     "jsdom": "^30.1.1",
     "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.8.1",
-    "tailwindcss": "^4",
+    "tailwindcss": "^4.3.3",
     "typescript": "^5",
     "vitest": "^5.0.1"
   }

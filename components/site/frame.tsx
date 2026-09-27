@@ -12,8 +12,8 @@ export function Plus({
       aria-hidden
       viewBox="0 0 9 9"
       className={cn(
-        "absolute -top-[5px] size-[9px] text-(--mark)",
-        side === "left" ? "-left-[5px]" : "-right-[5px]",
+        "absolute -top-1.25 size-2.25 text-(--mark)",
+        side === "left" ? "-left-1.25" : "-right-1.25",
         className
       )}
     >
@@ -45,7 +45,7 @@ export function Band({
     >
       <div
         className={cn(
-          "relative mx-auto w-full max-w-[1320px] border-x border-(--rule)",
+          "relative mx-auto w-full max-w-330 border-x border-(--rule)",
           grow && "flex-1",
           className
         )}
@@ -72,7 +72,7 @@ export function Label({
   return (
     <span
       className={cn(
-        "font-mono text-[11px] leading-4 tracking-[0.1em] text-(--ink-label) uppercase",
+        "font-mono text-[11px] leading-4 tracking-widest text-(--ink-label) uppercase",
         className
       )}
     >

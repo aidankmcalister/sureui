@@ -78,7 +78,7 @@ export function Code({
 export function Command({ children }: { children: string }) {
   return (
     <div className="flex min-h-9 items-center justify-between gap-2 rounded-md border bg-(--well) pr-1 pl-3 font-mono text-xs text-foreground">
-      <span className="min-w-0 py-2 leading-5 sm:[scrollbar-width:none] sm:overflow-x-auto sm:whitespace-nowrap">
+      <span className="min-w-0 py-2 leading-5 sm:scrollbar-none sm:overflow-x-auto sm:whitespace-nowrap">
         {children}
       </span>
       <CopyButton value={children} />
