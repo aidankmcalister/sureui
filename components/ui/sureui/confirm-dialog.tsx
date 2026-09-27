@@ -32,6 +32,9 @@ type ConfirmDialogProps = ConfirmDialogOptions & {
   children: React.ReactElement
 }
 
+type ConfirmOptions = Omit<ConfirmDialogOptions, "onConfirm" | "onCancel"> &
+  Partial<Pick<ConfirmDialogOptions, "onConfirm">>
+
 function ConfirmDialog({
   children,
   onConfirm,
@@ -39,32 +42,41 @@ function ConfirmDialog({
   ...options
 }: ConfirmDialogProps) {
   const [open, setOpen] = React.useState(false)
+  const [pending, setPending] = React.useState(false)
 
   async function handleConfirm() {
-    await onConfirm()
-    setOpen(false)
+    setPending(true)
+    try {
+      await onConfirm()
+      setOpen(false)
+    } finally {
+      setPending(false)
+    }
   }
 
   return (
     <AlertDialog
       open={open}
       onOpenChange={(next) => {
+        if (!next && pending) return
         setOpen(next)
         if (!next) onCancel?.()
       }}
     >
       <AlertDialogTrigger render={children} />
-      <ConfirmContent {...options} onConfirm={handleConfirm} />
+      <ConfirmContent
+        {...options}
+        pending={pending}
+        onConfirm={handleConfirm}
+      />
     </AlertDialog>
   )
 }
 
 function useConfirm() {
   const [open, setOpen] = React.useState(false)
-  const [options, setOptions] = React.useState<Omit<
-    ConfirmDialogOptions,
-    "onConfirm" | "onCancel"
-  > | null>(null)
+  const [pending, setPending] = React.useState(false)
+  const [options, setOptions] = React.useState<ConfirmOptions | null>(null)
   const resolver = React.useRef<((value: boolean) => void) | null>(null)
 
   const settle = React.useCallback((value: boolean) => {
@@ -73,17 +85,14 @@ function useConfirm() {
     setOpen(false)
   }, [])
 
-  const confirm = React.useCallback(
-    (next: Omit<ConfirmDialogOptions, "onConfirm" | "onCancel">) => {
-      resolver.current?.(false)
-      setOptions(next)
-      setOpen(true)
-      return new Promise<boolean>((resolve) => {
-        resolver.current = resolve
-      })
-    },
-    []
-  )
+  const confirm = React.useCallback((next: ConfirmOptions) => {
+    resolver.current?.(false)
+    setOptions(next)
+    setOpen(true)
+    return new Promise<boolean>((resolve) => {
+      resolver.current = resolve
+    })
+  }, [])
 
   React.useEffect(() => () => resolver.current?.(false), [])
 
@@ -91,11 +100,24 @@ function useConfirm() {
     <AlertDialog
       open={open}
       onOpenChange={(next) => {
-        if (!next) settle(false)
+        if (!next && !pending) settle(false)
       }}
     >
       {options && (
-        <ConfirmContent {...options} onConfirm={() => settle(true)} />
+        <ConfirmContent
+          {...options}
+          pending={pending}
+          onConfirm={async () => {
+            if (!options.onConfirm) return settle(true)
+            setPending(true)
+            try {
+              await options.onConfirm()
+              settle(true)
+            } finally {
+              setPending(false)
+            }
+          }}
+        />
       )}
     </AlertDialog>
   )
@@ -112,8 +134,10 @@ function ConfirmContent({
   gesture = "click",
   phrase,
   acknowledgements,
+  pending,
   onConfirm,
 }: Omit<ConfirmDialogOptions, "onCancel"> & {
+  pending?: boolean
   onConfirm: () => void | Promise<unknown>
 }) {
   return (
@@ -134,7 +158,7 @@ function ConfirmContent({
         />
       )}
       <AlertDialogFooter>
-        <AlertDialogCancel>{cancelLabel}</AlertDialogCancel>
+        <AlertDialogCancel disabled={pending}>{cancelLabel}</AlertDialogCancel>
         {!phrase && (
           <ConfirmButton
             gesture={gesture}
@@ -154,4 +178,5 @@ export {
   useConfirm,
   type ConfirmDialogProps,
   type ConfirmDialogOptions,
+  type ConfirmOptions,
 }
