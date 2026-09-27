@@ -8,6 +8,9 @@ import { Footer } from "@/components/site/footer"
 import { Header } from "@/components/site/header"
 import { siteUrl } from "@/components/site/styles"
 
+import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
+
 const fontSans = Geist({ subsets: ["latin"], variable: "--font-sans" })
 
 const fontDisplay = Space_Grotesk({
@@ -45,6 +48,8 @@ export default function RootLayout({
       )}
     >
       <body>
+        <Analytics />
+        <SpeedInsights />
         <ThemeProvider>
           <div className="flex min-h-svh flex-col bg-(--paper) text-(--ink)">
             <Header />
