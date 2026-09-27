@@ -35,8 +35,8 @@ export default function Home() {
             Try it out.
           </h2>
           <p className="max-w-140 text-[17px] leading-7 text-pretty text-(--ink-muted)">
-            Each asks in its own way, from a quick undo to a typed name. They
-            all work, and each one resets when you&apos;re done.
+            SureUI in the kind of apps you already build, from dashboards to
+            messaging. Every example works.
           </p>
         </div>
         <div className={grid}>
