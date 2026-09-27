@@ -30,14 +30,14 @@ export default function Home() {
         <Actions />
       </Band>
       <Band>
-        <div className="grid grid-cols-1 items-end gap-y-4 border-b border-(--rule) py-12 sm:py-14 lg:grid-cols-[minmax(0,3fr)_minmax(0,4fr)]">
-          <h2 className="px-3 font-display text-3xl leading-9 font-bold tracking-[-0.04em] text-balance sm:px-6 sm:text-[40px] sm:leading-[44px]">
-            <span className="block text-(--mark)">See them in use.</span>
-            Every button works.
+        <div className="grid gap-4 border-b border-(--rule) px-3 py-12 sm:px-6 sm:py-14">
+          <h2 className="font-display text-3xl leading-9 font-bold tracking-[-0.04em] text-balance sm:text-[40px] sm:leading-[44px]">
+            <span className="block text-(--mark)">Eight real screens.</span>
+            Try every one.
           </h2>
-          <p className="max-w-[480px] px-3 text-[17px] leading-7 text-pretty text-(--ink-muted) sm:px-6">
-            Eight screens you&apos;d find in a real app, each asking in its own
-            way. Press, hold and type to try them, then reset.
+          <p className="max-w-[560px] text-[17px] leading-7 text-pretty text-(--ink-muted)">
+            Each asks in its own way, from a quick undo to a typed name. They
+            all work, and each one resets when you&apos;re done.
           </p>
         </div>
         <div className={grid}>
