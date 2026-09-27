@@ -70,8 +70,8 @@ export default function Introduction() {
       <DocsSection label="One contract">
         <Prose>
           <p>
-            Every style takes the same <code>onConfirm</code>. Return a promise
-            and the control stays pending until it settles.
+            Every component takes the same <code>onConfirm</code>. Return a
+            promise and the control stays pending until it settles.
           </p>
         </Prose>
         <Code>{contract}</Code>

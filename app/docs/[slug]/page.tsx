@@ -45,6 +45,15 @@ export default async function StylePage({ params }: Props) {
       <DocsSection label="Usage">
         <Code>{style.usage}</Code>
       </DocsSection>
+      {style.behavior && (
+        <DocsSection label="How it behaves">
+          <ul className="grid max-w-[640px] list-disc gap-3 pl-5 text-sm text-pretty marker:text-(--ink-label)">
+            {style.behavior.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </DocsSection>
+      )}
       <DocsSection label="Props" className="gap-6">
         {style.api.map((api) => (
           <div key={api.name} className="grid gap-3">

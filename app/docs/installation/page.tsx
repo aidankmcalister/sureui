@@ -22,16 +22,16 @@ export default function RootLayout({ children }) {
 
 const steps = [
   {
-    title: "Add the confirm button",
-    body: "It brings the confirmation core that every style shares.",
-    content: <Command>{installCommand("confirm-button")}</Command>,
-  },
-  {
-    title: "Add the others you need",
-    body: "Each is its own item. Skip the dialog and it never lands in your app.",
+    title: "Add the items you need",
+    body: "Each brings the confirmation core with it. Skip the dialog and it never lands in your app.",
     content: (
       <div className="grid grid-cols-1 gap-2">
-        {["type-to-confirm", "confirm-dialog", "undo-toast"].map((item) => (
+        {[
+          "confirm-button",
+          "type-to-confirm",
+          "confirm-dialog",
+          "undo-toast",
+        ].map((item) => (
           <Command key={item}>{installCommand(item)}</Command>
         ))}
       </div>

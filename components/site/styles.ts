@@ -9,6 +9,11 @@ const onCancel = ["onCancel", "() => void", "—"]
 const undo = ["undo", "boolean | number", "—"]
 const gesture = ["gesture", '"click" | "click-again" | "hold"', '"click"']
 const buttonProps = ["...props", "Button props", "—"]
+const dataState = [
+  "data-state",
+  '"idle" | "armed" | "holding" | "undo" | "pending"',
+  '"idle"',
+]
 
 export type Style = {
   slug: string
@@ -22,6 +27,7 @@ export type Style = {
   items: string[]
   usage: string
   api: { name: string; rows: string[][] }[]
+  behavior?: string[]
   useWhen: string[]
   instead: { when: string; slug: string }[]
 }
@@ -53,6 +59,7 @@ if (await undoToast("Moved 3 files to trash")) {
           ["announcements.undo", "string", '"Done. Undo is available."'],
           onConfirm,
           onCancel,
+          dataState,
         ],
       },
       {
@@ -64,6 +71,14 @@ if (await undoToast("Moved 3 files to trash")) {
           ["undoLabel", "string", '"Undo"'],
         ],
       },
+    ],
+    behavior: [
+      "Nothing runs until the window ends: 5 seconds by default, or the number you pass, at least 4 seconds.",
+      "Undo calls onCancel, and onConfirm never runs.",
+      "If someone leaves the button and comes back to it, by pointer or keyboard, the window pauses until they leave again.",
+      "Unmounting the control during the window drops the action without calling either handler. Closing the tab does the same.",
+      "undoToast pauses while the toast is hovered, like any Sonner toast.",
+      "Keep a trash or history view too, so people can still restore things after the window closes.",
     ],
     useWhen: [
       "Moving files to trash, archiving mail, hiding a post.",
@@ -101,6 +116,7 @@ if (await undoToast("Moved 3 files to trash")) {
           onCancel,
           undo,
           buttonProps,
+          dataState,
         ],
       },
     ],
@@ -139,6 +155,7 @@ if (await undoToast("Moved 3 files to trash")) {
           onCancel,
           undo,
           buttonProps,
+          dataState,
         ],
       },
     ],
@@ -195,6 +212,19 @@ async function discard() {
           ["acknowledgements", "string[]", "—"],
         ],
       },
+      {
+        name: "useConfirm()",
+        rows: [
+          ["returns", "{ confirm, dialog }", "—"],
+          [
+            "confirm(options)",
+            "ConfirmDialog props, minus children and onCancel",
+            "—",
+          ],
+          ["options.onConfirm", "() => void | Promise<unknown>", "—"],
+          ["confirm() resolves", "Promise<boolean>", "—"],
+        ],
+      },
     ],
     useWhen: [
       "Leaving a team or removing someone else's access.",
@@ -238,6 +268,7 @@ async function discard() {
           ["variant", "Button variant", '"destructive"'],
           ["acknowledgements", "string[]", "[]"],
           ["className", "string", "—"],
+          dataState,
         ],
       },
     ],
