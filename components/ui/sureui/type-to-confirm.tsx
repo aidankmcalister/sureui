@@ -14,6 +14,10 @@ import {
 
 type TypeToConfirmProps = ConfirmationOptions & {
   phrase: string
+  label?: React.ReactNode
+  announcements?: {
+    match?: string
+  }
   confirmLabel?: string
   undoLabel?: string
   variant?: React.ComponentProps<typeof Button>["variant"]
@@ -26,6 +30,8 @@ function TypeToConfirm({
   onCancel,
   undo,
   phrase,
+  label,
+  announcements,
   confirmLabel = "Confirm",
   undoLabel = "Undo",
   variant = "destructive",
@@ -58,7 +64,11 @@ function TypeToConfirm({
     >
       <div className="grid gap-2">
         <Label htmlFor={inputId} className="block leading-normal">
-          Type <span className="font-mono">{phrase}</span> to confirm
+          {label ?? (
+            <>
+              Type <span className="font-mono">{phrase}</span> to confirm
+            </>
+          )}
         </Label>
         <Input
           id={inputId}
@@ -69,7 +79,7 @@ function TypeToConfirm({
           onChange={(event) => setValue(event.target.value)}
         />
         <p aria-live="polite" className="sr-only">
-          {matches ? "Phrase matches" : ""}
+          {matches ? (announcements?.match ?? "Phrase matches") : ""}
         </p>
       </div>
       {acknowledgements.map((text, index) => (

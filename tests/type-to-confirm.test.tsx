@@ -129,6 +129,20 @@ describe("TypeToConfirm", () => {
     expect(onConfirm).toHaveBeenCalledOnce()
   })
 
+  it("label and announcements can be replaced", () => {
+    render(
+      <TypeToConfirm
+        phrase="acme"
+        label="Escribe acme para confirmar"
+        announcements={{ match: "Coincide" }}
+        onConfirm={() => {}}
+      />
+    )
+    expect(screen.getByLabelText("Escribe acme para confirmar")).toBeTruthy()
+    type("acme")
+    expect(screen.getByText("Coincide")).toBeTruthy()
+  })
+
   it("async: pending onConfirm disables the button", async () => {
     let resolve!: () => void
     const onConfirm = vi.fn(() => new Promise<void>((res) => (resolve = res)))

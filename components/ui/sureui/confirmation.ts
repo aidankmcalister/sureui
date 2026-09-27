@@ -200,13 +200,6 @@ function useConfirmation(options: ConfirmationOptions) {
     optionsRef.current.onCancel?.()
   }, [clearTimer, cancelAnimation])
 
-  const announcement =
-    state === "armed"
-      ? "Click again to confirm"
-      : state === "undo"
-        ? "Done. Undo is available."
-        : ""
-
   return {
     state,
     fillRef,
@@ -217,7 +210,6 @@ function useConfirmation(options: ConfirmationOptions) {
     cancel,
     pauseUndo,
     resumeUndo,
-    announcement,
   }
 }
 

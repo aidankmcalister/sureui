@@ -517,6 +517,37 @@ describe("ConfirmButton", () => {
     expect(onConfirm).toHaveBeenCalledOnce()
   })
 
+  it("announcements: every screen reader string can be replaced", async () => {
+    const { rerender } = render(
+      <ConfirmButton
+        gesture="hold"
+        announcements={{ hold: "Mantén pulsado para confirmar" }}
+        onConfirm={() => {}}
+      >
+        Borrar
+      </ConfirmButton>
+    )
+    expect(
+      screen.getByText("Mantén pulsado para confirmar").className
+    ).toContain("sr-only")
+    rerender(
+      <ConfirmButton
+        gesture="click-again"
+        confirmLabel={<span aria-hidden>?</span>}
+        announcements={{ armed: "Pulsa otra vez", undo: "Hecho" }}
+        undo
+        onConfirm={() => {}}
+      >
+        Borrar
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await click(button)
+    expect(screen.getByText("Pulsa otra vez")).toBeTruthy()
+    await click(button)
+    expect(screen.getByText("Hecho")).toBeTruthy()
+  })
+
   it("async: pending onConfirm disables the button until it resolves", async () => {
     let resolve!: () => void
     const onConfirm = vi.fn(() => new Promise<void>((res) => (resolve = res)))

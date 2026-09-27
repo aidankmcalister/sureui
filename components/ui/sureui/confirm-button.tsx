@@ -15,6 +15,11 @@ type ConfirmButtonProps = React.ComponentProps<typeof Button> &
     gesture?: "click" | "click-again" | "hold"
     confirmLabel?: React.ReactNode
     undoLabel?: React.ReactNode
+    announcements?: {
+      hold?: string
+      armed?: string
+      undo?: string
+    }
     timeout?: number
     duration?: number
   }
@@ -26,6 +31,7 @@ function ConfirmButton({
   gesture = "click",
   confirmLabel = "Click again to confirm",
   undoLabel = "Undo",
+  announcements,
   timeout = 3000,
   duration = 1200,
   className,
@@ -55,7 +61,6 @@ function ConfirmButton({
     cancel,
     pauseUndo,
     resumeUndo,
-    announcement,
   } = useConfirmation({ onConfirm, onCancel, undo })
   const hintId = React.useId()
 
@@ -235,13 +240,18 @@ function ConfirmButton({
       </Button>
       {gesture === "hold" && (
         <span id={hintId} className="sr-only">
-          Press and hold to confirm
+          {announcements?.hold ?? "Press and hold to confirm"}
         </span>
       )}
       <span aria-live="polite" className="sr-only">
-        {state === "armed" && typeof confirmLabel === "string"
-          ? confirmLabel
-          : announcement}
+        {state === "armed"
+          ? (announcements?.armed ??
+            (typeof confirmLabel === "string"
+              ? confirmLabel
+              : "Click again to confirm"))
+          : state === "undo"
+            ? (announcements?.undo ?? "Done. Undo is available.")
+            : ""}
       </span>
     </>
   )
