@@ -41,7 +41,9 @@ function undoToast(
   message: React.ReactNode,
   { description, duration = 5000, undoLabel = "Undo" }: UndoToastOptions = {}
 ) {
-  const ms = Math.max(duration, 4000)
+  const ms = Number.isFinite(duration)
+    ? Math.min(Math.max(duration, 4000), 60000)
+    : 5000
 
   return new Promise<boolean>((resolve) => {
     let settled = false

@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   composeHandlers,
+  toMs,
   useConfirmation,
   type ConfirmationOptions,
 } from "@/components/ui/sureui/confirmation"
@@ -66,12 +67,15 @@ function ConfirmButton({
 
   React.useEffect(() => {
     if (state !== "armed") return
-    const timer = setTimeout(cancel, timeout)
+    const timer = setTimeout(cancel, toMs(timeout, 3000, 0))
     return () => clearTimeout(timer)
   }, [state, timeout, cancel])
 
+  const repeatRef = React.useRef(false)
+
   const handleClick = React.useCallback(() => {
     if (gesture === "hold") return
+    if (repeatRef.current) return
     if (state === "undo") {
       cancel()
       return
@@ -167,6 +171,13 @@ function ConfirmButton({
     <>
       <Button
         {...props}
+        aria-label={
+          state === "undo" &&
+          typeof undoLabel === "string" &&
+          props["aria-label"]
+            ? undoLabel
+            : props["aria-label"]
+        }
         aria-describedby={holdDescribedBy}
         data-state={state}
         className={cn(
@@ -205,12 +216,16 @@ function ConfirmButton({
         onKeyDown={(event) =>
           gesture === "hold"
             ? composeHandlers(onKeyDown, handleKeyDown)(event)
-            : onKeyDown?.(event)
+            : composeHandlers(onKeyDown, () => {
+                repeatRef.current = event.repeat
+              })(event)
         }
         onKeyUp={(event) =>
           gesture === "hold"
             ? composeHandlers(onKeyUp, handleKeyUp)(event)
-            : onKeyUp?.(event)
+            : composeHandlers(onKeyUp, () => {
+                repeatRef.current = false
+              })(event)
         }
         onContextMenu={(event) =>
           gesture === "hold"

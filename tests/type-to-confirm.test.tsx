@@ -143,6 +143,64 @@ describe("TypeToConfirm", () => {
     expect(screen.getByText("Coincide")).toBeTruthy()
   })
 
+  it("undo: announces that undo is available", async () => {
+    render(<TypeToConfirm phrase="acme" undo onConfirm={vi.fn()} />)
+    type("acme")
+    await act(async () =>
+      fireEvent.submit(screen.getByRole("textbox").closest("form")!)
+    )
+    expect(screen.getByText("Done. Undo is available.")).toBeTruthy()
+  })
+
+  it("unchecking an acknowledgement disables confirm again", () => {
+    render(
+      <TypeToConfirm
+        phrase="acme"
+        acknowledgements={["I understand"]}
+        onConfirm={vi.fn()}
+      />
+    )
+    const confirm = screen.getByRole("button", { name: "Confirm" })
+    type("acme")
+    const checkbox = screen.getByRole("checkbox")
+    fireEvent.click(checkbox)
+    expect(confirm).toHaveProperty("disabled", false)
+    fireEvent.click(checkbox)
+    expect(confirm).toHaveProperty("disabled", true)
+  })
+
+  it("the phrase must match exactly", () => {
+    render(<TypeToConfirm phrase="acme" onConfirm={vi.fn()} />)
+    const confirm = screen.getByRole("button", { name: "Confirm" })
+    type("Acme")
+    expect(confirm).toHaveProperty("disabled", true)
+    type("acme ")
+    expect(confirm).toHaveProperty("disabled", true)
+  })
+
+  it("acknowledgements reset after confirming", () => {
+    render(
+      <TypeToConfirm
+        phrase="acme"
+        acknowledgements={["I understand"]}
+        onConfirm={vi.fn()}
+      />
+    )
+    type("acme")
+    fireEvent.click(screen.getByRole("checkbox"))
+    fireEvent.click(screen.getByRole("button", { name: "Confirm" }))
+    expect(screen.getByRole("checkbox").getAttribute("aria-checked")).toBe(
+      "false"
+    )
+    expect(screen.getByRole("textbox")).toHaveProperty("value", "")
+  })
+
+  it("announces when the phrase matches", () => {
+    render(<TypeToConfirm phrase="acme" onConfirm={vi.fn()} />)
+    type("acme")
+    expect(screen.getByText("Phrase matches")).toBeTruthy()
+  })
+
   it("async: pending onConfirm disables the button", async () => {
     let resolve!: () => void
     const onConfirm = vi.fn(() => new Promise<void>((res) => (resolve = res)))

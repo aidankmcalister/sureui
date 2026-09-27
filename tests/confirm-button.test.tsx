@@ -548,6 +548,264 @@ describe("ConfirmButton", () => {
     expect(screen.getByText("Hecho")).toBeTruthy()
   })
 
+  it("undo: an aria-label is replaced by undoLabel during the window", async () => {
+    render(
+      <ConfirmButton undo aria-label="Archive" onConfirm={vi.fn()}>
+        icon
+      </ConfirmButton>
+    )
+    await click(screen.getByRole("button", { name: "Archive" }))
+    expect(screen.getByRole("button", { name: "Undo" })).toBeTruthy()
+  })
+
+  it("click-again: key-repeat clicks neither arm nor confirm", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmButton gesture="click-again" onConfirm={onConfirm}>
+        Archive
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    fireEvent.keyDown(button, { key: "Enter" })
+    await click(button)
+    expect(button.getAttribute("data-state")).toBe("armed")
+    await act(async () => vi.advanceTimersByTime(400))
+    fireEvent.keyDown(button, { key: "Enter", repeat: true })
+    await click(button)
+    expect(onConfirm).not.toHaveBeenCalled()
+    expect(button.getAttribute("data-state")).toBe("armed")
+    fireEvent.keyUp(button, { key: "Enter" })
+    await click(button)
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("durations: non-finite values fall back to the defaults", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmButton undo={Number.POSITIVE_INFINITY} onConfirm={onConfirm}>
+        Archive
+      </ConfirmButton>
+    )
+    await click(screen.getByRole("button"))
+    await act(async () => vi.advanceTimersByTime(4999))
+    expect(onConfirm).not.toHaveBeenCalled()
+    await act(async () => vi.advanceTimersByTime(1))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("durations: oversized values are capped at a minute", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmButton undo={1e12} onConfirm={onConfirm}>
+        Archive
+      </ConfirmButton>
+    )
+    await click(screen.getByRole("button"))
+    await act(async () => vi.advanceTimersByTime(59999))
+    expect(onConfirm).not.toHaveBeenCalled()
+    await act(async () => vi.advanceTimersByTime(1))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("durations: a non-finite hold duration uses the default", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmButton
+        gesture="hold"
+        duration={Number.POSITIVE_INFINITY}
+        onConfirm={onConfirm}
+      >
+        Hold to delete
+      </ConfirmButton>
+    )
+    fireEvent.pointerDown(screen.getByRole("button"), { button: 0 })
+    await act(async () => vi.advanceTimersByTime(1199))
+    expect(onConfirm).not.toHaveBeenCalled()
+    await act(async () => vi.advanceTimersByTime(1))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("durations: a non-finite timeout uses the default", async () => {
+    render(
+      <ConfirmButton
+        gesture="click-again"
+        timeout={Number.NaN}
+        onConfirm={vi.fn()}
+      >
+        Archive
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await click(button)
+    await act(async () => vi.advanceTimersByTime(2999))
+    expect(button.getAttribute("data-state")).toBe("armed")
+    await act(async () => vi.advanceTimersByTime(1))
+    expect(button.getAttribute("data-state")).toBe("idle")
+  })
+
+  function renderHold(
+    props: Partial<React.ComponentProps<typeof ConfirmButton>> = {}
+  ) {
+    const onConfirm = vi.fn()
+    const onCancel = vi.fn()
+    render(
+      <ConfirmButton
+        gesture="hold"
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+        {...props}
+      >
+        Hold to delete
+      </ConfirmButton>
+    )
+    return { button: screen.getByRole("button"), onConfirm, onCancel }
+  }
+
+  it("hold: Space keyUp before the duration cancels", async () => {
+    const { button, onConfirm, onCancel } = renderHold()
+    fireEvent.keyDown(button, { key: " " })
+    await act(async () => vi.advanceTimersByTime(500))
+    fireEvent.keyUp(button, { key: " " })
+    await act(async () => vi.advanceTimersByTime(2000))
+    expect(onCancel).toHaveBeenCalledOnce()
+    expect(onConfirm).not.toHaveBeenCalled()
+  })
+
+  it("hold: Enter starts and confirms the hold", async () => {
+    const { button, onConfirm } = renderHold()
+    fireEvent.keyDown(button, { key: "Enter" })
+    await act(async () => vi.advanceTimersByTime(1200))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("hold: blur while holding cancels", async () => {
+    const { button, onConfirm, onCancel } = renderHold()
+    fireEvent.pointerDown(button, { button: 0 })
+    fireEvent.blur(button)
+    expect(onCancel).toHaveBeenCalledOnce()
+    await act(async () => vi.advanceTimersByTime(2000))
+    expect(onConfirm).not.toHaveBeenCalled()
+  })
+
+  it("hold: pointerLeave releases", async () => {
+    const { button, onConfirm, onCancel } = renderHold()
+    fireEvent.pointerDown(button, { button: 0 })
+    fireEvent.pointerLeave(button)
+    await act(async () => vi.advanceTimersByTime(2000))
+    expect(onCancel).toHaveBeenCalledOnce()
+    expect(onConfirm).not.toHaveBeenCalled()
+  })
+
+  it("hold: pointerCancel releases", async () => {
+    const { button, onConfirm, onCancel } = renderHold()
+    fireEvent.pointerDown(button, { button: 0 })
+    fireEvent.pointerCancel(button)
+    await act(async () => vi.advanceTimersByTime(2000))
+    expect(onCancel).toHaveBeenCalledOnce()
+    expect(onConfirm).not.toHaveBeenCalled()
+  })
+
+  it("hold: a non-primary button does not start a hold", () => {
+    const { button } = renderHold()
+    fireEvent.pointerDown(button, { button: 2 })
+    expect(button.getAttribute("data-state")).toBe("idle")
+  })
+
+  it("hold: the context menu is suppressed", () => {
+    const { button } = renderHold()
+    expect(fireEvent.contextMenu(button)).toBe(false)
+  })
+
+  it("hold + undo: key auto-repeat after completing does not cancel", async () => {
+    const { button, onCancel } = renderHold({ undo: true })
+    fireEvent.keyDown(button, { key: " " })
+    await act(async () => vi.advanceTimersByTime(1200))
+    expect(button.getAttribute("data-state")).toBe("undo")
+    fireEvent.keyDown(button, { key: " ", repeat: true })
+    expect(button.getAttribute("data-state")).toBe("undo")
+    expect(onCancel).not.toHaveBeenCalled()
+  })
+
+  it("hold: aria-describedby keeps the consumer's id", () => {
+    const { button } = renderHold({ "aria-describedby": "extra" })
+    expect(button.getAttribute("aria-describedby")).toMatch(/ extra$/)
+  })
+
+  it("click-again: a custom timeout disarms", async () => {
+    const onCancel = vi.fn()
+    render(
+      <ConfirmButton
+        gesture="click-again"
+        timeout={1000}
+        onConfirm={vi.fn()}
+        onCancel={onCancel}
+      >
+        Archive
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await click(button)
+    await act(async () => vi.advanceTimersByTime(999))
+    expect(button.getAttribute("data-state")).toBe("armed")
+    await act(async () => vi.advanceTimersByTime(1))
+    expect(button.getAttribute("data-state")).toBe("idle")
+    expect(onCancel).toHaveBeenCalledOnce()
+  })
+
+  it("click-again + undo: confirming starts undo, clicking again cancels", async () => {
+    const onConfirm = vi.fn()
+    const onCancel = vi.fn()
+    render(
+      <ConfirmButton
+        gesture="click-again"
+        undo
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+      >
+        Archive
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await click(button)
+    await act(async () => vi.advanceTimersByTime(400))
+    await click(button)
+    expect(screen.getByRole("button", { name: "Undo" })).toBe(button)
+    await click(button)
+    expect(onCancel).toHaveBeenCalledOnce()
+    await act(async () => vi.advanceTimersByTime(6000))
+    expect(onConfirm).not.toHaveBeenCalled()
+  })
+
+  it("consumer onClick and onBlur still run", async () => {
+    const onClick = vi.fn()
+    const onBlur = vi.fn()
+    render(
+      <ConfirmButton
+        gesture="click-again"
+        onClick={onClick}
+        onBlur={onBlur}
+        onConfirm={vi.fn()}
+      >
+        Archive
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await click(button)
+    fireEvent.blur(button)
+    expect(onClick).toHaveBeenCalledOnce()
+    expect(onBlur).toHaveBeenCalledOnce()
+    expect(button.getAttribute("data-state")).toBe("idle")
+  })
+
+  it("disabled passes through", () => {
+    render(
+      <ConfirmButton disabled onConfirm={vi.fn()}>
+        Archive
+      </ConfirmButton>
+    )
+    expect(screen.getByRole("button")).toHaveProperty("disabled", true)
+  })
+
   it("async: pending onConfirm disables the button until it resolves", async () => {
     let resolve!: () => void
     const onConfirm = vi.fn(() => new Promise<void>((res) => (resolve = res)))

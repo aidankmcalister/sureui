@@ -20,6 +20,12 @@ type ConfirmationOptions = {
   undo?: boolean | number
 }
 
+function toMs(value: number, fallback: number, min: number) {
+  return Number.isFinite(value)
+    ? Math.min(Math.max(value, min), 60000)
+    : fallback
+}
+
 function composeHandlers<E>(
   theirs: ((event: E) => void) | undefined,
   ours: (event: E) => void
@@ -109,7 +115,7 @@ function useConfirmation(options: ConfirmationOptions) {
     const { undo, onConfirm } = optionsRef.current
     clearTimer()
     if (undo) {
-      const undoMs = undo === true ? 5000 : Math.max(undo, 4000)
+      const undoMs = undo === true ? 5000 : toMs(undo, 5000, 4000)
       cancelAnimation()
       setState("undo")
       const undoWindow: UndoWindow = {
@@ -163,7 +169,7 @@ function useConfirmation(options: ConfirmationOptions) {
 
   const hold = React.useCallback(
     (duration: number) => {
-      const ms = Math.max(duration, 800)
+      const ms = toMs(duration, 1200, 800)
       holdStartRef.current = performance.now()
       holdDurationRef.current = ms
       setState("holding")
@@ -216,6 +222,7 @@ function useConfirmation(options: ConfirmationOptions) {
 export {
   useConfirmation,
   composeHandlers,
+  toMs,
   type ConfirmationState,
   type ConfirmationOptions,
 }

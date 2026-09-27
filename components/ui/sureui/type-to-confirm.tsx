@@ -17,6 +17,7 @@ type TypeToConfirmProps = ConfirmationOptions & {
   label?: React.ReactNode
   announcements?: {
     match?: string
+    undo?: string
   }
   confirmLabel?: string
   undoLabel?: string
@@ -79,7 +80,11 @@ function TypeToConfirm({
           onChange={(event) => setValue(event.target.value)}
         />
         <p aria-live="polite" className="sr-only">
-          {matches ? (announcements?.match ?? "Phrase matches") : ""}
+          {state === "undo"
+            ? (announcements?.undo ?? "Done. Undo is available.")
+            : matches
+              ? (announcements?.match ?? "Phrase matches")
+              : ""}
         </p>
       </div>
       {acknowledgements.map((text, index) => (

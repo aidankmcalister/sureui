@@ -1,10 +1,11 @@
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react"
-import { Toaster } from "sonner"
+import { toast, Toaster } from "sonner"
 import { afterEach, describe, expect, it, vi } from "vitest"
 
 import { undoToast } from "@/components/ui/sureui/undo-toast"
 
 afterEach(() => {
+  toast.dismiss()
   cleanup()
   vi.useRealTimers()
   vi.restoreAllMocks()
@@ -18,6 +19,29 @@ describe("undoToast", () => {
       result = undoToast("Deleted 3 files")
     })
     fireEvent.click(await screen.findByRole("button", { name: "Undo" }))
+    await expect(result).resolves.toBe(false)
+  })
+
+  it("resolves true when dismissed", async () => {
+    render(<Toaster />)
+    let result!: Promise<boolean>
+    act(() => {
+      result = undoToast("Deleted")
+    })
+    await screen.findByText("Deleted")
+    act(() => {
+      toast.dismiss()
+    })
+    await expect(result).resolves.toBe(true)
+  })
+
+  it("uses a custom undoLabel", async () => {
+    render(<Toaster />)
+    let result!: Promise<boolean>
+    act(() => {
+      result = undoToast("Deleted", { undoLabel: "Restore" })
+    })
+    fireEvent.click(await screen.findByRole("button", { name: "Restore" }))
     await expect(result).resolves.toBe(false)
   })
 

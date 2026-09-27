@@ -260,6 +260,7 @@ async function discard() {
           ["phrase", "string", "required"],
           ["label", "ReactNode", '"Type {phrase} to confirm"'],
           ["announcements.match", "string", '"Phrase matches"'],
+          ["announcements.undo", "string", '"Done. Undo is available."'],
           onConfirm,
           onCancel,
           undo,
