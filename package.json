@@ -3,15 +3,21 @@
   "version": "0.0.1",
   "type": "module",
   "private": true,
+  "packageManager": "pnpm@10.30.3",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "pnpm registry:build && next build",
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
-    "typecheck": "tsc --noEmit",
+    "format:check": "prettier --check \"**/*.{ts,tsx}\"",
+    "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "check": "pnpm lint && pnpm typecheck && pnpm test",
-    "registry:build": "shadcn build"
+    "registry:build": "shadcn build",
+    "smoke:install": "./scripts/smoke-install.sh"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
