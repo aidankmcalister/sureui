@@ -272,6 +272,7 @@ async function discard() {
           ["undoLabel", "string", '"Undo"'],
           ["variant", "Button variant", '"destructive"'],
           ["acknowledgements", "string[]", "[]"],
+          ["renderActions", "(confirmButton) => ReactNode", "—"],
           ["className", "string", "—"],
           dataState,
         ],
