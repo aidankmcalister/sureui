@@ -37,4 +37,25 @@ describe("registry", () => {
       }
     }
   )
+
+  it.each(registry.items)(
+    "$name declares every stock component and package it imports",
+    (item) => {
+      const stock =
+        "registryDependencies" in item ? item.registryDependencies : []
+      const packages = "dependencies" in item ? item.dependencies : []
+      for (const { path } of item.files) {
+        const content = readFileSync(path, "utf8")
+        for (const [, name] of content.matchAll(
+          /from "@\/components\/ui\/([\w-]+)"/g
+        )) {
+          expect(stock).toContain(name)
+        }
+        for (const [, name] of content.matchAll(/from "([^@./][^"]*)"/g)) {
+          if (name !== "react") expect(packages).toContain(name)
+        }
+        expect(content.includes('from "cn"')).toBe(false)
+      }
+    }
+  )
 })
