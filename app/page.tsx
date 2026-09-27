@@ -1,5 +1,5 @@
 import { Actions } from "@/components/site/actions"
-import { Band, Label } from "@/components/site/frame"
+import { Band } from "@/components/site/frame"
 import { Cell } from "@/components/site/home/cell"
 import {
   ApiKeys,
@@ -30,13 +30,14 @@ export default function Home() {
         <Actions />
       </Band>
       <Band>
-        <div className="grid gap-1 border-b border-(--rule) px-3 py-6 sm:p-6">
-          <Label className="mb-2">Figures</Label>
-          <h2 className="font-display text-lg leading-7 font-bold tracking-tight">
-            See them in use
+        <div className="grid grid-cols-1 items-end gap-y-4 border-b border-(--rule) py-12 sm:py-14 lg:grid-cols-[minmax(0,3fr)_minmax(0,4fr)]">
+          <h2 className="px-3 font-display text-3xl leading-9 font-bold tracking-[-0.04em] text-balance sm:px-6 sm:text-[40px] sm:leading-[44px]">
+            <span className="block text-(--mark)">See them in use.</span>
+            Every button works.
           </h2>
-          <p className="text-sm text-(--ink-muted)">
-            Eight live examples. Every button works.
+          <p className="max-w-[480px] px-3 text-[17px] leading-7 text-pretty text-(--ink-muted) sm:px-6">
+            Eight screens you&apos;d find in a real app, each asking in its own
+            way. Press, hold and type to try them, then reset.
           </p>
         </div>
         <div className={grid}>
