@@ -1,19 +1,13 @@
-import { addArgs, githubUrl, items, siteUrl } from "@/lib/site/config"
+import { addArgs, items, siteUrl } from "@/lib/site/config"
 import { styles } from "@/lib/site/styles"
 
 export const intro = [
   'When every action opens an "Are you sure?" dialog, people stop reading and confirm on reflex, so the one dialog that matters gets the same click as the fifty before it.',
-  "SureUI has other ways to ask: undo, a second click, a hold, a typed name, or a dialog when you want one. The Which one page has a question for each to help you choose.",
+  "SureUI has other ways to ask: undo, a second click, a hold, a typed name, or a dialog when you want one.",
 ]
 
 export const contractNote =
   "Every component takes the same `onConfirm`. Return a promise and the control stays pending until it settles."
-
-export const coreNote = {
-  slug: "how-its-built",
-  link: "How it's built",
-  text: "covers the confirmation core every control shares: its states, timing, undo window and tests.",
-}
 
 export const contract = `async function deleteProject() {
   await api.projects.delete(id)
@@ -93,35 +87,6 @@ export default function RootLayout({ children }) {
   },
 ]
 
-export const agentRules = {
-  intro: {
-    label: "What it is",
-    paragraphs: [
-      "Coding agents tend to put every delete behind an alert dialog. The agent rules give them the Which one questions in order, the install command and usage for each style, and the contract every control shares.",
-      "The rules are generated from the same data as these docs and change with them.",
-    ],
-  },
-  shadcn: {
-    label: "Install with shadcn",
-    body: "With the `@sureui` registry in your `components.json`, add the `rules` item. It writes a Cursor rule to `.cursor/rules/sureui.mdc` and a Claude Code skill to `.claude/skills/sureui/SKILL.md`.",
-    command: addArgs(["rules"]),
-  },
-  skill: {
-    label: "Install as a skill",
-    body: "The SureUI repository has the same rules as an agent skill. The skills CLI asks which agents to install it for.",
-    command: `npx skills add ${githubUrl.replace("https://github.com/", "")}`,
-  },
-  contents: {
-    label: "What's in it",
-    items: [
-      "The five questions, in order, each with examples and when to use something else.",
-      "What counts as reversible, so a delete that can't be restored doesn't get Undo.",
-      "The install command, usage and behavior of each style.",
-      "The shared contract: `onConfirm`, `onCancel`, `undo` and `data-state`.",
-    ],
-  },
-}
-
 const docs = [
   {
     href: "/docs",
@@ -144,27 +109,6 @@ const docs = [
     group: "Components",
     lead: style.lead,
   })),
-  {
-    href: "/docs/which-one",
-    slug: "which-one",
-    title: "Which one should I use?",
-    group: "Guides",
-    lead: "A question for each style, and a table that compares them.",
-  },
-  {
-    href: "/docs/agent-rules",
-    slug: "agent-rules",
-    title: "Agent rules",
-    group: "Guides",
-    lead: "Rules that tell coding agents which style fits an action, installed with the shadcn CLI or as a skill.",
-  },
-  {
-    href: "/docs/how-its-built",
-    slug: "how-its-built",
-    title: "How it's built",
-    group: "Guides",
-    lead: "The confirmation core every control shares: its states, timing, undo window, handlers and tests.",
-  },
 ]
 
 export const pages = docs.map((page, index) => ({

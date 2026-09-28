@@ -1,3 +1,5 @@
+import type { Metadata } from "next"
+
 import { Actions } from "@/components/site/layout/actions"
 import { Band } from "@/components/site/layout/frame"
 import { Cell } from "@/components/site/home/cell"
@@ -9,6 +11,22 @@ import { Members } from "@/components/site/home/examples/members"
 import { MessageToolbar } from "@/components/site/home/examples/message-toolbar"
 import { Preferences } from "@/components/site/home/examples/preferences"
 import { Workspace } from "@/components/site/home/examples/workspace"
+
+const title = "SureUI · Confirmation components for shadcn/ui"
+const description =
+  "Open source confirmation components for shadcn/ui: undo, hold to confirm, type to confirm and more. Built on Base UI."
+
+export const metadata: Metadata = {
+  title: { absolute: title },
+  description,
+  openGraph: {
+    title,
+    description,
+    url: "/",
+    siteName: "SureUI",
+    type: "website",
+  },
+}
 
 const grid =
   "grid grid-cols-1 gap-px bg-(--rule) md:grid-cols-2 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)_minmax(0,2fr)]"
@@ -42,8 +60,8 @@ export default function Home() {
           <Cell
             featured
             figure={1}
-            gesture="Which one"
-            href="/docs/which-one"
+            gesture="Several styles"
+            href="/docs"
             title="A project danger zone"
             description="Pause, transfer and delete each ask for a different amount of confirmation."
           >
