@@ -60,7 +60,7 @@ for item in "${items[@]}"; do
   "$shadcn" add "$root/public/r/$item.json" --yes --overwrite --silent
 done
 
-for block in "${blocks[@]}"; do
+for block in ${blocks[@]+"${blocks[@]}"}; do
   echo "Installing @sureui/$block"
   "$shadcn" add "@sureui/$block" --yes --overwrite --silent
 done
