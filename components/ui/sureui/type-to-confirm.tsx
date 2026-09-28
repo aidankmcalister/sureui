@@ -116,8 +116,9 @@ function TypeToConfirm({
         </p>
       </div>
       {acknowledgements.map((text, index) => (
-        <Label key={index} className="leading-normal font-normal">
+        <Label key={index} className="items-start leading-normal font-normal">
           <Checkbox
+            className="mt-0.5"
             checked={checked.includes(index)}
             disabled={state === "pending"}
             onCheckedChange={(on) =>
