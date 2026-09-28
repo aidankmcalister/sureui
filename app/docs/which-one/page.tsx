@@ -28,10 +28,7 @@ const columns = [
 export default function WhichOne() {
   return (
     <>
-      <DocsHeader
-        href="/docs/which-one"
-        lead="A quick guide, if you're not sure where to start."
-      />
+      <DocsHeader href="/docs/which-one" />
       <DocsSection label="Questions to ask">
         <FramedList>
           {styles.map((style, index) => (

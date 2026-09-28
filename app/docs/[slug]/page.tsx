@@ -31,7 +31,7 @@ export default async function StylePage({ params }: Props) {
 
   return (
     <>
-      <DocsHeader href={`/docs/${style.slug}`} lead={style.lead}>
+      <DocsHeader href={`/docs/${style.slug}`}>
         <Preview figure={figure} code={<Code>{style.usage}</Code>}>
           <Demo slug={style.slug} />
         </Preview>

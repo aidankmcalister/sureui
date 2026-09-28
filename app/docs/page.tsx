@@ -6,44 +6,23 @@ import {
   DocsHeader,
   DocsSection,
   FramedList,
+  InlineCode,
   Prose,
 } from "@/components/site/docs"
 import { Label } from "@/components/site/frame"
-import { styles } from "@/components/site/styles"
+import { contract, contractNote, intro, styles } from "@/components/site/styles"
 
 export const metadata: Metadata = { title: "Introduction" }
-
-const contract = `async function deleteProject() {
-  await api.projects.delete(id)
-}
-
-<ConfirmButton undo onConfirm={deleteProject}>Delete</ConfirmButton>
-<ConfirmButton gesture="click-again" onConfirm={deleteProject}>Delete</ConfirmButton>
-<ConfirmButton gesture="hold" onConfirm={deleteProject}>Delete</ConfirmButton>
-<TypeToConfirm phrase="acme-prod" onConfirm={deleteProject} />
-<ConfirmDialog title="Delete acme-prod?" onConfirm={deleteProject}>
-  <Button>Delete</Button>
-</ConfirmDialog>`
 
 export default function Introduction() {
   return (
     <>
-      <DocsHeader
-        href="/docs"
-        lead="What SureUI is, and how to choose how much to ask of people."
-      />
+      <DocsHeader href="/docs" />
       <DocsSection label="The idea">
         <Prose>
-          <p>
-            When every action opens an &quot;Are you sure?&quot; dialog, people
-            stop reading and confirm on reflex, so the one dialog that matters
-            gets the same click as the fifty before it.
-          </p>
-          <p>
-            SureUI gives you more ways to ask: an undo, a second click, a hold,
-            a typed name, or a dialog when you want one. If you&apos;re not sure
-            which fits, the Which one page has a question for each.
-          </p>
+          {intro.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
         </Prose>
       </DocsSection>
       <DocsSection label="Five styles">
@@ -70,8 +49,7 @@ export default function Introduction() {
       <DocsSection label="One contract">
         <Prose>
           <p>
-            Every component takes the same <code>onConfirm</code>. Return a
-            promise and the control stays pending until it settles.
+            <InlineCode>{contractNote}</InlineCode>
           </p>
         </Prose>
         <Code>{contract}</Code>
