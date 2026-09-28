@@ -112,6 +112,26 @@ const notes: BlockNote[] = [
       },
     ],
   },
+  {
+    name: "inbox-01",
+    actions: [
+      {
+        action: "Archive or delete from the list",
+        style: "undo",
+        why: "Clearing an inbox means many quick actions in a row. Each one runs on one click and collapses the row in place to an Undo at the same height, so the rows below don't move.",
+      },
+      {
+        action: "Archive from the toolbar",
+        style: "click-again",
+        why: "Archiving is easy to reverse, but the toolbar moves on to the next message when it runs, so an Undo there would go with it. The small icon asks for a second click instead.",
+      },
+      {
+        action: "Delete from the toolbar",
+        style: "hold",
+        why: "Deleting is permanent and the icon sits next to Archive. A hold takes a deliberate second, and letting go early cancels.",
+      },
+    ],
+  },
 ]
 
 function styleName(slug: string | null) {

@@ -446,6 +446,30 @@
         }
       ],
       "categories": ["block", "files"]
+    },
+    {
+      "name": "inbox-01",
+      "type": "registry:block",
+      "title": "Inbox",
+      "description": "A message list where archive and delete collapse the row in place with an Undo, and a reading pane whose toolbar archives on a second click and deletes on a hold.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": [
+        "@sureui/confirm-button",
+        "@sureui/undoable",
+        "avatar",
+        "badge",
+        "button",
+        "card",
+        "empty"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/inbox-01/inbox.tsx",
+          "type": "registry:component",
+          "target": "@components/inbox.tsx"
+        }
+      ],
+      "categories": ["block", "mail"]
     }
   ]
 }

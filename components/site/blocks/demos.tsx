@@ -6,6 +6,7 @@ import { ApiKeys } from "@/components/blocks/api-keys-01/api-keys"
 import { DangerZone } from "@/components/blocks/danger-zone-01/danger-zone"
 import { DeleteAccount } from "@/components/blocks/delete-account-01/delete-account"
 import { FileManager } from "@/components/blocks/file-manager-01/file-manager"
+import { Inbox } from "@/components/blocks/inbox-01/inbox"
 import { TeamMembers } from "@/components/blocks/team-members-01/team-members"
 
 const Toaster = dynamic(
@@ -24,6 +25,7 @@ const demos: Record<string, React.ReactNode> = {
       <Toaster />
     </>
   ),
+  "inbox-01": <Inbox />,
 }
 
 export const blockDemoNames = Object.keys(demos)

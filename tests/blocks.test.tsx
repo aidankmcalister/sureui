@@ -13,6 +13,7 @@ import { ApiKeys } from "@/components/blocks/api-keys-01/api-keys"
 import { DangerZone } from "@/components/blocks/danger-zone-01/danger-zone"
 import { DeleteAccount } from "@/components/blocks/delete-account-01/delete-account"
 import { FileManager } from "@/components/blocks/file-manager-01/file-manager"
+import { Inbox } from "@/components/blocks/inbox-01/inbox"
 import { TeamMembers } from "@/components/blocks/team-members-01/team-members"
 import { blockDemoNames } from "@/components/site/blocks/demos"
 import { blocks } from "@/lib/site/blocks"
@@ -279,5 +280,58 @@ describe("file-manager-01", () => {
     await waitFor(() => expect(confirm.hasAttribute("disabled")).toBe(false))
     fireEvent.click(confirm)
     await screen.findByText("Trash is empty", undefined, settled)
+  })
+})
+
+describe("inbox-01", () => {
+  it("collapses a row in place with Undo, then removes it", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "performance"] })
+    render(<Inbox />)
+    fireEvent.click(
+      screen.getByRole("button", { name: "Archive Launch checklist" })
+    )
+    expect(screen.getByText("Archived: Launch checklist")).toBeTruthy()
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }))
+    expect(
+      screen.getByRole("button", { name: "Archive Launch checklist" })
+    ).toBeTruthy()
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Delete Offsite venue options" })
+    )
+    expect(screen.getByText("Deleted: Offsite venue options")).toBeTruthy()
+    await act(async () => vi.advanceTimersByTime(5000))
+    expect(screen.queryByText("Deleted: Offsite venue options")).toBeNull()
+    expect(screen.queryByText("Offsite venue options")).toBeNull()
+  })
+
+  it("archives the open message on a second click and deletes on a hold", async () => {
+    useHoldTimers()
+    render(<Inbox />)
+    const reader = screen.getByRole("region", { name: "Message" })
+    expect(within(reader).getByText("Launch checklist")).toBeTruthy()
+    const archive = within(reader).getByRole("button", { name: "Archive" })
+    await act(async () => fireEvent.click(archive))
+    expect(archive.getAttribute("data-state")).toBe("armed")
+    await act(async () => fireEvent.click(archive))
+    await act(async () => vi.advanceTimersByTime(600))
+    await waitFor(
+      () => expect(within(reader).getByText("Re: Q3 numbers")),
+      settled
+    )
+    expect(screen.queryByText("Launch checklist")).toBeNull()
+
+    const remove = within(reader).getByRole("button", {
+      name: "Hold to delete",
+    })
+    fireEvent.pointerDown(remove, { button: 0 })
+    await act(async () => vi.advanceTimersByTime(1200))
+    await act(async () => fireEvent.pointerUp(remove))
+    await act(async () => vi.advanceTimersByTime(600))
+    await waitFor(
+      () => expect(within(reader).getByText("Design review moved to Friday")),
+      settled
+    )
+    expect(screen.queryByText("Re: Q3 numbers")).toBeNull()
   })
 })
