@@ -1,23 +1,11 @@
-import {
-  act,
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react"
-import { afterEach, describe, expect, it, vi } from "vitest"
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
+import { describe, expect, it, vi } from "vitest"
 
 import { Button } from "@/components/ui/button"
 import {
   ConfirmDialog,
   useConfirm,
 } from "@/components/ui/sureui/confirm-dialog"
-
-afterEach(() => {
-  cleanup()
-  vi.useRealTimers()
-})
 
 function renderDialog() {
   const onConfirm = vi.fn()
@@ -60,6 +48,10 @@ describe("ConfirmDialog", () => {
   })
 
   it("gesture=hold: holding then releasing confirms and closes", async () => {
+    vi.useFakeTimers({
+      toFake: ["setTimeout", "clearTimeout", "performance"],
+      shouldAdvanceTime: true,
+    })
     const onConfirm = vi.fn()
     render(
       <ConfirmDialog title="Revoke key?" gesture="hold" onConfirm={onConfirm}>
@@ -70,12 +62,10 @@ describe("ConfirmDialog", () => {
     const confirmButton = await screen.findByRole("button", {
       name: "Confirm",
     })
-    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "performance"] })
     fireEvent.pointerDown(confirmButton, { button: 0 })
     await act(async () => vi.advanceTimersByTimeAsync(1200))
     await act(async () => fireEvent.pointerUp(confirmButton))
     expect(onConfirm).toHaveBeenCalledOnce()
-    vi.useRealTimers()
     await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
   })
 

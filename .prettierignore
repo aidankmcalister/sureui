@@ -4,7 +4,8 @@ node_modules/
 .turbo/
 coverage/
 pnpm-lock.yaml
-.pnpm-store/components/ui/*.tsx
+.pnpm-store/
+components/ui/*.tsx
 next-env.d.ts
 out/
 public/r/
