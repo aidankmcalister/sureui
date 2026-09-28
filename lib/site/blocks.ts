@@ -74,6 +74,21 @@ const notes: BlockNote[] = [
       },
     ],
   },
+  {
+    name: "team-members-01",
+    actions: [
+      {
+        action: "Remove from team",
+        style: "click-again",
+        why: "Removing one person is small and an admin can invite them back. The menu item asks again in place and stays open until the second click, so a stray click in the menu removes nobody.",
+      },
+      {
+        action: "Make owner",
+        style: "dialogs",
+        why: "It changes what two people can do, and you can't take it back yourself. The dialog says what the new owner gets and what you lose before anything changes.",
+      },
+    ],
+  },
 ]
 
 function styleName(slug: string | null) {

@@ -396,6 +396,30 @@
         }
       ],
       "categories": ["block", "settings"]
+    },
+    {
+      "name": "team-members-01",
+      "type": "registry:block",
+      "title": "Team Members",
+      "description": "A team members list with a row menu to remove someone, which asks again in place, and to make someone the owner, which explains what changes in a dialog first.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": [
+        "@sureui/confirm-dialog",
+        "@sureui/confirm-menu-item",
+        "avatar",
+        "badge",
+        "button",
+        "card",
+        "dropdown-menu"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/team-members-01/team-members.tsx",
+          "type": "registry:component",
+          "target": "@components/team-members.tsx"
+        }
+      ],
+      "categories": ["block", "settings"]
     }
   ]
 }

@@ -1,9 +1,17 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 
 import { ApiKeys } from "@/components/blocks/api-keys-01/api-keys"
 import { DangerZone } from "@/components/blocks/danger-zone-01/danger-zone"
 import { DeleteAccount } from "@/components/blocks/delete-account-01/delete-account"
+import { TeamMembers } from "@/components/blocks/team-members-01/team-members"
 import { blockDemoNames } from "@/components/site/blocks/demos"
 import { blocks } from "@/lib/site/blocks"
 
@@ -148,5 +156,56 @@ describe("delete-account-01", () => {
     fireEvent.click(screen.getByRole("button", { name: "Export data" }))
     await screen.findByRole("button", { name: "Export requested" }, settled)
     expect(screen.getByRole("button", { name: "Delete account" })).toBeTruthy()
+  })
+})
+
+describe("team-members-01", () => {
+  it("removes someone only after a second click in their row menu", async () => {
+    render(<TeamMembers />)
+    fireEvent.click(
+      screen.getByRole("button", { name: "Actions for Ava Diaz" })
+    )
+    const item = await screen.findByRole("menuitem", {
+      name: "Remove from team",
+    })
+    await act(async () => fireEvent.click(item))
+    expect(screen.getByText("ava@acme.com")).toBeTruthy()
+    const armed = screen.getByRole("menuitem", {
+      name: "Click again to remove",
+    })
+    await act(async () => fireEvent.click(armed))
+    await waitFor(
+      () => expect(screen.queryByText("ava@acme.com")).toBeNull(),
+      settled
+    )
+    expect(screen.getByText("4 people have access to Acme.")).toBeTruthy()
+  })
+
+  it("transfers ownership only from the dialog", async () => {
+    render(<TeamMembers />)
+    fireEvent.click(
+      screen.getByRole("button", { name: "Actions for Leo Park" })
+    )
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Make owner" }))
+    const dialog = await screen.findByRole("alertdialog")
+    expect(
+      within(dialog).getByText("Make Leo Park the owner of Acme?")
+    ).toBeTruthy()
+    fireEvent.click(
+      within(dialog).getByRole("button", { name: "Transfer ownership" })
+    )
+    await waitFor(
+      () => expect(screen.queryByRole("alertdialog")).toBeNull(),
+      settled
+    )
+    const rows = screen.getAllByRole("listitem")
+    expect(within(rows[0]).getAllByText("Admin").length).toBeGreaterThan(0)
+    expect(within(rows[1]).getAllByText("Owner").length).toBeGreaterThan(0)
+    expect(
+      screen.queryByRole("button", { name: "Actions for Leo Park" })
+    ).toBeNull()
+    fireEvent.click(screen.getByRole("button", { name: "Actions for Sam Lee" }))
+    await screen.findByRole("menuitem", { name: "Remove from team" })
+    expect(screen.queryByRole("menuitem", { name: "Make owner" })).toBeNull()
   })
 })
