@@ -201,6 +201,37 @@
       "categories": ["confirmation", "toast"]
     },
     {
+      "name": "undoable",
+      "type": "registry:ui",
+      "title": "Undoable",
+      "description": "Wraps a list item or table row. Removing it collapses the row in place to a label and an Undo button at the same height, then runs onConfirm when the undo window ends.",
+      "dependencies": ["@base-ui/react"],
+      "registryDependencies": ["button"],
+      "files": [
+        {
+          "path": "components/ui/sureui/fill.ts",
+          "type": "registry:lib",
+          "target": "@ui/sureui/fill.ts"
+        },
+        {
+          "path": "components/ui/sureui/undo-window.ts",
+          "type": "registry:lib",
+          "target": "@ui/sureui/undo-window.ts"
+        },
+        {
+          "path": "components/ui/sureui/confirmation.ts",
+          "type": "registry:lib",
+          "target": "@ui/sureui/confirmation.ts"
+        },
+        {
+          "path": "components/ui/sureui/undoable.tsx",
+          "type": "registry:ui",
+          "target": "@ui/sureui/undoable.tsx"
+        }
+      ],
+      "categories": ["confirmation", "list", "table"]
+    },
+    {
       "name": "rules",
       "type": "registry:item",
       "title": "Agent Rules",

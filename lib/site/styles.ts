@@ -39,14 +39,29 @@ export const styles: Style[] = [
     interrupts: "No",
     reads: "No",
     bestFor: "Trash, archive, anything you can restore",
-    items: ["confirm-button", "undo-toast"],
+    items: ["confirm-button", "undo-toast", "undoable"],
     usage: `<ConfirmButton undo onConfirm={moveToTrash}>
   Move to trash
 </ConfirmButton>
 
 if (await undoToast("Moved 3 files to trash")) {
   await deleteFiles(ids)
-}`,
+}
+
+<Undoable
+  render={<TableRow />}
+  label={\`Deleted \${file.name}\`}
+  onConfirm={() => deleteFile(file.id)}
+>
+  {({ remove }) => (
+    <>
+      <TableCell>{file.name}</TableCell>
+      <TableCell>
+        <Button onClick={remove}>Delete</Button>
+      </TableCell>
+    </>
+  )}
+</Undoable>`,
     api: [
       {
         name: "ConfirmButton",
@@ -72,6 +87,23 @@ if (await undoToast("Moved 3 files to trash")) {
           ["pauseOnFocus", "boolean", "true"],
         ],
       },
+      {
+        name: "Undoable",
+        rows: [
+          onConfirm,
+          ["children", "ReactNode | ({ remove, state }) => ReactNode", "—"],
+          ["render", "ReactElement, like <li /> or <TableRow />", "<div />"],
+          ["label", "ReactNode", '"Deleted"'],
+          ["undoLabel", "ReactNode", '"Undo"'],
+          ["announcements.undo", "string", '"{label}. Undo is available."'],
+          ["undo", "boolean | number", "true (5000), min 4000"],
+          ["pauseUndoOnHover", "boolean", "true"],
+          ["pauseUndoOnFocus", "boolean", "true"],
+          onCancel,
+          ["...props", "props for the rendered element", "—"],
+          ["data-state", '"idle" | "undo" | "pending" | "removed"', '"idle"'],
+        ],
+      },
     ],
     behavior: [
       "Nothing runs until the window ends: 5 seconds by default, or the number you pass. Anything under 4 seconds is raised to 4, because a shorter window ends before most people notice the mistake.",
@@ -80,6 +112,8 @@ if (await undoToast("Moved 3 files to trash")) {
       "Disabling the button during the window keeps Undo pressable, so an action is never stuck without a way back.",
       "Unmounting the control during the window drops the action without calling either handler. Closing the tab does the same.",
       "undoToast pauses while the toast is hovered or has keyboard focus, and while the tab is hidden. Turn this off with pauseOnHover: false or pauseOnFocus: false.",
+      "For a row whose button goes away with it, wrap the row in Undoable, with render={<li />} or render={<TableRow />}. Calling remove collapses the row in place to its label and an Undo button at the same height, so the rows below don't move. In a table the label spans every column.",
+      'Undoable moves focus to Undo if focus was in the row, and back to the button that removed it after Undo. Its window pauses when the pointer or focus comes back to the row. Once onConfirm has run, data-state is "removed", so drop the item from your data then.',
       "Keep a trash or history view too, so people can still restore things after the window closes.",
     ],
     useWhen: [

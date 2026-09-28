@@ -9,6 +9,7 @@ import type { ConfirmPopoverProps } from "@/components/ui/sureui/confirm-popover
 import type { ConfirmMenuItemProps } from "@/components/ui/sureui/confirm-menu-item"
 import type { TypeToConfirmProps } from "@/components/ui/sureui/type-to-confirm"
 import type { UndoToastOptions } from "@/components/ui/sureui/undo-toast"
+import type { UndoableProps } from "@/components/ui/sureui/undoable"
 import { demoSlugs } from "@/components/site/docs/demos"
 import { styles } from "@/lib/site/styles"
 
@@ -137,6 +138,25 @@ const undoToast = {
   pauseOnFocus: true,
 } satisfies Record<keyof UndoToastOptions | "message", true>
 
+const undoable = {
+  onConfirm: true,
+  onCancel: true,
+  undo: true,
+  pauseUndoOnHover: true,
+  pauseUndoOnFocus: true,
+  children: true,
+  render: true,
+  label: true,
+  undoLabel: true,
+  announcements: true,
+} satisfies Record<
+  Exclude<
+    keyof UndoableProps,
+    Exclude<keyof React.ComponentPropsWithRef<"div">, "children">
+  >,
+  true
+>
+
 const documented = {
   ConfirmButton: confirmButton,
   ConfirmMenuItem: confirmMenuItem,
@@ -144,6 +164,7 @@ const documented = {
   ConfirmDialog: confirmDialog,
   ConfirmPopover: confirmPopover,
   "undoToast(message, options)": undoToast,
+  Undoable: undoable,
 }
 
 function rowsFor(name: string) {

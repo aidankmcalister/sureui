@@ -9,6 +9,7 @@ export const items = [
   "confirm-dialog",
   "confirm-popover",
   "undo-toast",
+  "undoable",
 ]
 
 export function addArgs(names: string[]) {

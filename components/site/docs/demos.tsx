@@ -1,5 +1,6 @@
 "use client"
 
+import * as React from "react"
 import {
   ArchiveIcon,
   CheckIcon,
@@ -25,6 +26,7 @@ import {
 } from "@/components/ui/sureui/confirm-dialog"
 import { ConfirmPopover } from "@/components/ui/sureui/confirm-popover"
 import { TypeToConfirm } from "@/components/ui/sureui/type-to-confirm"
+import { Undoable } from "@/components/ui/sureui/undoable"
 import { useReport } from "@/components/site/docs/preview"
 
 const Toaster = dynamic(
@@ -32,30 +34,79 @@ const Toaster = dynamic(
   { ssr: false }
 )
 
+const files = ["q3-report.pdf", "brand-assets.zip", "meeting-notes.md"]
+
+function UndoableList() {
+  const report = useReport()
+  const [names, setNames] = React.useState(files)
+
+  return (
+    <ul className="w-full max-w-sm divide-y rounded-lg border bg-background text-sm">
+      {names.map((name) => (
+        <Undoable
+          key={name}
+          render={<li className="flex items-center gap-2 py-1.5 pr-1.5 pl-3" />}
+          label={`Deleted ${name}`}
+          onConfirm={() => {
+            setNames((prev) => prev.filter((item) => item !== name))
+            report(`onConfirm, ${name} removed`)
+          }}
+          onCancel={() => report(`onCancel, ${name} restored`)}
+        >
+          {({ remove }) => (
+            <>
+              <span className="min-w-0 flex-1 truncate">{name}</span>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label={`Delete ${name}`}
+                onClick={remove}
+              >
+                <Trash2Icon />
+              </Button>
+            </>
+          )}
+        </Undoable>
+      ))}
+      {names.length === 0 && (
+        <li className="flex items-center justify-between gap-2 py-1.5 pr-1.5 pl-3 text-muted-foreground">
+          No files
+          <Button variant="outline" size="sm" onClick={() => setNames(files)}>
+            Reset
+          </Button>
+        </li>
+      )}
+    </ul>
+  )
+}
+
 function UndoDemo() {
   const report = useReport()
 
   return (
-    <div className="flex flex-wrap justify-center gap-2">
-      <ConfirmButton
-        undo
-        variant="outline"
-        onConfirm={() => report("onConfirm, the undo window closed")}
-        onCancel={() => report("onCancel, undone")}
-      >
-        Move to trash
-      </ConfirmButton>
-      <Button
-        variant="outline"
-        onClick={async () => {
-          const { undoToast } =
-            await import("@/components/ui/sureui/undo-toast")
-          const committed = await undoToast("Moved 3 files to trash")
-          report(`undoToast() resolved ${committed}`)
-        }}
-      >
-        Trash with a toast
-      </Button>
+    <div className="flex w-full flex-col items-center gap-6">
+      <div className="flex flex-wrap justify-center gap-2">
+        <ConfirmButton
+          undo
+          variant="outline"
+          onConfirm={() => report("onConfirm, the undo window closed")}
+          onCancel={() => report("onCancel, undone")}
+        >
+          Move to trash
+        </ConfirmButton>
+        <Button
+          variant="outline"
+          onClick={async () => {
+            const { undoToast } =
+              await import("@/components/ui/sureui/undo-toast")
+            const committed = await undoToast("Moved 3 files to trash")
+            report(`undoToast() resolved ${committed}`)
+          }}
+        >
+          Trash with a toast
+        </Button>
+      </div>
+      <UndoableList />
       <Toaster />
     </div>
   )

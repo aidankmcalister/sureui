@@ -256,7 +256,7 @@ describe("ConfirmMenuItem", () => {
     })
     expect(item.getAttribute("data-variant")).toBe("destructive")
     await click(item)
-    await act(async () => fireEvent.keyDown(item, { key: "ArrowDown" }))
+    await act(async () => fireEvent.keyDown(item, { key: "Shift" }))
     expect(onClick).toHaveBeenCalledOnce()
     expect(onKeyDown).toHaveBeenCalledOnce()
     expect(item.getAttribute("data-state")).toBe("armed")
