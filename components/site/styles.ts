@@ -20,7 +20,7 @@ const gesture = ["gesture", '"click" | "click-again" | "hold"', '"click"']
 const buttonProps = ["...props", "Button props", "—"]
 const dataState = [
   "data-state",
-  '"idle" | "armed" | "holding" | "undo" | "pending"',
+  '"idle" | "armed" | "holding" | "ready" | "undo" | "pending"',
   '"idle"',
 ]
 
@@ -86,7 +86,7 @@ if (await undoToast("Moved 3 files to trash")) {
       },
     ],
     behavior: [
-      "Nothing runs until the window ends: 5 seconds by default, or the number you pass, at least 4 seconds.",
+      "Nothing runs until the window ends: 5 seconds by default, or the number you pass. Anything under 4 seconds is raised to 4, because a shorter window ends before most people notice the mistake.",
       "Undo calls onCancel, and onConfirm never runs.",
       "If someone leaves the button and comes back to it, by pointer or keyboard, the window pauses until they leave again. Turn this off with pauseUndoOnHover={false} or pauseUndoOnFocus={false}.",
       "Unmounting the control during the window drops the action without calling either handler. Closing the tab does the same.",
@@ -126,12 +126,18 @@ if (await undoToast("Moved 3 files to trash")) {
           ["confirmLabel", "ReactNode", '"Click again to confirm"'],
           ["announcements.armed", "string", "confirmLabel when it's a string"],
           ["timeout", "number", "3000"],
+          ["cancelOnBlur", "boolean", "true"],
           onCancel,
           undo,
           buttonProps,
           dataState,
         ],
       },
+    ],
+    behavior: [
+      "The button disarms after timeout, 3 seconds by default, or when focus leaves it. Keep it armed on blur with cancelOnBlur={false}.",
+      "Key-repeat clicks are ignored, so holding Enter can't arm and confirm in one go.",
+      "While a promise from onConfirm is pending, the button is disabled but keeps focus.",
     ],
     useWhen: [
       "Archiving one message or removing one row.",
@@ -146,8 +152,8 @@ if (await undoToast("Moved 3 files to trash")) {
   {
     slug: "hold",
     name: "Hold",
-    lead: "People press and hold until the fill completes. Letting go early cancels.",
-    summary: "Press and hold until it fills. Letting go cancels.",
+    lead: "People press and hold until the fill completes, then let go to confirm. Letting go early cancels.",
+    summary: "Press and hold until it fills, then let go.",
     question: "Could a stray tap trigger it?",
     interrupts: "No",
     reads: "No",
@@ -163,13 +169,25 @@ if (await undoToast("Moved 3 files to trash")) {
           onConfirm,
           gesture,
           ["duration", "number", "1200, min 800"],
+          ["confirmOnRelease", "boolean", "true"],
+          ["cancelHoldOnLeave", "boolean", "true"],
+          ["releaseLabel", "ReactNode", "children"],
           ["announcements.hold", "string", '"Press and hold to confirm"'],
+          ["announcements.ready", "string", '"Release to confirm"'],
           onCancel,
           undo,
           buttonProps,
           dataState,
         ],
       },
+    ],
+    behavior: [
+      "The fill takes 1.2 seconds by default. Anything under 0.8 seconds is raised to 0.8, because a shorter hold is easy to trigger with a slow tap.",
+      'Once the fill completes, the button is ready (data-state="ready") and confirms when the pointer or key is released on it. Show a different label while ready with releaseLabel.',
+      "Letting go outside the button, moving off it, or losing focus cancels, even after the fill. Set cancelHoldOnLeave={false} to let the pointer leave and come back before letting go, like a native button.",
+      "Set confirmOnRelease={false} to confirm the moment the fill completes. Pair it with undo, since there is no last chance to back out.",
+      "With undo, the Undo button runs on click, so pressing it and sliding off does nothing.",
+      "The context menu is blocked on the button so a long press on a phone doesn't open it.",
     ],
     useWhen: [
       "Revoking an API key or resetting preferences.",
@@ -268,6 +286,8 @@ async function discard() {
         name: "TypeToConfirm",
         rows: [
           ["phrase", "string", "required"],
+          ["caseSensitive", "boolean", "true"],
+          ["trim", "boolean", "false"],
           ["label", "ReactNode", '"Type {phrase} to confirm"'],
           ["announcements.match", "string", '"Phrase matches"'],
           ["announcements.undo", "string", '"Done. Undo is available."'],
@@ -285,6 +305,11 @@ async function discard() {
           dataState,
         ],
       },
+    ],
+    behavior: [
+      "The phrase must match exactly by default, including case and spaces. Relax it with caseSensitive={false} or trim.",
+      "The input and checkboxes clear after confirming, so after an undo the form isn't one click from running again.",
+      "While a promise from onConfirm is pending, the input is read-only and the button is disabled but keeps focus.",
     ],
     useWhen: [
       "Deleting a project, a database or an account.",

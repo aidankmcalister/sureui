@@ -40,7 +40,7 @@ Each one installs on its own, into `components/ui/sureui/`. Nothing to mount. `u
 if (await undoToast("Deleted 3 files")) deleteFiles(ids)
 ```
 
-`onConfirm` may return a promise; the control disables itself and sets `data-state="pending"` until it settles. Every control sets `data-state` to `idle`, `armed`, `holding`, `undo` or `pending`, so you can style around it.
+`onConfirm` may return a promise; the control disables itself, keeps focus, and sets `data-state="pending"` until it settles. Every control sets `data-state` to `idle`, `armed`, `holding`, `ready`, `undo` or `pending`, so you can style around it.
 
 If `onConfirm` throws or rejects, the control returns to idle and the error reaches your app unchanged.
 
