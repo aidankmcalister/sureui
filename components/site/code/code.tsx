@@ -3,7 +3,7 @@ import { createJavaScriptRegexEngine } from "shiki/engine/javascript"
 import tsx from "shiki/langs/tsx.mjs"
 
 import { cn } from "@/lib/utils"
-import { CopyButton } from "@/components/site/copy-button"
+import { CopyButton } from "@/components/site/code/copy-button"
 
 const sureui = new Set([
   "ConfirmButton",

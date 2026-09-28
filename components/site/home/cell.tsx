@@ -1,7 +1,7 @@
 import Link from "next/link"
 
 import { cn } from "@/lib/utils"
-import { Label, tapTarget } from "@/components/site/frame"
+import { Label, tapTarget } from "@/components/site/layout/frame"
 
 export function Cell({
   figure,

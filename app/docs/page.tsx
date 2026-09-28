@@ -1,16 +1,17 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 
-import { Code } from "@/components/site/code"
+import { Code } from "@/components/site/code/code"
 import {
   DocsHeader,
   DocsSection,
   FramedList,
   InlineCode,
   Prose,
-} from "@/components/site/docs"
-import { Label } from "@/components/site/frame"
-import { contract, contractNote, intro, styles } from "@/components/site/styles"
+} from "@/components/site/docs/sections"
+import { Label } from "@/components/site/layout/frame"
+import { contract, contractNote, intro } from "@/lib/site/pages"
+import { styles } from "@/lib/site/styles"
 
 export const metadata: Metadata = { title: "Introduction" }
 

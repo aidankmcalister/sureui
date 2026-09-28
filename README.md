@@ -86,7 +86,7 @@ pnpm check
 pnpm build
 ```
 
-Registry source lives in `components/ui/sureui`. Everything in `app` and `components/site` is the docs site.
+Registry source lives in `components/ui/sureui`. Everything in `app`, `components/site` and `lib/site` is the docs site.
 
 ## License
 

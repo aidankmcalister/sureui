@@ -13,9 +13,9 @@ import {
   DocsSection,
   FramedList,
   StyleLink,
-} from "@/components/site/docs"
-import { Label } from "@/components/site/frame"
-import { styles } from "@/components/site/styles"
+} from "@/components/site/docs/sections"
+import { Label } from "@/components/site/layout/frame"
+import { styles } from "@/lib/site/styles"
 
 export const metadata: Metadata = { title: "Which one should I use?" }
 

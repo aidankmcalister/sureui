@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 
-import { Actions } from "@/components/site/actions"
-import { Band } from "@/components/site/frame"
+import { Actions } from "@/components/site/layout/actions"
+import { Band } from "@/components/site/layout/frame"
 
 export const metadata: Metadata = { title: "Blocks" }
 

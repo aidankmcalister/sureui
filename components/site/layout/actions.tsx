@@ -1,9 +1,9 @@
 import Link from "next/link"
 
 import { buttonVariants } from "@/components/ui/button"
-import { GitHubIcon } from "@/components/site/github-icon"
-import { SiteLink } from "@/components/site/site-link"
-import { githubUrl } from "@/components/site/styles"
+import { GitHubIcon } from "@/components/site/layout/github-icon"
+import { SiteLink } from "@/components/site/layout/site-link"
+import { githubUrl } from "@/lib/site/config"
 
 export function Actions() {
   return (

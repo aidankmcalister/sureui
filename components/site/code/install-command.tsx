@@ -3,7 +3,7 @@
 import * as React from "react"
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { CopyButton } from "@/components/site/copy-button"
+import { CopyButton } from "@/components/site/code/copy-button"
 
 const runners = {
   npm: "npx",

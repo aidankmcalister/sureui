@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest"
 
 import registry from "@/registry.json"
-import { llmsFull, llmsIndex, pageMarkdown } from "@/components/site/llms"
-import { pages, siteUrl, styles } from "@/components/site/styles"
+import { llmsFull, llmsIndex, pageMarkdown } from "@/lib/site/llms"
+import { siteUrl } from "@/lib/site/config"
+import { pages } from "@/lib/site/pages"
+import { styles } from "@/lib/site/styles"
 
 describe("llms.txt", () => {
   it("links every docs page and registry item", () => {

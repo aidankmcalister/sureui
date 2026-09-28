@@ -13,8 +13,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { Label, Plus } from "@/components/site/frame"
-import { getPage, pages, type Page } from "@/components/site/styles"
+import { Label, Plus } from "@/components/site/layout/frame"
+import { getPage, pages, type Page } from "@/lib/site/pages"
 
 const groups = [...new Set(pages.map((page) => page.group))]
 

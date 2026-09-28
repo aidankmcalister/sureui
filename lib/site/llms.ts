@@ -1,16 +1,14 @@
 import registry from "@/registry.json"
+import { addArgs, siteUrl } from "@/lib/site/config"
 import {
-  addArgs,
   contract,
   contractNote,
   installSteps,
   intro,
   pages,
-  siteUrl,
-  styles,
   type Page,
-  type Style,
-} from "@/components/site/styles"
+} from "@/lib/site/pages"
+import { styles, type Style } from "@/lib/site/styles"
 
 const description =
   "Confirmation components for shadcn/ui: undo, click again, hold, type to confirm and dialogs. Installed with the shadcn CLI from the `@sureui` registry and built on Base UI."

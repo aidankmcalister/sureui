@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 
 import { buttonVariants } from "@/components/ui/button"
-import { Band } from "@/components/site/frame"
+import { Band } from "@/components/site/layout/frame"
 
 export const metadata: Metadata = { title: "Page not found" }
 

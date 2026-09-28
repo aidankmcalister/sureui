@@ -1,10 +1,14 @@
 import type { Metadata } from "next"
 
-import { Code } from "@/components/site/code"
-import { DocsHeader, DocsSection, InlineCode } from "@/components/site/docs"
-import { Label } from "@/components/site/frame"
-import { InstallCommand } from "@/components/site/install-command"
-import { installSteps } from "@/components/site/styles"
+import { Code } from "@/components/site/code/code"
+import {
+  DocsHeader,
+  DocsSection,
+  InlineCode,
+} from "@/components/site/docs/sections"
+import { Label } from "@/components/site/layout/frame"
+import { InstallCommand } from "@/components/site/code/install-command"
+import { installSteps } from "@/lib/site/pages"
 
 export const metadata: Metadata = { title: "Installation" }
 

@@ -1,4 +1,4 @@
-import { llmsFull, textResponse } from "@/components/site/llms"
+import { llmsFull, textResponse } from "@/lib/site/llms"
 
 export const dynamic = "force-static"
 

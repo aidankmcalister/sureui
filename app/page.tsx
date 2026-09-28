@@ -1,16 +1,14 @@
-import { Actions } from "@/components/site/actions"
-import { Band } from "@/components/site/frame"
+import { Actions } from "@/components/site/layout/actions"
+import { Band } from "@/components/site/layout/frame"
 import { Cell } from "@/components/site/home/cell"
-import {
-  ApiKeys,
-  ConfirmByName,
-  DangerZone,
-  Files,
-  Members,
-  MessageToolbar,
-  Preferences,
-  Workspace,
-} from "@/components/site/home/examples"
+import { ApiKeys } from "@/components/site/home/examples/api-keys"
+import { ConfirmByName } from "@/components/site/home/examples/confirm-by-name"
+import { DangerZone } from "@/components/site/home/examples/danger-zone"
+import { Files } from "@/components/site/home/examples/files"
+import { Members } from "@/components/site/home/examples/members"
+import { MessageToolbar } from "@/components/site/home/examples/message-toolbar"
+import { Preferences } from "@/components/site/home/examples/preferences"
+import { Workspace } from "@/components/site/home/examples/workspace"
 
 const grid =
   "grid grid-cols-1 gap-px bg-(--rule) md:grid-cols-2 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)_minmax(0,2fr)]"

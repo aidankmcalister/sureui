@@ -3,7 +3,7 @@
 import * as React from "react"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Label } from "@/components/site/frame"
+import { Label } from "@/components/site/layout/frame"
 
 const ReportContext = React.createContext<(entry: string) => void>(() => {})
 

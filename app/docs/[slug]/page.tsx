@@ -2,14 +2,19 @@ import type { Metadata } from "next"
 import { CheckIcon } from "lucide-react"
 import { notFound } from "next/navigation"
 
-import { Code } from "@/components/site/code"
-import { Demo } from "@/components/site/demos"
-import { DocsHeader, DocsSection, StyleLink } from "@/components/site/docs"
-import { Label } from "@/components/site/frame"
-import { Preview } from "@/components/site/preview"
-import { PropsTable } from "@/components/site/props-table"
-import { InstallCommand } from "@/components/site/install-command"
-import { addArgs, getStyle, styles } from "@/components/site/styles"
+import { Code } from "@/components/site/code/code"
+import { Demo } from "@/components/site/docs/demos"
+import {
+  DocsHeader,
+  DocsSection,
+  StyleLink,
+} from "@/components/site/docs/sections"
+import { Label } from "@/components/site/layout/frame"
+import { Preview } from "@/components/site/docs/preview"
+import { PropsTable } from "@/components/site/docs/props-table"
+import { InstallCommand } from "@/components/site/code/install-command"
+import { addArgs } from "@/lib/site/config"
+import { getStyle, styles } from "@/lib/site/styles"
 
 type Props = { params: Promise<{ slug: string }> }
 

@@ -10,7 +10,7 @@ import {
   useConfirm,
 } from "@/components/ui/sureui/confirm-dialog"
 import { TypeToConfirm } from "@/components/ui/sureui/type-to-confirm"
-import { useReport } from "@/components/site/preview"
+import { useReport } from "@/components/site/docs/preview"
 
 const Toaster = dynamic(
   () => import("@/components/ui/sonner").then((mod) => mod.Toaster),

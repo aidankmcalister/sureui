@@ -1,8 +1,8 @@
 import Link from "next/link"
 
 import { cn } from "@/lib/utils"
-import { Label, Plus, tapTarget } from "@/components/site/frame"
-import { getPage } from "@/components/site/styles"
+import { Label, Plus, tapTarget } from "@/components/site/layout/frame"
+import { getPage } from "@/lib/site/pages"
 
 export function DocsSection({
   label,
