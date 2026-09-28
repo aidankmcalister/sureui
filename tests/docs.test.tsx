@@ -29,6 +29,7 @@ const confirmButton = {
   confirmOnRelease: true,
   cancelOnBlur: true,
   cancelHoldOnLeave: true,
+  holdFallback: true,
 } satisfies Record<OwnProps<ConfirmButtonProps>, true>
 
 const confirmMenuItem = {
@@ -48,6 +49,7 @@ const confirmMenuItem = {
   confirmOnRelease: true,
   cancelOnBlur: true,
   cancelHoldOnLeave: true,
+  holdFallback: true,
   closeOnConfirm: true,
   closeOnUndo: true,
   commitUndoOnClose: true,
@@ -95,6 +97,7 @@ const confirmDialog = {
   duration: true,
   confirmOnRelease: true,
   cancelHoldOnLeave: true,
+  holdFallback: true,
   caseSensitive: true,
   trim: true,
   announcements: true,

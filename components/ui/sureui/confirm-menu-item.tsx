@@ -29,6 +29,7 @@ type ConfirmMenuItemProps = Omit<
       hold?: string
       ready?: string
       armed?: string
+      fallback?: string
       undo?: string
     }
   }
@@ -53,9 +54,10 @@ function ConfirmMenuItem({
   confirmOnRelease,
   cancelOnBlur,
   cancelHoldOnLeave,
+  holdFallback = "click-again",
   disabled,
   menu = "dropdown",
-  confirmLabel = "Click again to confirm",
+  confirmLabel,
   releaseLabel,
   undoLabel = "Undo",
   closeOnConfirm = true,
@@ -104,6 +106,7 @@ function ConfirmMenuItem({
     confirmOnRelease,
     cancelOnBlur,
     cancelHoldOnLeave,
+    holdFallback,
     disabled,
   })
   const labelId = React.useId()
@@ -143,8 +146,9 @@ function ConfirmMenuItem({
       : "idle"
   const labels = [
     { state: "idle", node: children },
-    ...(gesture === "click-again"
-      ? [{ state: "armed", node: confirmLabel }]
+    ...(gesture === "click-again" ||
+    (gesture === "hold" && confirmLabel != null)
+      ? [{ state: "armed", node: confirmLabel ?? "Click again to confirm" }]
       : []),
     ...(hasReleaseLabel ? [{ state: "ready", node: releaseLabel }] : []),
     ...(undo ? [{ state: "undo", node: undoLabel }] : []),
@@ -202,20 +206,25 @@ function ConfirmMenuItem({
       </span>
       {gesture === "hold" && (
         <span id={hintId} className="sr-only">
-          {announcements?.hold ?? "Press and hold to confirm"}
+          {announcements?.hold ??
+            (holdFallback === "none"
+              ? "Press and hold to confirm"
+              : "Press and hold, or activate twice, to confirm")}
         </span>
       )}
       <span aria-live="polite" className="sr-only">
         {state === "ready"
           ? (announcements?.ready ?? "Release to confirm")
-          : state === "armed"
-            ? (announcements?.armed ??
-              (typeof confirmLabel === "string"
-                ? confirmLabel
-                : "Click again to confirm"))
-            : state === "undo"
-              ? (announcements?.undo ?? "Done. Undo is available.")
-              : ""}
+          : state === "armed" && gesture === "hold"
+            ? (announcements?.fallback ?? "Activate again to confirm")
+            : state === "armed"
+              ? (announcements?.armed ??
+                (typeof confirmLabel === "string"
+                  ? confirmLabel
+                  : "Click again to confirm"))
+              : state === "undo"
+                ? (announcements?.undo ?? "Done. Undo is available.")
+                : ""}
       </span>
     </Item>
   )

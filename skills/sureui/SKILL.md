@@ -243,9 +243,10 @@ npx shadcn@latest add @sureui/confirm-button
 
 - The fill takes 1.2 seconds by default. Anything under 0.8 seconds is raised to 0.8, because a shorter hold is easy to trigger with a slow tap.
 - Once the fill completes, the button is ready (data-state="ready") and confirms when the pointer or key is released on it. Show a different label while ready with releaseLabel.
+- Holding is a shortcut, not the only way. A screen reader activation, or a Space or Enter press let go before the fill completes, arms the button instead (data-state="armed", announced as "Activate again to confirm"), and the next activation confirms. This armed state never times out; blur or Escape clears it. A mouse or finger let go early still cancels. Turn this off with holdFallback="none".
 - Letting go outside the button, moving off it, or losing focus cancels, even after the fill. Set cancelHoldOnLeave={false} to let the pointer leave and come back before letting go, like a native button.
 - Set confirmOnRelease={false} to confirm the moment the fill completes. Pair it with undo, since there is no last chance to back out.
 - With undo, the Undo button runs on click, so pressing it and sliding off does nothing.
 - The context menu is blocked on the button so a long press on a phone doesn't open it.
 - With prefers-reduced-motion, fills don't animate: the hold fill appears when it completes and the undo fill clears when the window ends.
-- ConfirmMenuItem with gesture="hold" keeps its menu open while held and closes it once the action commits. Hold Enter or Space to confirm from the keyboard.
+- ConfirmMenuItem with gesture="hold" keeps its menu open while held and closes it once the action commits. From the keyboard, hold Enter or Space, or press twice.

@@ -40,6 +40,7 @@ type ConfirmDialogOptions = Pick<
       hold?: string
       ready?: string
       armed?: string
+      fallback?: string
       match?: string
     }
   }
