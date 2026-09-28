@@ -2,13 +2,14 @@ import type { Metadata } from "next"
 import { CheckIcon } from "lucide-react"
 import { notFound } from "next/navigation"
 
-import { Code, Command } from "@/components/site/code"
+import { Code } from "@/components/site/code"
 import { Demo } from "@/components/site/demos"
 import { DocsHeader, DocsSection, StyleLink } from "@/components/site/docs"
 import { Label } from "@/components/site/frame"
 import { Preview } from "@/components/site/preview"
 import { PropsTable } from "@/components/site/props-table"
-import { getStyle, installCommand, styles } from "@/components/site/styles"
+import { InstallCommand } from "@/components/site/install-command"
+import { addArgs, getStyle, styles } from "@/components/site/styles"
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -36,11 +37,7 @@ export default async function StylePage({ params }: Props) {
         </Preview>
       </DocsHeader>
       <DocsSection label="Installation">
-        <div className="grid grid-cols-1 gap-2">
-          {style.items.map((item) => (
-            <Command key={item}>{installCommand(item)}</Command>
-          ))}
-        </div>
+        <InstallCommand args={addArgs(style.items)} />
       </DocsSection>
       <DocsSection label="Usage">
         <Code>{style.usage}</Code>

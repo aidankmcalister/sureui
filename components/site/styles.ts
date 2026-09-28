@@ -1,9 +1,16 @@
 export const githubUrl = "https://github.com/aidankmcalister/sureui"
 
-export const siteUrl = "https://sureui.vercel.app"
+export const siteUrl = "https://sureui.com"
 
-export function installCommand(item: string) {
-  return `npx shadcn add @sureui/${item}`
+export const items = [
+  "confirm-button",
+  "type-to-confirm",
+  "confirm-dialog",
+  "undo-toast",
+]
+
+export function addArgs(names: string[]) {
+  return `add ${names.map((name) => `@sureui/${name}`).join(" ")}`
 }
 
 const onConfirm = ["onConfirm", "() => void | Promise<unknown>", "required"]
