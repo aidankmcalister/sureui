@@ -26,6 +26,7 @@ const columns = [
       { href: "/llms.txt", label: "llms.txt" },
       { href: "/llms-full.txt", label: "llms-full.txt" },
       { href: "/r/registry.json", label: "registry.json" },
+      { href: "/changelog", label: "Changelog" },
       { href: githubUrl, label: "GitHub" },
       { href: `${githubUrl}/issues`, label: "Issues" },
     ],
