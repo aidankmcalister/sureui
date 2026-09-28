@@ -19,7 +19,9 @@ export type Style = {
   summary: string
   items: string[]
   usage: string
-  api: { name: string; rows: string[][] }[]
+  preview?: string
+  api: { name: string; rows: string[][]; figure?: boolean }[]
+  inlineFeedback?: boolean
   behavior?: string[]
   useWhen: string[]
   instead: { when: string; slug: string }[]
@@ -32,7 +34,19 @@ export const styles: Style[] = [
     lead: "Act right away and give people a few seconds to take it back.",
     summary: "Runs on click, then offers a few seconds to take it back.",
     items: ["confirm-button", "undo-toast", "undoable"],
-    usage: `<ConfirmButton undo onConfirm={moveToTrash}>
+    inlineFeedback: true,
+    preview: `import { ConfirmButton } from "@/components/ui/sureui/confirm-button"
+
+<ConfirmButton undo variant="outline" size="sm" onConfirm={deleteFile}>
+  Delete
+</ConfirmButton>`,
+    usage: `import { Button } from "@/components/ui/button"
+import { ConfirmButton } from "@/components/ui/sureui/confirm-button"
+import { undoToast } from "@/components/ui/sureui/undo-toast"
+import { Undoable } from "@/components/ui/sureui/undoable"
+import { TableCell, TableRow } from "@/components/ui/table"
+
+<ConfirmButton undo onConfirm={moveToTrash}>
   Move to trash
 </ConfirmButton>
 
@@ -70,6 +84,7 @@ if (await undoToast("Moved 3 files to trash")) {
       },
       {
         name: "undoToast(message, options)",
+        figure: true,
         rows: [
           ["message", "ReactNode", "required"],
           ["description", "ReactNode", "—"],
@@ -81,6 +96,7 @@ if (await undoToast("Moved 3 files to trash")) {
       },
       {
         name: "Undoable",
+        figure: true,
         rows: [
           onConfirm,
           ["children", "ReactNode | ({ remove, state }) => ReactNode", "—"],
@@ -126,7 +142,13 @@ if (await undoToast("Moved 3 files to trash")) {
     lead: "The first click arms the button and the second one confirms.",
     summary: "The first click arms it, the second confirms.",
     items: ["confirm-button"],
-    usage: `<ConfirmButton gesture="click-again" onConfirm={archive}>
+    usage: `import { DropdownMenuContent } from "@/components/ui/dropdown-menu"
+import { Label } from "@/components/ui/label"
+import { ConfirmButton } from "@/components/ui/sureui/confirm-button"
+import { ConfirmMenuItem } from "@/components/ui/sureui/confirm-menu-item"
+import { ConfirmSwitch } from "@/components/ui/sureui/confirm-switch"
+
+<ConfirmButton gesture="click-again" onConfirm={archive}>
   Archive
 </ConfirmButton>
 
@@ -277,7 +299,11 @@ if (await undoToast("Moved 3 files to trash")) {
     lead: "People press and hold until the fill completes, then let go to confirm. Letting go early cancels.",
     summary: "Press and hold until it fills, then let go.",
     items: ["confirm-button"],
-    usage: `<ConfirmButton gesture="hold" variant="destructive" onConfirm={revoke}>
+    usage: `import { ConfirmButton } from "@/components/ui/sureui/confirm-button"
+import { ConfirmMenuItem } from "@/components/ui/sureui/confirm-menu-item"
+import { ConfirmSwitch } from "@/components/ui/sureui/confirm-switch"
+
+<ConfirmButton gesture="hold" variant="destructive" onConfirm={revoke}>
   Hold to revoke
 </ConfirmButton>
 
@@ -370,7 +396,11 @@ if (await undoToast("Moved 3 files to trash")) {
     lead: "An optional alert dialog for actions that need a sentence of explanation, or a popover anchored to the button when one line is enough.",
     summary: "Opens a dialog or a popover when there's something to explain.",
     items: ["confirm-dialog"],
-    usage: `<ConfirmDialog
+    usage: `import { Button } from "@/components/ui/button"
+import { ConfirmDialog, useConfirm } from "@/components/ui/sureui/confirm-dialog"
+import { ConfirmPopover } from "@/components/ui/sureui/confirm-popover"
+
+<ConfirmDialog
   title="Leave the Design team?"
   description="An admin can add you back later."
   confirmLabel="Leave team"
@@ -496,7 +526,10 @@ async function discard() {
     lead: "An inline form that unlocks only after the exact phrase is typed.",
     summary: "Unlocks only after the exact name is typed.",
     items: ["type-to-confirm", "consequences"],
-    usage: `<TypeToConfirm
+    usage: `import { Consequences } from "@/components/ui/sureui/consequences"
+import { TypeToConfirm } from "@/components/ui/sureui/type-to-confirm"
+
+<TypeToConfirm
   phrase="acme-prod"
   consequences={
     <Consequences

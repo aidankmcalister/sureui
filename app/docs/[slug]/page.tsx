@@ -3,7 +3,8 @@ import { CheckIcon } from "lucide-react"
 import { notFound } from "next/navigation"
 
 import { Code } from "@/components/site/code/code"
-import { Demo } from "@/components/site/docs/demos"
+import { ApiDemo, Demo } from "@/components/site/docs/demos"
+import { Figure } from "@/components/site/docs/figure"
 import {
   DocsHeader,
   DocsSection,
@@ -39,7 +40,8 @@ export default async function StylePage({ params }: Props) {
       <DocsHeader href={`/docs/${style.slug}`}>
         <Preview
           figure={figure}
-          code={<Code framed={false}>{style.usage}</Code>}
+          log={!style.inlineFeedback}
+          code={<Code framed={false}>{style.preview ?? style.usage}</Code>}
         >
           <Demo slug={style.slug} />
         </Preview>
@@ -66,6 +68,15 @@ export default async function StylePage({ params }: Props) {
               <div key={api.name} className="grid gap-3">
                 {style.api.length > 1 && (
                   <h3 className="font-mono text-sm font-medium">{api.name}</h3>
+                )}
+                {api.figure && (
+                  <Figure
+                    label={`Fig. ${figure}·${String.fromCharCode(
+                      98 + style.api.filter((item) => item.figure).indexOf(api)
+                    )}`}
+                  >
+                    <ApiDemo slug={style.slug} api={api.name} />
+                  </Figure>
                 )}
                 <PropsTable rows={api.rows} />
               </div>
