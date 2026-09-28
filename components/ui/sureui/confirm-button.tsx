@@ -76,8 +76,15 @@ function ConfirmButton({
   const labels = [
     { state: "idle", node: children },
     ...(gesture === "click-again" ||
-    (gesture === "hold" && confirmLabel != null)
-      ? [{ state: "armed", node: confirmLabel ?? "Click again to confirm" }]
+    (gesture === "hold" && (confirmLabel != null || holdFallback !== "none"))
+      ? [
+          {
+            state: "armed",
+            node:
+              confirmLabel ??
+              (gesture === "hold" ? "Confirm" : "Click again to confirm"),
+          },
+        ]
       : []),
     ...(hasReleaseLabel ? [{ state: "ready", node: releaseLabel }] : []),
     ...(undo ? [{ state: "undo", node: undoLabel }] : []),
@@ -102,9 +109,8 @@ function ConfirmButton({
         aria-describedby={holdDescribedBy}
         data-state={state}
         className={cn(
-          "relative overflow-hidden aria-disabled:opacity-50 motion-safe:data-[state=pending]:animate-pulse motion-safe:aria-disabled:data-[state=pending]:opacity-100",
-          gesture === "hold" &&
-            "touch-none active:not-aria-[haspopup]:translate-y-0",
+          "relative overflow-hidden transition-[color,background-color,border-color,box-shadow] active:not-aria-[haspopup]:translate-y-0 aria-disabled:opacity-50 motion-safe:data-[state=pending]:animate-pulse motion-safe:aria-disabled:data-[state=pending]:opacity-100",
+          gesture === "hold" ? "touch-none" : "touch-manipulation",
           className
         )}
         focusableWhenDisabled={

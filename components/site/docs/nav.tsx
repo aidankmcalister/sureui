@@ -1,21 +1,13 @@
 "use client"
 
-import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { TableOfContentsIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { Label, Plus, tapTarget } from "@/components/site/layout/frame"
-import { siteButton } from "@/components/site/ui/button"
-import {
-  SiteDrawer,
-  SiteDrawerContent,
-  SiteDrawerTrigger,
-} from "@/components/site/ui/drawer"
+import { Label, Plus } from "@/components/site/layout/frame"
 import type { Page } from "@/lib/site/docs"
 
-function DocsNav({
+export function DocsNav({
   pages,
   onNavigate,
 }: {
@@ -26,7 +18,7 @@ function DocsNav({
   const groups = [...new Set(pages.map((page) => page.group))]
 
   return (
-    <nav className="grid gap-7">
+    <nav aria-label="Docs pages" className="grid gap-7">
       {groups.map((group) => (
         <div key={group} className="grid gap-1">
           <Label className="px-2.75 pb-2">{group}</Label>
@@ -66,37 +58,14 @@ function DocsNav({
 
 export function DocsSidebar({ pages }: { pages: Page[] }) {
   return (
-    <aside className="hidden border-r border-(--rule) lg:block">
+    <aside
+      aria-label="Docs"
+      className="hidden border-r border-(--rule) lg:block"
+    >
       <div className="sticky top-0 max-h-svh overflow-y-auto px-4 py-6">
         <DocsNav pages={pages} />
       </div>
     </aside>
-  )
-}
-
-export function DocsBar({ pages }: { pages: Page[] }) {
-  const [open, setOpen] = React.useState(false)
-  const pathname = usePathname()
-  const page = pages.find((item) => item.href === pathname)
-
-  return (
-    <div className="flex h-14 items-center justify-between gap-4 px-3 sm:px-6">
-      <Label className="truncate">
-        <span className="text-(--mark-text)">{page?.sheet}</span> ·{" "}
-        {page?.title}
-      </Label>
-      <SiteDrawer open={open} onOpenChange={setOpen}>
-        <SiteDrawerTrigger className={siteButton({ className: tapTarget })}>
-          <TableOfContentsIcon aria-hidden />
-          Contents
-        </SiteDrawerTrigger>
-        <SiteDrawerContent title="Contents">
-          <div className="overflow-y-auto px-3 py-6">
-            <DocsNav pages={pages} onNavigate={() => setOpen(false)} />
-          </div>
-        </SiteDrawerContent>
-      </SiteDrawer>
-    </div>
   )
 }
 

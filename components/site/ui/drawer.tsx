@@ -16,10 +16,11 @@ function SiteDrawerTrigger(props: DialogPrimitive.Trigger.Props) {
 
 function SiteDrawerContent({
   title,
+  actions,
   className,
   children,
   ...props
-}: DialogPrimitive.Popup.Props & { title: string }) {
+}: DialogPrimitive.Popup.Props & { title: string; actions?: React.ReactNode }) {
   return (
     <DialogPrimitive.Portal>
       <DialogPrimitive.Backdrop className="fixed inset-0 z-50 bg-black/40 transition-opacity duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0" />
@@ -34,12 +35,15 @@ function SiteDrawerContent({
           <DialogPrimitive.Title className="font-mono text-[11px] leading-4 font-normal tracking-widest text-(--ink-label) uppercase">
             {title}
           </DialogPrimitive.Title>
-          <DialogPrimitive.Close
-            aria-label="Close"
-            className={siteButton({ variant: "ghost", size: "icon" })}
-          >
-            <XIcon />
-          </DialogPrimitive.Close>
+          <div className="flex items-center">
+            {actions}
+            <DialogPrimitive.Close
+              aria-label="Close"
+              className={siteButton({ variant: "ghost", size: "icon" })}
+            >
+              <XIcon />
+            </DialogPrimitive.Close>
+          </div>
         </div>
         {children}
       </DialogPrimitive.Popup>

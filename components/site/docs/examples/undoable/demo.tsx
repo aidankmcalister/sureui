@@ -12,14 +12,6 @@ export default function UndoableDemo() {
   const log = useLog()
   const [files, setFiles] = React.useState(initialFiles)
 
-  if (files.length === 0) {
-    return (
-      <Button variant="outline" onClick={() => setFiles(initialFiles)}>
-        Reset
-      </Button>
-    )
-  }
-
   return (
     <ul className="w-full max-w-sm divide-y rounded-lg border text-sm">
       {files.map((file) => (

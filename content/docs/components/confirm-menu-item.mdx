@@ -48,10 +48,11 @@ Set `menu="context"` inside a `ContextMenuContent`.
 
 ### ConfirmMenuItem
 
-Takes every prop of the shadcn `DropdownMenuItem`, like `variant`, except `closeOnClick`.
+Extends the shadcn [`DropdownMenuItem`](https://ui.shadcn.com/docs/components/base/dropdown-menu), except `closeOnClick`. The table lists the props it adds.
 
 | Prop | Type | Default |
 | --- | --- | --- |
+| `...menuItemProps` | [`DropdownMenuItem`](https://ui.shadcn.com/docs/components/base/dropdown-menu) props | — |
 | `onConfirm` | `() => void \| Promise<unknown>` | required |
 | `onCancel` | `() => void` | — |
 | `gesture` | `"click" \| "click-again" \| "hold"` | `"click-again"` |
@@ -62,13 +63,13 @@ Takes every prop of the shadcn `DropdownMenuItem`, like `variant`, except `close
 | `undo` | `boolean \| number` | — |
 | `pauseUndoOnHover` | `boolean` | `true` |
 | `pauseUndoOnFocus` | `boolean` | `true` |
-| `confirmLabel` | `ReactNode` | `"Click again to confirm"` |
+| `confirmLabel` | `ReactNode` | `"Click again to confirm"`, or `"Confirm"` for a hold |
 | `releaseLabel` | `ReactNode` | — |
 | `undoLabel` | `ReactNode` | `"Undo"` |
 | `timeout` | `number` | `3000` |
 | `cancelOnBlur` | `boolean` | `true` |
 | `duration` | `number` | `1200` |
-| `confirmOnRelease` | `boolean` | `true` |
+| `confirmOnRelease` | `boolean` | `false` |
 | `cancelHoldOnLeave` | `boolean` | `true` |
 | `holdFallback` | `"click-again" \| "none"` | `"click-again"` |
 | `announcements` | `{ armed?, hold?, fallback?, ready?, undo? }` | — |

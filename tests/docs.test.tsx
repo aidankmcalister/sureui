@@ -134,6 +134,8 @@ const confirmPopover = {
   onOpenChange: true,
 } satisfies Record<keyof ConfirmPopoverProps, true>
 const consequences = {
+  subject: true,
+  subjectDescription: true,
   items: true,
   title: true,
   variant: true,

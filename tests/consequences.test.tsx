@@ -34,6 +34,24 @@ describe("Consequences", () => {
     expect(within(list).getAllByRole("listitem")).toHaveLength(3)
   })
 
+  it("shows the subject above the title and list", () => {
+    render(
+      <Consequences
+        subject="acme/web-app"
+        subjectDescription="48 stars · 6 watchers"
+        title="This permanently deletes"
+        items={[{ label: "Issues", count: 12 }]}
+      />
+    )
+    const subject = screen.getByText("acme/web-app")
+    expect(screen.getByText("48 stars · 6 watchers")).toBeTruthy()
+    expect(
+      subject.compareDocumentPosition(
+        screen.getByRole("list", { name: "This permanently deletes" })
+      ) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
+  })
+
   it("reads each item as its label, count and names", () => {
     render(
       <Consequences
@@ -65,7 +83,9 @@ describe("Consequences", () => {
         items={[{ label: "projects", count: 3, names: projects }]}
       />
     )
-    expect(screen.getByText("acme-web, acme-api and 1 more")).toBeTruthy()
+    expect(
+      document.querySelector('[data-slot="consequences-names"]')?.textContent
+    ).toBe("acme-web, acme-api and 1 more")
     expect(screen.queryByRole("button")).toBeNull()
   })
 
@@ -76,7 +96,9 @@ describe("Consequences", () => {
         items={[{ label: "sites", count: 50, names: many.slice(0, 5) }]}
       />
     )
-    expect(screen.getByText("site-1, site-2, site-3 and 47 more")).toBeTruthy()
+    expect(
+      document.querySelector('[data-slot="consequences-names"]')?.textContent
+    ).toBe("site-1, site-2, site-3 and 47 more")
   })
 
   it("expands the rest of the names and collapses them again", () => {

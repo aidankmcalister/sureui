@@ -68,8 +68,18 @@ export function InstallCommand({ args }: { args: string }) {
         </SiteTabs>
         <CopyButton value={command} />
       </div>
-      <p className="px-4 py-3 font-mono text-[13px] leading-6 break-all">
-        {command}
+      <p className="px-4 py-3 font-mono text-[13px] leading-6 break-all text-(--code-foreground)">
+        <span className="text-(--code-keyword)">{runners[runner]}</span>{" "}
+        shadcn@latest{" "}
+        {args.split(/(@sureui\/\S+)/).map((part, index) =>
+          index % 2 ? (
+            <span key={index} className="text-(--code-sureui)">
+              {part}
+            </span>
+          ) : (
+            part
+          )
+        )}
       </p>
     </div>
   )

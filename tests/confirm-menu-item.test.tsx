@@ -115,8 +115,11 @@ describe("ConfirmMenuItem", () => {
     )
   })
 
-  it("hold: keeps the menu open while holding, confirms on release and closes", async () => {
-    const { item, onConfirm, onOpenChange } = renderMenu({ gesture: "hold" })
+  it("hold: confirmOnRelease keeps the menu open while held, confirms on release and closes", async () => {
+    const { item, onConfirm, onOpenChange } = renderMenu({
+      gesture: "hold",
+      confirmOnRelease: true,
+    })
     expect(item.getAttribute("aria-describedby")).toBeTruthy()
     fireEvent.pointerDown(item, { button: 0 })
     expect(item.getAttribute("data-state")).toBe("holding")
@@ -144,13 +147,12 @@ describe("ConfirmMenuItem", () => {
     expect(closed(onOpenChange)).toBe(false)
   })
 
-  it("hold: holding Enter confirms on release", async () => {
+  it("hold: holding Enter confirms when the fill completes", async () => {
     const { item, onConfirm, onOpenChange } = renderMenu({ gesture: "hold" })
     act(() => item.focus())
     await act(async () => fireEvent.keyDown(item, { key: "Enter" }))
     expect(item.getAttribute("data-state")).toBe("holding")
     await act(async () => vi.advanceTimersByTime(1200))
-    await act(async () => fireEvent.keyUp(item, { key: "Enter" }))
     expect(onConfirm).toHaveBeenCalledOnce()
     expect(closed(onOpenChange)).toBe(true)
   })

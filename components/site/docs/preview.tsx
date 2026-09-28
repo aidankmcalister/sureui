@@ -9,6 +9,7 @@ import {
   SiteTabsList,
 } from "@/components/site/ui/tabs"
 import { Label } from "@/components/site/layout/frame"
+import { ResetButton } from "@/components/site/ui/reset"
 
 type Log = (message: string) => void
 
@@ -32,6 +33,7 @@ export function Preview({
   children: React.ReactNode
 }) {
   const [line, setLine] = React.useState<Line | null>(null)
+  const [version, setVersion] = React.useState(0)
   const nextId = React.useRef(0)
 
   const push = React.useCallback<Log>((message) => {
@@ -41,16 +43,27 @@ export function Preview({
   return (
     <div className="border border-(--rule) bg-(--well) text-foreground">
       <SiteTabs defaultValue="preview">
-        <div className="flex h-10 items-center justify-between gap-4 border-b border-(--rule) pr-4 pl-2">
+        <div className="flex h-10 items-center justify-between gap-4 border-b border-(--rule) pr-1.5 pl-2">
           <SiteTabsList>
             <SiteTab value="preview">Preview</SiteTab>
             <SiteTab value="code">Code</SiteTab>
           </SiteTabsList>
-          <Label>Fig. {figure}</Label>
+          <div className="flex items-center gap-2">
+            <Label>Fig. {figure}</Label>
+            <ResetButton
+              onReset={() => {
+                setVersion((value) => value + 1)
+                setLine(null)
+              }}
+            />
+          </div>
         </div>
-        <SiteTabPanel value="preview">
+        <SiteTabPanel value="preview" className="min-w-0">
           <LogContext value={push}>
-            <div className="flex min-h-48 items-center justify-center p-6">
+            <div
+              key={version}
+              className="flex min-h-48 items-center justify-center p-6"
+            >
               {children}
             </div>
           </LogContext>
@@ -77,7 +90,9 @@ export function Preview({
             </p>
           )}
         </SiteTabPanel>
-        <SiteTabPanel value="code">{code}</SiteTabPanel>
+        <SiteTabPanel value="code" className="min-w-0">
+          {code}
+        </SiteTabPanel>
       </SiteTabs>
     </div>
   )

@@ -112,10 +112,22 @@ function TypeToConfirm({
     >
       {consequences}
       <div className="grid gap-2">
-        <Label htmlFor={inputId} className="block leading-normal">
+        <Label
+          htmlFor={inputId}
+          className="block leading-normal select-text"
+          onClick={(event) => {
+            if (window.getSelection()?.isCollapsed === false) {
+              event.preventDefault()
+            }
+          }}
+        >
           {label ?? (
             <>
-              Type <span className="font-mono">{phrase}</span> to confirm
+              Type{" "}
+              <code className="rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-[0.9em] font-semibold text-foreground">
+                {phrase}
+              </code>{" "}
+              to confirm
             </>
           )}
         </Label>

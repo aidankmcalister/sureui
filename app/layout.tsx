@@ -4,6 +4,7 @@ import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils"
+import { DemoToaster } from "@/components/site/layout/toaster"
 import { Footer } from "@/components/site/layout/footer"
 import { Header } from "@/components/site/layout/header"
 import { siteUrl } from "@/lib/site/config"
@@ -56,6 +57,7 @@ export default function RootLayout({
             {children}
             <Footer />
           </div>
+          <DemoToaster />
         </ThemeProvider>
       </body>
     </html>

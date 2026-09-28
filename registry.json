@@ -297,6 +297,165 @@
         "list",
         "table"
       ]
+    },
+    {
+      "name": "danger-zone-01",
+      "type": "registry:block",
+      "title": "Danger Zone",
+      "description": "A project settings danger zone: pause deployments with an undo window, transfer the project in a dialog, and delete it in a dialog that asks for the project name.",
+      "registryDependencies": [
+        "@sureui/confirm-button",
+        "@sureui/confirm-dialog",
+        "button",
+        "card"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/danger-zone-01/danger-zone.tsx",
+          "type": "registry:component",
+          "target": "@components/danger-zone.tsx"
+        }
+      ],
+      "categories": [
+        "block",
+        "settings"
+      ]
+    },
+    {
+      "name": "api-keys-01",
+      "type": "registry:block",
+      "title": "API Keys",
+      "description": "A list of API keys with the last time each was used, hold to revoke, and a Create key dialog that shows the new secret once with a copy button.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "@sureui/confirm-button",
+        "button",
+        "card",
+        "dialog",
+        "input",
+        "label"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/api-keys-01/api-keys.tsx",
+          "type": "registry:component",
+          "target": "@components/api-keys.tsx"
+        },
+        {
+          "path": "components/blocks/api-keys-01/create-key-dialog.tsx",
+          "type": "registry:component",
+          "target": "@components/create-key-dialog.tsx"
+        }
+      ],
+      "categories": [
+        "block",
+        "settings"
+      ]
+    },
+    {
+      "name": "delete-account-01",
+      "type": "registry:block",
+      "title": "Delete Account",
+      "description": "An account deletion screen with an export link first, a list of what gets deleted, and a form that unlocks after you type your email and check each acknowledgement.",
+      "registryDependencies": [
+        "@sureui/consequences",
+        "@sureui/type-to-confirm",
+        "button",
+        "card"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/delete-account-01/delete-account.tsx",
+          "type": "registry:component",
+          "target": "@components/delete-account.tsx"
+        }
+      ],
+      "categories": [
+        "block",
+        "settings"
+      ]
+    },
+    {
+      "name": "team-members-01",
+      "type": "registry:block",
+      "title": "Team Members",
+      "description": "A team members list whose row menu removes someone after a second click, and makes someone the owner after a dialog explains what changes.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "@sureui/confirm-dialog",
+        "@sureui/confirm-menu-item",
+        "avatar",
+        "button",
+        "card",
+        "dropdown-menu"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/team-members-01/team-members.tsx",
+          "type": "registry:component",
+          "target": "@components/team-members.tsx"
+        }
+      ],
+      "categories": [
+        "block",
+        "settings"
+      ]
+    },
+    {
+      "name": "file-manager-01",
+      "type": "registry:block",
+      "title": "File Manager",
+      "description": "A file list where selected files move to trash with an undo toast, a Trash tab restores them one at a time, and an Empty trash dialog lists what goes and asks you to type a phrase.",
+      "registryDependencies": [
+        "@sureui/confirm-dialog",
+        "@sureui/consequences",
+        "@sureui/undo-toast",
+        "button",
+        "card",
+        "checkbox",
+        "tabs"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/file-manager-01/file-manager.tsx",
+          "type": "registry:component",
+          "target": "@components/file-manager.tsx"
+        }
+      ],
+      "categories": [
+        "block",
+        "files"
+      ]
+    },
+    {
+      "name": "inbox-01",
+      "type": "registry:block",
+      "title": "Inbox",
+      "description": "A message list where archive and delete collapse the row in place with an Undo, and a reading pane whose toolbar archives on a second click and deletes on a hold.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "@sureui/confirm-button",
+        "@sureui/undoable",
+        "button",
+        "card"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/inbox-01/inbox.tsx",
+          "type": "registry:component",
+          "target": "@components/inbox.tsx"
+        }
+      ],
+      "categories": [
+        "block",
+        "mail"
+      ]
     }
   ]
 }

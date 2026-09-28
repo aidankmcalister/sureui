@@ -30,7 +30,9 @@ export default function UndoableTable() {
         <TableRow>
           <TableHead>Branch</TableHead>
           <TableHead>Updated</TableHead>
-          <TableHead />
+          <TableHead>
+            <span className="sr-only">Actions</span>
+          </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

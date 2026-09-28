@@ -1,5 +1,4 @@
-import { DocsBar, DocsPager, DocsSidebar } from "@/components/site/docs/nav"
-import { DemoToaster } from "@/components/site/docs/toaster"
+import { DocsPager, DocsSidebar } from "@/components/site/docs/nav"
 import { Band } from "@/components/site/layout/frame"
 import { pages } from "@/lib/site/docs"
 
@@ -9,20 +8,12 @@ export default function DocsLayout({
   children: React.ReactNode
 }>) {
   return (
-    <>
-      <div className="lg:hidden">
-        <Band>
-          <DocsBar pages={pages} />
-        </Band>
-      </div>
-      <Band grow className="grid lg:grid-cols-[240px_minmax(0,1fr)]">
-        <DocsSidebar pages={pages} />
-        <main className="flex min-w-0 flex-col">
-          <div className="flex-1">{children}</div>
-          <DocsPager pages={pages} />
-        </main>
-      </Band>
-      <DemoToaster />
-    </>
+    <Band grow className="grid lg:grid-cols-[240px_minmax(0,1fr)]">
+      <DocsSidebar pages={pages} />
+      <main className="flex min-w-0 flex-col">
+        <div className="flex-1">{children}</div>
+        <DocsPager pages={pages} />
+      </main>
+    </Band>
   )
 }

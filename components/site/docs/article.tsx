@@ -13,7 +13,10 @@ export async function DocsArticle({ page }: { page: Page }) {
           <Content />
         </div>
       </article>
-      <aside className="hidden border-l border-(--rule) xl:block">
+      <aside
+        aria-label="Table of contents"
+        className="hidden border-l border-(--rule) xl:block"
+      >
         <div className="sticky top-0 max-h-svh overflow-y-auto px-5 py-10 lg:py-12">
           <DocsToc headings={headings(page.slug)} />
         </div>

@@ -49,10 +49,11 @@ The window lasts 5 seconds, or the milliseconds you pass to `undo`.
 
 ### Undoable
 
-Takes every prop of the element it renders.
+The table lists the props it adds to the element it renders.
 
 | Prop | Type | Default |
 | --- | --- | --- |
+| `...elementProps` | props of the `render` element | — |
 | `onConfirm` | `() => void \| Promise<unknown>` | required |
 | `onCancel` | `() => void` | — |
 | `children` | `ReactNode \| (({ remove, state }) => ReactNode)` | — |

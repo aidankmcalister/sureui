@@ -6,6 +6,12 @@ import { cn } from "@/lib/utils"
 
 type ConsequencesVariant = "default" | "destructive"
 
+function mutedText(variant?: ConsequencesVariant) {
+  return variant === "destructive"
+    ? "text-[color-mix(in_oklab,var(--muted-foreground)_85%,var(--foreground))]"
+    : "text-muted-foreground"
+}
+
 type ConsequencesListOptions = {
   limit?: number
   expandable?: boolean
@@ -26,6 +32,8 @@ type ConsequencesItemProps = Omit<React.ComponentProps<"li">, "children"> &
 
 type ConsequencesProps = Omit<React.ComponentProps<"div">, "title"> &
   ConsequencesListOptions & {
+    subject?: React.ReactNode
+    subjectDescription?: React.ReactNode
     title?: React.ReactNode
     items?: Consequence[]
     variant?: ConsequencesVariant
@@ -44,6 +52,8 @@ const ConsequencesContext = React.createContext<
 >({ ...defaults, variant: "default" })
 
 function Consequences({
+  subject,
+  subjectDescription,
   title,
   items,
   variant = "default",
@@ -67,11 +77,29 @@ function Consequences({
         className={cn(
           "overflow-hidden rounded-xl bg-card text-sm text-card-foreground ring-1 ring-foreground/10",
           variant === "destructive" &&
-            "bg-destructive/5 ring-destructive/20 dark:bg-destructive/10",
+            "bg-destructive/3 ring-destructive/20 dark:bg-destructive/5",
           className
         )}
         {...props}
       >
+        {subject && (
+          <div
+            data-slot="consequences-subject"
+            className="grid gap-0.5 border-b px-3 py-2.5"
+          >
+            <div className="leading-5 font-medium break-words">{subject}</div>
+            {subjectDescription && (
+              <div
+                className={cn(
+                  "text-xs leading-4 text-pretty",
+                  mutedText(variant)
+                )}
+              >
+                {subjectDescription}
+              </div>
+            )}
+          </div>
+        )}
         {title && (
           <div
             id={titleId}
@@ -79,7 +107,7 @@ function Consequences({
             className={cn(
               "border-b bg-muted/50 px-3 py-2 font-medium",
               variant === "destructive" &&
-                "border-destructive/20 bg-destructive/10 text-destructive dark:bg-destructive/15"
+                "border-destructive/15 bg-destructive/10 text-[color-mix(in_oklab,var(--destructive)_80%,var(--foreground))] dark:bg-destructive/20"
             )}
           >
             {title}
@@ -91,7 +119,7 @@ function Consequences({
           aria-labelledby={title ? titleId : undefined}
           className={cn(
             "divide-y",
-            variant === "destructive" && "divide-destructive/20"
+            variant === "destructive" && "divide-destructive/12"
           )}
         >
           {items?.map((item, index) => (
@@ -174,11 +202,17 @@ function ConsequencesItem({
           id={namesId}
           data-slot="consequences-names"
           className={cn(
-            "text-xs leading-4 text-pretty break-words text-muted-foreground",
+            "text-xs leading-4 text-pretty break-words",
+            mutedText(context.variant),
             icon ? "col-start-2" : "col-start-1"
           )}
         >
-          {shown.join(", ")}
+          {shown.map((name, index) => (
+            <React.Fragment key={index}>
+              {index > 0 && ", "}
+              <span className="whitespace-nowrap">{name}</span>
+            </React.Fragment>
+          ))}
           {hidden > 0 &&
             !(canExpand && !expanded) &&
             `${shown.length > 0 ? " " : ""}${more(hidden)}`}
@@ -189,7 +223,7 @@ function ConsequencesItem({
                 type="button"
                 aria-expanded={expanded}
                 aria-controls={namesId}
-                className="rounded-sm font-medium text-foreground underline-offset-4 outline-none hover:underline focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                className="rounded-sm py-1 font-medium text-foreground underline-offset-4 outline-none hover:underline focus-visible:ring-[3px] focus-visible:ring-ring/50"
                 onClick={() => setExpanded((open) => !open)}
               >
                 {expanded ? (lessLabel ?? context.lessLabel) : more(hidden)}
@@ -201,7 +235,8 @@ function ConsequencesItem({
       {description && (
         <span
           className={cn(
-            "text-xs leading-4 text-pretty text-muted-foreground",
+            "text-xs leading-4 text-pretty",
+            mutedText(context.variant),
             icon ? "col-start-2" : "col-start-1"
           )}
         >

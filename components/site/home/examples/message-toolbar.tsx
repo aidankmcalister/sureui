@@ -46,6 +46,7 @@ export function MessageToolbar() {
               size="icon-sm"
               aria-label="Hold to delete"
               title="Hold to delete"
+              confirmLabel={<CheckIcon />}
               onConfirm={() => setStatus("deleted")}
             >
               <Trash2Icon />

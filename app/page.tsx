@@ -1,7 +1,8 @@
 import type { Metadata } from "next"
 
 import { Actions } from "@/components/site/layout/actions"
-import { Band } from "@/components/site/layout/frame"
+import { aboveMark, Band } from "@/components/site/layout/frame"
+import { cn } from "@/lib/utils"
 import { Cell } from "@/components/site/home/cell"
 import { ApiKeys } from "@/components/site/home/examples/api-keys"
 import { ConfirmByName } from "@/components/site/home/examples/confirm-by-name"
@@ -137,7 +138,12 @@ export default function Home() {
           </Cell>
         </div>
       </Band>
-      <Band className="flex flex-wrap items-center justify-between gap-6 px-3 py-12 sm:px-6">
+      <Band
+        className={cn(
+          aboveMark,
+          "flex flex-wrap items-center justify-between gap-6 px-3 py-12 sm:px-6"
+        )}
+      >
         <p className="font-display text-2xl font-bold tracking-tight">
           Free and open source. MIT licensed.
         </p>

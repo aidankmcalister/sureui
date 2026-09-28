@@ -1,7 +1,13 @@
 import Link from "next/link"
 
 import { cn } from "@/lib/utils"
-import { Band, Label, tapTarget } from "@/components/site/layout/frame"
+import { CheckMark } from "@/components/site/home/check-mark"
+import {
+  aboveMark,
+  Band,
+  Label,
+  tapTarget,
+} from "@/components/site/layout/frame"
 import { GitHubIcon } from "@/components/site/layout/github-icon"
 import { SiteLink } from "@/components/site/layout/site-link"
 import { githubUrl } from "@/lib/site/config"
@@ -35,8 +41,14 @@ const columns = [
 
 export function Footer() {
   return (
-    <footer>
-      <Band className="grid grid-cols-2 gap-x-6 gap-y-10 px-3 py-12 sm:grid-cols-3 sm:px-6 lg:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))] lg:py-16">
+    <footer className="relative">
+      <CheckMark />
+      <Band
+        className={cn(
+          aboveMark,
+          "grid grid-cols-2 gap-x-6 gap-y-10 px-3 py-12 sm:grid-cols-3 sm:px-6 lg:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))] lg:py-16"
+        )}
+      >
         <div className="col-span-full grid content-start gap-3 lg:col-span-1">
           <Link
             href="/"
@@ -59,7 +71,11 @@ export function Footer() {
           </SiteLink>
         </div>
         {columns.map((column) => (
-          <nav key={column.title} aria-label={column.title}>
+          <nav
+            key={column.title}
+            aria-label={column.title}
+            className={cn(column.title === "Docs" && "max-sm:order-last")}
+          >
             <Label>{column.title}</Label>
             <ul className="mt-4 grid gap-2.5">
               {column.links.map((link) => (
@@ -79,7 +95,12 @@ export function Footer() {
           </nav>
         ))}
       </Band>
-      <Band className="flex flex-col gap-2 px-3 py-4 text-xs text-(--ink-label) sm:flex-row sm:justify-between sm:px-6">
+      <Band
+        className={cn(
+          aboveMark,
+          "flex flex-col gap-2 px-3 py-4 text-xs text-(--ink-label) sm:flex-row sm:justify-between sm:px-6"
+        )}
+      >
         <span>© 2026 SureUI · MIT licensed</span>
         <span>Built on shadcn/ui and Base UI</span>
       </Band>

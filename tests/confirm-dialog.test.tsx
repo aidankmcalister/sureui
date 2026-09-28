@@ -107,6 +107,7 @@ describe("ConfirmDialog", () => {
       <ConfirmDialog
         title="Revoke key?"
         gesture="hold"
+        confirmOnRelease
         cancelHoldOnLeave={false}
         announcements={{ hold: "Mantén pulsado", ready: "Suelta ahora" }}
         onConfirm={vi.fn()}

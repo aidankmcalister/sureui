@@ -12,6 +12,15 @@ function type(value: string) {
 }
 
 describe("TypeToConfirm", () => {
+  it("lets people select the phrase without the label moving focus", () => {
+    render(<TypeToConfirm phrase="acme-prod" onConfirm={vi.fn()} />)
+    const phrase = screen.getByText("acme-prod")
+    window.getSelection()!.selectAllChildren(phrase)
+    expect(fireEvent.click(phrase)).toBe(false)
+    window.getSelection()!.removeAllRanges()
+    expect(fireEvent.click(phrase)).toBe(true)
+  })
+
   it("confirms only when the phrase matches", () => {
     const onConfirm = vi.fn()
     render(<TypeToConfirm phrase="acme" onConfirm={onConfirm} />)

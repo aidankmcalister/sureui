@@ -35,6 +35,12 @@ Names past `limit` collapse into an "and N more" button. The count comes from th
 
 If you only have some of the names, pass the total as `count` and "and N more" includes the rest. Set `expandable={false}` to keep it as text.
 
+### Subject
+
+`subject` names the thing being deleted, with `subjectDescription` for a line of facts under it, so people can check it's the right one.
+
+<Example name="consequences/subject" />
+
 ### Destructive
 
 `variant="destructive"` tints the whole list.
@@ -45,10 +51,13 @@ If you only have some of the names, pass the total as `count` and "and N more" i
 
 ### Consequences
 
-Takes every prop of a `div`. Each entry in `items` takes the props of `ConsequencesItem`.
+Each entry in `items` takes the props of `ConsequencesItem`.
 
 | Prop | Type | Default |
 | --- | --- | --- |
+| `...divProps` | `ComponentProps<"div">` | — |
+| `subject` | `ReactNode` | — |
+| `subjectDescription` | `ReactNode` | — |
 | `items` | `Consequence[]` | — |
 | `children` | `ReactNode` | — |
 | `title` | `ReactNode` | — |
@@ -57,14 +66,14 @@ Takes every prop of a `div`. Each entry in `items` takes the props of `Consequen
 | `expandable` | `boolean` | `true` |
 | `moreLabel` | `(hidden: number) => string` | `"and {hidden} more"` |
 | `lessLabel` | `string` | `"Show less"` |
-| `...props` | `ComponentProps<"div">` | — |
 
 ### ConsequencesItem
 
-Takes every prop of an `li`. `limit`, `expandable`, `moreLabel` and `lessLabel` default to the values set on `Consequences`.
+`limit`, `expandable`, `moreLabel` and `lessLabel` default to the values set on `Consequences`.
 
 | Prop | Type | Default |
 | --- | --- | --- |
+| `...liProps` | `ComponentProps<"li">` | — |
 | `label` | `ReactNode` | required |
 | `count` | `number` | — |
 | `names` | `string[]` | `[]` |
@@ -74,7 +83,6 @@ Takes every prop of an `li`. `limit`, `expandable`, `moreLabel` and `lessLabel` 
 | `expandable` | `boolean` | — |
 | `moreLabel` | `(hidden: number) => string` | — |
 | `lessLabel` | `string` | — |
-| `...props` | `ComponentProps<"li">` | — |
 
 ## Accessibility
 

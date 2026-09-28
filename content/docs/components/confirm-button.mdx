@@ -41,11 +41,11 @@ The button disarms after `timeout` or when it loses focus.
 
 ### Hold
 
-Press and hold until the fill completes, then let go to confirm. Letting go early cancels.
+Press and hold until the fill completes, and it confirms. Letting go early cancels.
 
 <Example name="confirm-button/hold" />
 
-Moving off the button or losing focus also cancels, even after the fill. Set `confirmOnRelease={false}` to confirm as soon as the fill completes.
+Moving off the button or losing focus also cancels. Set `confirmOnRelease` to wait for people to let go after the fill, so they can still back out.
 
 ### Pending
 
@@ -55,7 +55,7 @@ Return a promise from `onConfirm` and the button pulses until it settles. If it 
 
 ### Labels
 
-`confirmLabel` shows while armed and `undoLabel` during the undo window. `releaseLabel` does the same for a finished hold.
+`confirmLabel` shows while armed and `undoLabel` during the undo window. With `confirmOnRelease`, `releaseLabel` shows while a finished hold waits for release.
 
 <Example name="confirm-button/labels" />
 
@@ -63,23 +63,24 @@ Return a promise from `onConfirm` and the button pulses until it settles. If it 
 
 ### ConfirmButton
 
-Takes every prop of the shadcn `Button`.
+Extends the shadcn [`Button`](https://ui.shadcn.com/docs/components/base/button). The table lists the props it adds.
 
 | Prop | Type | Default |
 | --- | --- | --- |
+| `...buttonProps` | [`Button`](https://ui.shadcn.com/docs/components/base/button) props | — |
 | `onConfirm` | `() => void \| Promise<unknown>` | required |
 | `onCancel` | `() => void` | — |
 | `gesture` | `"click" \| "click-again" \| "hold"` | `"click"` |
 | `undo` | `boolean \| number` | — |
 | `pauseUndoOnHover` | `boolean` | `true` |
 | `pauseUndoOnFocus` | `boolean` | `true` |
-| `confirmLabel` | `ReactNode` | `"Click again to confirm"` |
+| `confirmLabel` | `ReactNode` | `"Click again to confirm"`, or `"Confirm"` for a hold |
 | `releaseLabel` | `ReactNode` | — |
 | `undoLabel` | `ReactNode` | `"Undo"` |
 | `timeout` | `number` | `3000` |
 | `cancelOnBlur` | `boolean` | `true` |
 | `duration` | `number` | `1200` |
-| `confirmOnRelease` | `boolean` | `true` |
+| `confirmOnRelease` | `boolean` | `false` |
 | `cancelHoldOnLeave` | `boolean` | `true` |
 | `holdFallback` | `"click-again" \| "none"` | `"click-again"` |
 | `announcements` | `{ armed?, hold?, fallback?, ready?, undo? }` | — |
@@ -93,7 +94,7 @@ The button sets `data-state`, so you can style around it.
 | `idle` | Waiting for input. |
 | `armed` | Clicked once with `click-again`, or a hold that fell back to a second activation. |
 | `holding` | Being held with `gesture="hold"`. |
-| `ready` | The hold fill is complete and letting go confirms. |
+| `ready` | With `confirmOnRelease`, the fill is complete and letting go confirms. |
 | `undo` | The undo window is open. |
 | `pending` | `onConfirm` returned a promise that hasn't settled. |
 

@@ -52,6 +52,16 @@ type TriggerProps<T extends Element> = {
   onKeyDown?(event: React.KeyboardEvent<T>): void
   onKeyUp?(event: React.KeyboardEvent<T>): void
   onContextMenu?(event: React.MouseEvent<T>): void
+  onMouseDown?(event: React.MouseEvent<T>): void
+}
+
+function hasSelection() {
+  const selection = window.getSelection()
+  return !!selection && !selection.isCollapsed
+}
+
+function clearSelection() {
+  if (hasSelection()) window.getSelection()?.removeAllRanges()
 }
 
 function toMs(value: number, fallback: number, min: number) {
@@ -76,13 +86,14 @@ function isPressKey(event: React.KeyboardEvent) {
 
 function isVirtualPress(event: React.PointerEvent) {
   const { width, height, pressure, pointerType } = event.nativeEvent
-  if (width < 1 && height < 1) return true
+  const android = /Android/i.test(navigator.userAgent)
+  if (width < 1 && height < 1) return !android
   return (
+    android &&
     pointerType === "mouse" &&
     width === 1 &&
     height === 1 &&
-    pressure === 0 &&
-    /Android/i.test(navigator.userAgent)
+    pressure === 0
   )
 }
 
@@ -269,7 +280,7 @@ function useConfirmation<T extends Element = HTMLElement>({
   gesture = "click",
   timeout = 3000,
   duration = 1200,
-  confirmOnRelease = true,
+  confirmOnRelease = false,
   cancelOnBlur = true,
   cancelHoldOnLeave = true,
   holdFallback = "click-again",
@@ -295,6 +306,7 @@ function useConfirmation<T extends Element = HTMLElement>({
   const undoPressRef = React.useRef(false)
   const pressRef = React.useRef<"none" | "pointer" | "virtual" | "key">("none")
   const fallbackRef = React.useRef(false)
+  const selectedRef = React.useRef(false)
 
   React.useEffect(() => {
     if (state !== "armed") fallbackRef.current = false
@@ -360,6 +372,7 @@ function useConfirmation<T extends Element = HTMLElement>({
       if (cancelHoldOnLeave && isHolding) release()
     },
     onPointerDown(event) {
+      selectedRef.current = hasSelection()
       if (!isHold || event.button !== 0) return
       pressRef.current = isVirtualPress(event) ? "virtual" : "pointer"
       undoPressRef.current = state === "undo"
@@ -371,6 +384,9 @@ function useConfirmation<T extends Element = HTMLElement>({
       hold(duration, confirmOnRelease)
     },
     onPointerUp(event) {
+      if (event.pointerType === "touch" && !selectedRef.current) {
+        requestAnimationFrame(clearSelection)
+      }
       if (state === "holding") {
         if (fallback && pressRef.current === "virtual") reset()
         else release()
@@ -409,6 +425,9 @@ function useConfirmation<T extends Element = HTMLElement>({
       } else if (state === "ready") confirm()
       else if (fallbackArmed && pressed) confirm()
       else undoFromPress()
+    },
+    onMouseDown(event) {
+      if (event.detail > 1) event.preventDefault()
     },
     onContextMenu(event) {
       if (isHold) event.preventDefault()

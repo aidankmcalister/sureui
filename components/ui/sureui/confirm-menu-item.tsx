@@ -147,8 +147,15 @@ function ConfirmMenuItem({
   const labels = [
     { state: "idle", node: children },
     ...(gesture === "click-again" ||
-    (gesture === "hold" && confirmLabel != null)
-      ? [{ state: "armed", node: confirmLabel ?? "Click again to confirm" }]
+    (gesture === "hold" && (confirmLabel != null || holdFallback !== "none"))
+      ? [
+          {
+            state: "armed",
+            node:
+              confirmLabel ??
+              (gesture === "hold" ? "Confirm" : "Click again to confirm"),
+          },
+        ]
       : []),
     ...(hasReleaseLabel ? [{ state: "ready", node: releaseLabel }] : []),
     ...(undo ? [{ state: "undo", node: undoLabel }] : []),
@@ -181,7 +188,7 @@ function ConfirmMenuItem({
       data-state={state}
       className={cn(
         "overflow-hidden motion-safe:data-[state=pending]:animate-pulse motion-safe:data-disabled:data-[state=pending]:opacity-100",
-        gesture === "hold" && "touch-none",
+        gesture === "hold" ? "touch-none" : "touch-manipulation",
         className
       )}
     >

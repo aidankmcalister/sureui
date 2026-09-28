@@ -254,8 +254,11 @@ describe("ConfirmPopover", () => {
     expect(onCancel).not.toHaveBeenCalled()
   })
 
-  it("gesture=hold: holding then releasing confirms and closes", async () => {
-    const { trigger, onConfirm } = renderPopover({ gesture: "hold" })
+  it("gesture=hold: confirmOnRelease confirms on release and closes", async () => {
+    const { trigger, onConfirm } = renderPopover({
+      gesture: "hold",
+      confirmOnRelease: true,
+    })
     await open(trigger)
     const confirm = confirmButton()
     fireEvent.pointerDown(confirm, { button: 0 })
@@ -281,11 +284,8 @@ describe("ConfirmPopover", () => {
     expect(screen.getByRole("dialog")).toBeTruthy()
   })
 
-  it("gesture=hold: forwards confirmOnRelease", async () => {
-    const { trigger, onConfirm } = renderPopover({
-      gesture: "hold",
-      confirmOnRelease: false,
-    })
+  it("gesture=hold: confirms when the fill completes and closes", async () => {
+    const { trigger, onConfirm } = renderPopover({ gesture: "hold" })
     await open(trigger)
     fireEvent.pointerDown(confirmButton(), { button: 0 })
     await act(async () => vi.advanceTimersByTimeAsync(1200))

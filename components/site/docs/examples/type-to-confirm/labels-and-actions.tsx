@@ -12,8 +12,11 @@ export default function TypeToConfirmLabelsAndActions() {
       phrase="acme-prod"
       label={
         <>
-          Type <span className="font-mono">acme-prod</span> to move it to the
-          Globex team
+          Type{" "}
+          <code className="rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-[0.9em] font-semibold">
+            acme-prod
+          </code>{" "}
+          to move it to the Globex team
         </>
       }
       variant="default"

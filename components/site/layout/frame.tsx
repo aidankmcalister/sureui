@@ -24,6 +24,8 @@ export function Plus({
 
 export const tapTarget = "relative after:absolute after:-inset-2"
 
+export const aboveMark = "[&>:not(svg)]:relative [&>:not(svg)]:z-2"
+
 export function Band({
   line = true,
   grow,
