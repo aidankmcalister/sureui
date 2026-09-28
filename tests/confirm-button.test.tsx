@@ -781,6 +781,22 @@ describe("ConfirmButton", () => {
     return { button: screen.getByRole("button"), onConfirm, onCancel }
   }
 
+  it("click-again: cancelOnBlur={false} stays armed when focus leaves", async () => {
+    render(
+      <ConfirmButton
+        gesture="click-again"
+        cancelOnBlur={false}
+        onConfirm={vi.fn()}
+      >
+        Archive
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await click(button)
+    fireEvent.blur(button)
+    expect(button.getAttribute("data-state")).toBe("armed")
+  })
+
   it("hold: Space keyUp before the duration cancels", async () => {
     const { button, onConfirm, onCancel } = renderHold()
     fireEvent.keyDown(button, { key: " " })
@@ -968,19 +984,26 @@ describe("ConfirmButton", () => {
     expect(onConfirm).toHaveBeenCalledOnce()
   })
 
-  it("async: pending onConfirm disables the button until it resolves", async () => {
+  it("async: pending onConfirm disables the button but keeps focus", async () => {
     let resolve!: () => void
     const onConfirm = vi.fn(() => new Promise<void>((res) => (resolve = res)))
     render(<ConfirmButton onConfirm={onConfirm}>Delete</ConfirmButton>)
     const button = screen.getByRole("button")
+    button.focus()
     await click(button)
     expect(button.getAttribute("data-state")).toBe("pending")
-    expect(button).toHaveProperty("disabled", true)
+    expect(button.getAttribute("aria-disabled")).toBe("true")
+    expect(button).toHaveProperty("disabled", false)
+    expect(document.activeElement).toBe(button)
+    await click(button)
+    fireEvent.keyDown(button, { key: "Enter" })
+    expect(onConfirm).toHaveBeenCalledOnce()
     await act(async () => {
       resolve()
       await Promise.resolve()
     })
     expect(button.getAttribute("data-state")).toBe("idle")
-    expect(button).toHaveProperty("disabled", false)
+    expect(button.getAttribute("aria-disabled")).toBeNull()
+    expect(document.activeElement).toBe(button)
   })
 })

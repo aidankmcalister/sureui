@@ -26,6 +26,7 @@ type ConfirmButtonProps = React.ComponentProps<typeof Button> &
     timeout?: number
     duration?: number
     confirmOnRelease?: boolean
+    cancelOnBlur?: boolean
     cancelHoldOnLeave?: boolean
   }
 
@@ -43,6 +44,7 @@ function ConfirmButton({
   timeout = 3000,
   duration = 1200,
   confirmOnRelease = true,
+  cancelOnBlur = true,
   cancelHoldOnLeave = true,
   className,
   children,
@@ -119,10 +121,10 @@ function ConfirmButton({
     resumeUndo("focus")
     if (gesture === "hold") {
       if (state === "holding" || state === "ready") release()
-    } else if (gesture === "click-again" && state === "armed") {
+    } else if (gesture === "click-again" && state === "armed" && cancelOnBlur) {
       cancel()
     }
-  }, [gesture, state, release, cancel, resumeUndo])
+  }, [gesture, state, release, cancel, resumeUndo, cancelOnBlur])
 
   const handlePointerDown = React.useCallback(
     (event: React.PointerEvent<HTMLButtonElement>) => {
@@ -227,12 +229,15 @@ function ConfirmButton({
         aria-describedby={holdDescribedBy}
         data-state={state}
         className={cn(
-          "relative overflow-hidden",
+          "relative overflow-hidden aria-disabled:opacity-50",
           gesture === "hold" &&
             "touch-none active:not-aria-[haspopup]:translate-y-0",
           className
         )}
         disabled={disabled || state === "pending"}
+        focusableWhenDisabled={
+          props.focusableWhenDisabled || state === "pending"
+        }
         onClick={(event) => composeHandlers(onClick, handleClick)(event)}
         onBlur={(event) => composeHandlers(onBlur, handleBlur)(event)}
         onFocus={(event) =>

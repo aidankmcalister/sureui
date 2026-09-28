@@ -23,6 +23,31 @@ describe("TypeToConfirm", () => {
     expect(onConfirm).toHaveBeenCalledOnce()
   })
 
+  it("matches exactly by default: case and spaces count", () => {
+    render(<TypeToConfirm phrase="Acme" onConfirm={vi.fn()} />)
+    const confirm = screen.getByRole("button", { name: "Confirm" })
+    type("acme")
+    expect(confirm).toHaveProperty("disabled", true)
+    type("Acme ")
+    expect(confirm).toHaveProperty("disabled", true)
+  })
+
+  it("caseSensitive={false} and trim relax the match", () => {
+    const onConfirm = vi.fn()
+    render(
+      <TypeToConfirm
+        phrase="Acme"
+        caseSensitive={false}
+        trim
+        onConfirm={onConfirm}
+      />
+    )
+    const confirm = screen.getByRole("button", { name: "Confirm" })
+    type("  acme ")
+    fireEvent.click(confirm)
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
   it("requires every acknowledgement", () => {
     const onConfirm = vi.fn()
     render(
@@ -217,14 +242,17 @@ describe("TypeToConfirm", () => {
     expect(onConfirm).toHaveBeenCalledOnce()
   })
 
-  it("async: pending onConfirm disables the button", async () => {
+  it("async: pending onConfirm disables the button but keeps focus", async () => {
     let resolve!: () => void
     const onConfirm = vi.fn(() => new Promise<void>((res) => (resolve = res)))
     render(<TypeToConfirm phrase="acme" onConfirm={onConfirm} />)
     const confirm = screen.getByRole("button", { name: "Confirm" })
     type("acme")
+    confirm.focus()
     await act(async () => fireEvent.click(confirm))
-    expect(confirm).toHaveProperty("disabled", true)
+    expect(confirm.getAttribute("aria-disabled")).toBe("true")
+    expect(document.activeElement).toBe(confirm)
+    expect(screen.getByRole("textbox")).toHaveProperty("readOnly", true)
     await act(async () => {
       resolve()
       await Promise.resolve()

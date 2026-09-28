@@ -14,6 +14,8 @@ import {
 
 type TypeToConfirmProps = ConfirmationOptions & {
   phrase: string
+  caseSensitive?: boolean
+  trim?: boolean
   label?: React.ReactNode
   announcements?: {
     match?: string
@@ -34,6 +36,8 @@ function TypeToConfirm({
   pauseUndoOnHover,
   pauseUndoOnFocus,
   phrase,
+  caseSensitive = true,
+  trim = false,
   label,
   announcements,
   confirmLabel = "Confirm",
@@ -55,7 +59,11 @@ function TypeToConfirm({
   const [checked, setChecked] = React.useState<number[]>([])
   const inputId = React.useId()
 
-  const matches = value === phrase
+  const normalize = (text: string) => {
+    const trimmed = trim ? text.trim() : text
+    return caseSensitive ? trimmed : trimmed.toLocaleLowerCase()
+  }
+  const matches = normalize(value) === normalize(phrase)
   const ready = matches && checked.length === acknowledgements.length
 
   const confirmButton = (
@@ -64,7 +72,8 @@ function TypeToConfirm({
       variant={variant}
       data-state={state}
       disabled={state === "undo" ? false : !ready || state === "pending"}
-      className="relative justify-self-start overflow-hidden"
+      focusableWhenDisabled={state === "pending"}
+      className="relative justify-self-start overflow-hidden aria-disabled:opacity-50"
       onClick={state === "undo" ? cancel : undefined}
       onPointerEnter={() => pauseUndo("hover")}
       onPointerLeave={() => resumeUndo("hover")}
@@ -104,7 +113,7 @@ function TypeToConfirm({
           value={value}
           autoComplete="off"
           spellCheck={false}
-          disabled={state === "pending"}
+          readOnly={state === "pending"}
           onChange={(event) => setValue(event.target.value)}
         />
         <p aria-live="polite" className="sr-only">
