@@ -1,18 +1,3 @@
-export const githubUrl = "https://github.com/aidankmcalister/sureui"
-
-export const siteUrl = "https://sureui.com"
-
-export const items = [
-  "confirm-button",
-  "type-to-confirm",
-  "confirm-dialog",
-  "undo-toast",
-]
-
-export function addArgs(names: string[]) {
-  return `add ${names.map((name) => `@sureui/${name}`).join(" ")}`
-}
-
 const onConfirm = ["onConfirm", "() => void | Promise<unknown>", "required"]
 const onCancel = ["onCancel", "() => void", "—"]
 const undo = ["undo", "boolean | number", "—"]
@@ -130,7 +115,11 @@ if (await undoToast("Moved 3 files to trash")) {
           onCancel,
           undo,
           buttonProps,
-          dataState,
+          [
+            "data-state (on the button)",
+            '"idle" | "undo" | "pending"',
+            '"idle"',
+          ],
         ],
       },
     ],
@@ -171,7 +160,7 @@ if (await undoToast("Moved 3 files to trash")) {
           ["duration", "number", "1200, min 800"],
           ["confirmOnRelease", "boolean", "true"],
           ["cancelHoldOnLeave", "boolean", "true"],
-          ["releaseLabel", "ReactNode", "children"],
+          ["releaseLabel", "ReactNode", "—"],
           ["announcements.hold", "string", '"Press and hold to confirm"'],
           ["announcements.ready", "string", '"Release to confirm"'],
           onCancel,
@@ -308,6 +297,7 @@ async function discard() {
     ],
     behavior: [
       "The phrase must match exactly by default, including case and spaces. Relax it with caseSensitive={false} or trim.",
+      "Acknowledgements are optional. Leave them out and typing the phrase is enough.",
       "The input and checkboxes clear after confirming, so after an undo the form isn't one click from running again.",
       "While a promise from onConfirm is pending, the input is read-only and the button is disabled but keeps focus.",
     ],
@@ -324,34 +314,25 @@ async function discard() {
   },
 ]
 
-const docs = [
-  { href: "/docs", title: "Introduction", group: "Getting started" },
-  {
-    href: "/docs/installation",
-    title: "Installation",
-    group: "Getting started",
-  },
-  ...styles.map((style) => ({
-    href: `/docs/${style.slug}`,
-    title: style.name,
-    group: "Components",
-  })),
-  {
-    href: "/docs/which-one",
-    title: "Which one should I use?",
-    group: "Guides",
-  },
-]
+export const styleSections = [
+  { id: "installation", label: "Installation" },
+  { id: "usage", label: "Usage" },
+  { id: "behavior", label: "How it behaves" },
+  { id: "props", label: "Props" },
+  { id: "when", label: "When to use it" },
+] as const
 
-export const pages = docs.map((page, index) => ({
-  ...page,
-  sheet: String(index + 1).padStart(2, "0"),
-}))
+export type StyleSectionId = (typeof styleSections)[number]["id"]
 
-export type Page = (typeof pages)[number]
+export const whenLabels = {
+  use: "Use it when",
+  instead: "Reach for something else when",
+}
 
-export function getPage(href: string) {
-  return pages.find((page) => page.href === href)
+export function sectionsFor(style: Style) {
+  return styleSections.filter(
+    (section) => section.id !== "behavior" || style.behavior
+  )
 }
 
 export function getStyle(slug: string) {

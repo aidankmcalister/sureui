@@ -3,18 +3,17 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { TableOfContentsIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { Label, Plus, tapTarget } from "@/components/site/layout/frame"
+import { siteButton } from "@/components/site/ui/button"
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
-import { Label, Plus } from "@/components/site/frame"
-import { getPage, pages, type Page } from "@/components/site/styles"
+  SiteDrawer,
+  SiteDrawerContent,
+  SiteDrawerTrigger,
+} from "@/components/site/ui/drawer"
+import { getPage, pages, type Page } from "@/lib/site/pages"
 
 const groups = [...new Set(pages.map((page) => page.group))]
 
@@ -37,7 +36,7 @@ function DocsNav({ onNavigate }: { onNavigate?: () => void }) {
                   aria-current={current ? "page" : undefined}
                   onClick={onNavigate}
                   className={cn(
-                    "flex items-center gap-2.5 rounded-md border border-transparent px-2.5 py-2 text-sm text-(--ink-muted) hover:text-(--ink)",
+                    "flex items-center gap-2.5 border border-transparent px-2.5 py-2 text-sm text-(--ink-muted) hover:text-(--ink)",
                     current &&
                       "border-(--rule) bg-(--well) font-medium text-(--ink)"
                   )}
@@ -80,19 +79,17 @@ export function DocsBar() {
         <span className="text-(--mark-text)">{page?.sheet}</span> ·{" "}
         {page?.title}
       </Label>
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetTrigger render={<Button variant="outline" size="sm" />}>
+      <SiteDrawer open={open} onOpenChange={setOpen}>
+        <SiteDrawerTrigger className={siteButton({ className: tapTarget })}>
+          <TableOfContentsIcon aria-hidden />
           Contents
-        </SheetTrigger>
-        <SheetContent side="left">
-          <SheetHeader>
-            <SheetTitle>Contents</SheetTitle>
-          </SheetHeader>
-          <div className="overflow-y-auto px-4 pb-6">
+        </SiteDrawerTrigger>
+        <SiteDrawerContent title="Contents">
+          <div className="overflow-y-auto px-3 py-6">
             <DocsNav onNavigate={() => setOpen(false)} />
           </div>
-        </SheetContent>
-      </Sheet>
+        </SiteDrawerContent>
+      </SiteDrawer>
     </div>
   )
 }

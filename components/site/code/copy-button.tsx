@@ -3,7 +3,7 @@
 import * as React from "react"
 import { CheckIcon, CopyIcon } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
+import { SiteButton } from "@/components/site/ui/button"
 
 export function CopyButton({
   value,
@@ -21,9 +21,9 @@ export function CopyButton({
   }, [copied])
 
   return (
-    <Button
+    <SiteButton
       variant="ghost"
-      size="icon-sm"
+      size="icon"
       aria-label={copied ? "Copied" : "Copy"}
       className={className}
       onClick={async () => {
@@ -32,6 +32,6 @@ export function CopyButton({
       }}
     >
       {copied ? <CheckIcon /> : <CopyIcon />}
-    </Button>
+    </SiteButton>
   )
 }

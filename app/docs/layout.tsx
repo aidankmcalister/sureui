@@ -1,5 +1,5 @@
-import { DocsBar, DocsPager, DocsSidebar } from "@/components/site/docs-nav"
-import { Band } from "@/components/site/frame"
+import { DocsBar, DocsPager, DocsSidebar } from "@/components/site/docs/nav"
+import { Band } from "@/components/site/layout/frame"
 
 export default function DocsLayout({
   children,

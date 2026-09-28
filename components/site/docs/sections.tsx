@@ -1,8 +1,8 @@
 import Link from "next/link"
 
 import { cn } from "@/lib/utils"
-import { Label, Plus, tapTarget } from "@/components/site/frame"
-import { getPage } from "@/components/site/styles"
+import { Label, Plus, tapTarget } from "@/components/site/layout/frame"
+import { getPage } from "@/lib/site/pages"
 
 export function DocsSection({
   label,
@@ -38,11 +38,9 @@ export function DocsSection({
 
 export function DocsHeader({
   href,
-  lead,
   children,
 }: {
   href: string
-  lead: string
   children?: React.ReactNode
 }) {
   const page = getPage(href)
@@ -58,12 +56,18 @@ export function DocsHeader({
           {page?.title}
         </h1>
         <p className="max-w-160 text-base leading-7 text-pretty text-(--ink-muted) lg:text-lg lg:leading-8">
-          {lead}
+          {page?.lead}
         </p>
       </div>
       {children}
     </DocsSection>
   )
+}
+
+export function InlineCode({ children }: { children: string }) {
+  return children
+    .split("`")
+    .map((part, index) => (index % 2 ? <code key={index}>{part}</code> : part))
 }
 
 export function Prose({ children }: { children: React.ReactNode }) {

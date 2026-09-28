@@ -1,4 +1,4 @@
-import { card, ogSize } from "@/components/site/og-card"
+import { card, ogSize } from "@/components/site/og/card"
 
 export const alt = "SureUI. Confirmation components for shadcn/ui."
 export const size = ogSize

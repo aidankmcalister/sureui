@@ -1,7 +1,7 @@
 import Link from "next/link"
 
 import { cn } from "@/lib/utils"
-import { Label, tapTarget } from "@/components/site/frame"
+import { Label, tapTarget } from "@/components/site/layout/frame"
 
 export function Cell({
   figure,
@@ -55,7 +55,7 @@ export function Cell({
           {description}
         </p>
       </div>
-      <div className="mt-auto rounded-lg border bg-(--well) p-5 text-foreground">
+      <div className="mt-auto border border-(--rule) bg-(--well) p-5 text-foreground">
         {children}
       </div>
     </article>

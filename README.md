@@ -23,6 +23,8 @@ npx shadcn add @sureui/undo-toast
 
 Each one installs on its own, into `components/ui/sureui/`. Nothing to mount. `undoToast` uses the shadcn `<Toaster />`.
 
+Full docs are at [sureui.com](https://sureui.com/docs). Coding agents can read [sureui.com/llms.txt](https://sureui.com/llms.txt), or every page at once in [llms-full.txt](https://sureui.com/llms-full.txt).
+
 ## Usage
 
 `ConfirmButton` is one Button with three gestures. Add `undo` to any of them for an inline undo window instead of committing right away:
@@ -84,7 +86,7 @@ pnpm check
 pnpm build
 ```
 
-Registry source lives in `components/ui/sureui`. Everything in `app` and `components/site` is the docs site.
+Registry source lives in `components/ui/sureui`. Everything in `app`, `components/site` and `lib/site` is the docs site.
 
 ## License
 

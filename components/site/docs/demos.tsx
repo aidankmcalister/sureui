@@ -10,7 +10,7 @@ import {
   useConfirm,
 } from "@/components/ui/sureui/confirm-dialog"
 import { TypeToConfirm } from "@/components/ui/sureui/type-to-confirm"
-import { useReport } from "@/components/site/preview"
+import { useReport } from "@/components/site/docs/preview"
 
 const Toaster = dynamic(
   () => import("@/components/ui/sonner").then((mod) => mod.Toaster),
@@ -145,7 +145,9 @@ const demos: Record<string, () => React.ReactNode> = {
   "type-to-confirm": TypeToConfirmDemo,
 }
 
+export const demoSlugs = Object.keys(demos)
+
 export function Demo({ slug }: { slug: string }) {
   const Component = demos[slug]
-  return <Component />
+  return Component ? <Component /> : null
 }

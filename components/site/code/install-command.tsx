@@ -2,8 +2,8 @@
 
 import * as React from "react"
 
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { CopyButton } from "@/components/site/copy-button"
+import { SiteTab, SiteTabs, SiteTabsList } from "@/components/site/ui/tabs"
+import { CopyButton } from "@/components/site/code/copy-button"
 
 const runners = {
   npm: "npx",
@@ -51,24 +51,24 @@ export function InstallCommand({ args }: { args: string }) {
   const command = `${runners[runner]} shadcn@latest ${args}`
 
   return (
-    <div className="rounded-md border bg-(--well) text-foreground">
-      <div className="flex items-center justify-between gap-2 border-b py-1 pr-1 pl-2">
-        <Tabs value={runner} onValueChange={(value) => write(value as Runner)}>
-          <TabsList variant="line">
+    <div className="border border-(--rule) bg-(--well) text-(--ink)">
+      <div className="flex h-10 items-center justify-between gap-2 border-b border-(--rule) pr-1.5 pl-2">
+        <SiteTabs
+          value={runner}
+          onValueChange={(value) => write(value as Runner)}
+          className="h-full"
+        >
+          <SiteTabsList>
             {Object.keys(runners).map((name) => (
-              <TabsTrigger
-                key={name}
-                value={name}
-                className="font-mono text-xs"
-              >
+              <SiteTab key={name} value={name}>
                 {name}
-              </TabsTrigger>
+              </SiteTab>
             ))}
-          </TabsList>
-        </Tabs>
+          </SiteTabsList>
+        </SiteTabs>
         <CopyButton value={command} />
       </div>
-      <p className="px-3 py-2.5 font-mono text-xs leading-5 break-all">
+      <p className="px-4 py-3 font-mono text-[13px] leading-6 break-all">
         {command}
       </p>
     </div>

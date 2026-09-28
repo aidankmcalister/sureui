@@ -1,5 +1,5 @@
-import { card, ogSize } from "@/components/site/og-card"
-import { getStyle, styles } from "@/components/site/styles"
+import { card, ogSize } from "@/components/site/og/card"
+import { getStyle, styles } from "@/lib/site/styles"
 
 export const alt = "A SureUI confirmation component for shadcn/ui."
 export const size = ogSize
