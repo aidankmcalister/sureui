@@ -2,8 +2,10 @@ import type * as React from "react"
 import { describe, expect, it } from "vitest"
 
 import type { Button } from "@/components/ui/button"
+import type { DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import type { ConfirmButtonProps } from "@/components/ui/sureui/confirm-button"
 import type { ConfirmDialogProps } from "@/components/ui/sureui/confirm-dialog"
+import type { ConfirmMenuItemProps } from "@/components/ui/sureui/confirm-menu-item"
 import type { TypeToConfirmProps } from "@/components/ui/sureui/type-to-confirm"
 import type { UndoToastOptions } from "@/components/ui/sureui/undo-toast"
 import { demoSlugs } from "@/components/site/docs/demos"
@@ -28,6 +30,34 @@ const confirmButton = {
   cancelOnBlur: true,
   cancelHoldOnLeave: true,
 } satisfies Record<OwnProps<ConfirmButtonProps>, true>
+
+const confirmMenuItem = {
+  onConfirm: true,
+  onCancel: true,
+  undo: true,
+  pauseUndoOnHover: true,
+  pauseUndoOnFocus: true,
+  gesture: true,
+  menu: true,
+  confirmLabel: true,
+  releaseLabel: true,
+  undoLabel: true,
+  announcements: true,
+  timeout: true,
+  duration: true,
+  confirmOnRelease: true,
+  cancelOnBlur: true,
+  cancelHoldOnLeave: true,
+  closeOnConfirm: true,
+  closeOnUndo: true,
+  commitUndoOnClose: true,
+} satisfies Record<
+  Exclude<
+    keyof ConfirmMenuItemProps,
+    keyof React.ComponentProps<typeof DropdownMenuItem>
+  >,
+  true
+>
 
 const typeToConfirm = {
   onConfirm: true,
@@ -81,6 +111,7 @@ const undoToast = {
 
 const documented = {
   ConfirmButton: confirmButton,
+  ConfirmMenuItem: confirmMenuItem,
   TypeToConfirm: typeToConfirm,
   ConfirmDialog: confirmDialog,
   "undoToast(message, options)": undoToast,

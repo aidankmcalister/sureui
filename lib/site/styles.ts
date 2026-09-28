@@ -3,6 +3,9 @@ const onCancel = ["onCancel", "() => void", "—"]
 const undo = ["undo", "boolean | number", "—"]
 const gesture = ["gesture", '"click" | "click-again" | "hold"', '"click"']
 const buttonProps = ["...props", "Button props", "—"]
+const menuItemProps = ["...props", "DropdownMenuItem props, like variant", "—"]
+const menu = ["menu", '"dropdown" | "context"', '"dropdown"']
+const closeOnConfirm = ["closeOnConfirm", "boolean", "true"]
 const dataState = [
   "data-state",
   '"idle" | "armed" | "holding" | "ready" | "undo" | "pending"',
@@ -99,10 +102,16 @@ if (await undoToast("Moved 3 files to trash")) {
     interrupts: "No",
     reads: "No",
     bestFor: "Single rows in a list",
-    items: ["confirm-button"],
+    items: ["confirm-button", "confirm-menu-item"],
     usage: `<ConfirmButton gesture="click-again" onConfirm={archive}>
   Archive
-</ConfirmButton>`,
+</ConfirmButton>
+
+<DropdownMenuContent>
+  <ConfirmMenuItem variant="destructive" onConfirm={remove}>
+    Delete
+  </ConfirmMenuItem>
+</DropdownMenuContent>`,
     api: [
       {
         name: "ConfirmButton",
@@ -123,11 +132,37 @@ if (await undoToast("Moved 3 files to trash")) {
           ],
         ],
       },
+      {
+        name: "ConfirmMenuItem",
+        rows: [
+          onConfirm,
+          ["gesture", '"click" | "click-again" | "hold"', '"click-again"'],
+          ["confirmLabel", "ReactNode", '"Click again to confirm"'],
+          ["announcements.armed", "string", "confirmLabel when it's a string"],
+          ["timeout", "number", "3000"],
+          ["cancelOnBlur", "boolean", "true"],
+          closeOnConfirm,
+          menu,
+          onCancel,
+          undo,
+          ["undoLabel", "ReactNode", '"Undo"'],
+          ["announcements.undo", "string", '"Done. Undo is available."'],
+          ["pauseUndoOnHover", "boolean", "true"],
+          ["pauseUndoOnFocus", "boolean", "true"],
+          ["closeOnUndo", "boolean", "true"],
+          ["commitUndoOnClose", "boolean", "true"],
+          menuItemProps,
+          dataState,
+        ],
+      },
     ],
     behavior: [
       "The button disarms after timeout, 3 seconds by default, or when focus leaves it. Keep it armed on blur with cancelOnBlur={false}.",
       "Key-repeat clicks are ignored, so holding Enter can't arm and confirm in one go.",
       "While a promise from onConfirm is pending, the button is disabled but keeps focus.",
+      'In a DropdownMenu or ContextMenu, use ConfirmMenuItem (menu="context" for a context menu). The menu stays open while the item is armed, pending or showing Undo, and closes once the action commits or Undo is pressed. Keep it open with closeOnConfirm={false} or closeOnUndo={false}.',
+      "Menus move focus with the highlight, so pointing at or arrowing to another item disarms a ConfirmMenuItem, like any blur.",
+      "Closing the menu during the undo window, with Escape or a click outside, commits the action, because Undo closes with it. Set commitUndoOnClose={false} to drop it instead.",
     ],
     useWhen: [
       "Archiving one message or removing one row.",
@@ -148,10 +183,14 @@ if (await undoToast("Moved 3 files to trash")) {
     interrupts: "No",
     reads: "No",
     bestFor: "Touch screens and small resets",
-    items: ["confirm-button"],
+    items: ["confirm-button", "confirm-menu-item"],
     usage: `<ConfirmButton gesture="hold" variant="destructive" onConfirm={revoke}>
   Hold to revoke
-</ConfirmButton>`,
+</ConfirmButton>
+
+<ConfirmMenuItem gesture="hold" variant="destructive" onConfirm={revoke}>
+  Hold to revoke
+</ConfirmMenuItem>`,
     api: [
       {
         name: "ConfirmButton",
@@ -170,6 +209,25 @@ if (await undoToast("Moved 3 files to trash")) {
           dataState,
         ],
       },
+      {
+        name: "ConfirmMenuItem",
+        rows: [
+          onConfirm,
+          ["gesture", '"click" | "click-again" | "hold"', '"click-again"'],
+          ["duration", "number", "1200, min 800"],
+          ["confirmOnRelease", "boolean", "true"],
+          ["cancelHoldOnLeave", "boolean", "true"],
+          ["releaseLabel", "ReactNode", "—"],
+          ["announcements.hold", "string", '"Press and hold to confirm"'],
+          ["announcements.ready", "string", '"Release to confirm"'],
+          closeOnConfirm,
+          menu,
+          onCancel,
+          undo,
+          menuItemProps,
+          dataState,
+        ],
+      },
     ],
     behavior: [
       "The fill takes 1.2 seconds by default. Anything under 0.8 seconds is raised to 0.8, because a shorter hold is easy to trigger with a slow tap.",
@@ -179,6 +237,7 @@ if (await undoToast("Moved 3 files to trash")) {
       "With undo, the Undo button runs on click, so pressing it and sliding off does nothing.",
       "The context menu is blocked on the button so a long press on a phone doesn't open it.",
       "With prefers-reduced-motion, fills don't animate: the hold fill appears when it completes and the undo fill clears when the window ends.",
+      'ConfirmMenuItem with gesture="hold" keeps its menu open while held and closes it once the action commits. Hold Enter or Space to confirm from the keyboard.',
     ],
     useWhen: [
       "Revoking an API key or resetting preferences.",
