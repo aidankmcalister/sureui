@@ -1,10 +1,24 @@
 "use client"
 
-import { ArchiveIcon, CheckIcon } from "lucide-react"
+import {
+  ArchiveIcon,
+  CheckIcon,
+  EllipsisIcon,
+  PencilIcon,
+  Trash2Icon,
+} from "lucide-react"
 import dynamic from "next/dynamic"
 
 import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { ConfirmButton } from "@/components/ui/sureui/confirm-button"
+import { ConfirmMenuItem } from "@/components/ui/sureui/confirm-menu-item"
 import {
   ConfirmDialog,
   useConfirm,
@@ -70,6 +84,30 @@ function ClickAgainDemo() {
       >
         <ArchiveIcon />
       </ConfirmButton>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button variant="ghost" size="icon" aria-label="More actions" />
+          }
+        >
+          <EllipsisIcon />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-auto">
+          <DropdownMenuItem onClick={() => report("Rename")}>
+            <PencilIcon />
+            Rename
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <ConfirmMenuItem
+            variant="destructive"
+            onConfirm={() => report("onConfirm, menu item")}
+            onCancel={() => report("onCancel, disarmed")}
+          >
+            <Trash2Icon />
+            Delete
+          </ConfirmMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   )
 }

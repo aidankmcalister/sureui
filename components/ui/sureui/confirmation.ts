@@ -35,6 +35,7 @@ type GestureOptions = {
   confirmOnRelease?: boolean
   cancelOnBlur?: boolean
   cancelHoldOnLeave?: boolean
+  holdFallback?: "click-again" | "none"
   disabled?: boolean
 }
 
@@ -71,6 +72,18 @@ function composeHandlers<E>(
 
 function isPressKey(event: React.KeyboardEvent) {
   return event.key === " " || event.key === "Enter"
+}
+
+function isVirtualPress(event: React.PointerEvent) {
+  const { width, height, pressure, pointerType } = event.nativeEvent
+  if (width < 1 && height < 1) return true
+  return (
+    pointerType === "mouse" &&
+    width === 1 &&
+    height === 1 &&
+    pressure === 0 &&
+    /Android/i.test(navigator.userAgent)
+  )
 }
 
 function isInside(event: React.PointerEvent) {
@@ -181,8 +194,9 @@ function useConfirmationMachine(options: ConfirmationOptions) {
   }, [])
 
   const arm = React.useCallback(() => {
+    clearTimer()
     enter("armed")
-  }, [enter])
+  }, [clearTimer, enter])
 
   const hold = React.useCallback(
     (duration: number, waitForRelease: boolean) => {
@@ -231,6 +245,11 @@ function useConfirmationMachine(options: ConfirmationOptions) {
     optionsRef.current.onCancel?.()
   }, [clearTimer, enter])
 
+  const reset = React.useCallback(() => {
+    clearTimer()
+    enter("idle")
+  }, [clearTimer, enter])
+
   return {
     state,
     fill,
@@ -242,6 +261,7 @@ function useConfirmationMachine(options: ConfirmationOptions) {
     cancel,
     pauseUndo,
     resumeUndo,
+    reset,
   }
 }
 
@@ -252,6 +272,7 @@ function useConfirmation<T extends Element = HTMLElement>({
   confirmOnRelease = true,
   cancelOnBlur = true,
   cancelHoldOnLeave = true,
+  holdFallback = "click-again",
   disabled = false,
   ...options
 }: ConfirmationOptions & GestureOptions) {
@@ -266,20 +287,29 @@ function useConfirmation<T extends Element = HTMLElement>({
     cancel,
     pauseUndo,
     resumeUndo,
+    reset,
   } = useConfirmationMachine(options)
   const fillRef = React.useRef<HTMLSpanElement>(null)
   useFill(fillRef, fill, paused)
   const repeatRef = React.useRef(false)
   const undoPressRef = React.useRef(false)
+  const pressRef = React.useRef<"none" | "pointer" | "virtual" | "key">("none")
+  const fallbackRef = React.useRef(false)
 
   React.useEffect(() => {
-    if (state !== "armed") return
+    if (state !== "armed") fallbackRef.current = false
+  }, [state])
+
+  React.useEffect(() => {
+    if (state !== "armed" || fallbackRef.current) return
     const timer = setTimeout(cancel, toMs(timeout, 3000, 0))
     return () => clearTimeout(timer)
   }, [state, timeout, cancel])
 
   const isHold = gesture === "hold"
   const isHolding = state === "holding" || state === "ready"
+  const fallback = isHold && holdFallback === "click-again"
+  const fallbackArmed = state === "armed" && fallbackRef.current
 
   function undoFromPress() {
     if (state !== "undo" || !undoPressRef.current) return
@@ -287,9 +317,27 @@ function useConfirmation<T extends Element = HTMLElement>({
     cancel()
   }
 
+  function armFallback() {
+    fallbackRef.current = true
+    arm()
+  }
+
+  function holdClick() {
+    const press = pressRef.current
+    pressRef.current = "none"
+    const unpressed = press === "none" || press === "virtual"
+    if (state === "undo") {
+      if (fallback && press === "none") undoPressRef.current = true
+      return undoFromPress()
+    }
+    if (!fallback) return
+    if (fallbackArmed) confirm()
+    else if (state === "idle" && unpressed) armFallback()
+  }
+
   const handlers: Required<Omit<TriggerProps<T>, "disabled">> = {
     onClick() {
-      if (isHold) return undoFromPress()
+      if (isHold) return holdClick()
       if (repeatRef.current) return
       if (state === "undo") cancel()
       else if (state === "armed") confirm()
@@ -299,7 +347,7 @@ function useConfirmation<T extends Element = HTMLElement>({
     onBlur() {
       resumeUndo("focus")
       if (isHolding) release()
-      else if (state === "armed" && cancelOnBlur) cancel()
+      else if (state === "armed" && (cancelOnBlur || fallbackArmed)) cancel()
     },
     onFocus() {
       pauseUndo("focus")
@@ -313,6 +361,7 @@ function useConfirmation<T extends Element = HTMLElement>({
     },
     onPointerDown(event) {
       if (!isHold || event.button !== 0) return
+      pressRef.current = isVirtualPress(event) ? "virtual" : "pointer"
       undoPressRef.current = state === "undo"
       if (state !== "idle") return
       const target = event.currentTarget
@@ -322,8 +371,10 @@ function useConfirmation<T extends Element = HTMLElement>({
       hold(duration, confirmOnRelease)
     },
     onPointerUp(event) {
-      if (state === "holding") release()
-      else if (state === "ready") {
+      if (state === "holding") {
+        if (fallback && pressRef.current === "virtual") reset()
+        else release()
+      } else if (state === "ready") {
         if (isInside(event)) confirm()
         else release()
       }
@@ -336,9 +387,11 @@ function useConfirmation<T extends Element = HTMLElement>({
         repeatRef.current = event.repeat
         return
       }
+      if (event.key === "Escape" && fallbackArmed) return cancel()
       if (!isPressKey(event)) return
       event.preventDefault()
       if (event.repeat) return
+      pressRef.current = "key"
       undoPressRef.current = state === "undo"
       if (state === "idle") hold(duration, confirmOnRelease)
     },
@@ -348,8 +401,13 @@ function useConfirmation<T extends Element = HTMLElement>({
         return
       }
       if (!isPressKey(event)) return
-      if (state === "holding") release()
-      else if (state === "ready") confirm()
+      const pressed = pressRef.current === "key"
+      pressRef.current = "none"
+      if (state === "holding") {
+        if (fallback) armFallback()
+        else release()
+      } else if (state === "ready") confirm()
+      else if (fallbackArmed && pressed) confirm()
       else undoFromPress()
     },
     onContextMenu(event) {

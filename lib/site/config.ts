@@ -4,6 +4,7 @@ export const siteUrl = "https://sureui.com"
 
 export const items = [
   "confirm-button",
+  "confirm-menu-item",
   "type-to-confirm",
   "confirm-dialog",
   "undo-toast",

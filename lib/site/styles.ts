@@ -3,6 +3,9 @@ const onCancel = ["onCancel", "() => void", "—"]
 const undo = ["undo", "boolean | number", "—"]
 const gesture = ["gesture", '"click" | "click-again" | "hold"', '"click"']
 const buttonProps = ["...props", "Button props", "—"]
+const menuItemProps = ["...props", "DropdownMenuItem props, like variant", "—"]
+const menu = ["menu", '"dropdown" | "context"', '"dropdown"']
+const closeOnConfirm = ["closeOnConfirm", "boolean", "true"]
 const dataState = [
   "data-state",
   '"idle" | "armed" | "holding" | "ready" | "undo" | "pending"',
@@ -102,7 +105,13 @@ if (await undoToast("Moved 3 files to trash")) {
     items: ["confirm-button"],
     usage: `<ConfirmButton gesture="click-again" onConfirm={archive}>
   Archive
-</ConfirmButton>`,
+</ConfirmButton>
+
+<DropdownMenuContent>
+  <ConfirmMenuItem variant="destructive" onConfirm={remove}>
+    Delete
+  </ConfirmMenuItem>
+</DropdownMenuContent>`,
     api: [
       {
         name: "ConfirmButton",
@@ -123,11 +132,37 @@ if (await undoToast("Moved 3 files to trash")) {
           ],
         ],
       },
+      {
+        name: "ConfirmMenuItem",
+        rows: [
+          onConfirm,
+          ["gesture", '"click" | "click-again" | "hold"', '"click-again"'],
+          ["confirmLabel", "ReactNode", '"Click again to confirm"'],
+          ["announcements.armed", "string", "confirmLabel when it's a string"],
+          ["timeout", "number", "3000"],
+          ["cancelOnBlur", "boolean", "true"],
+          closeOnConfirm,
+          menu,
+          onCancel,
+          undo,
+          ["undoLabel", "ReactNode", '"Undo"'],
+          ["announcements.undo", "string", '"Done. Undo is available."'],
+          ["pauseUndoOnHover", "boolean", "true"],
+          ["pauseUndoOnFocus", "boolean", "true"],
+          ["closeOnUndo", "boolean", "true"],
+          ["commitUndoOnClose", "boolean", "true"],
+          menuItemProps,
+          dataState,
+        ],
+      },
     ],
     behavior: [
       "The button disarms after timeout, 3 seconds by default, or when focus leaves it. Keep it armed on blur with cancelOnBlur={false}.",
       "Key-repeat clicks are ignored, so holding Enter can't arm and confirm in one go.",
       "While a promise from onConfirm is pending, the button is disabled but keeps focus.",
+      'In a DropdownMenu or ContextMenu, use ConfirmMenuItem, added with @sureui/confirm-menu-item (menu="context" for a context menu). The menu stays open while the item is armed, pending or showing Undo, and closes once the action commits or Undo is pressed. Keep it open with closeOnConfirm={false} or closeOnUndo={false}.',
+      "Menus move focus with the highlight, so pointing at or arrowing to another item disarms a ConfirmMenuItem, like any blur.",
+      "Closing the menu during the undo window, with Escape or a click outside, commits the action, because Undo closes with it. Set commitUndoOnClose={false} to drop it instead.",
     ],
     useWhen: [
       "Archiving one message or removing one row.",
@@ -151,7 +186,11 @@ if (await undoToast("Moved 3 files to trash")) {
     items: ["confirm-button"],
     usage: `<ConfirmButton gesture="hold" variant="destructive" onConfirm={revoke}>
   Hold to revoke
-</ConfirmButton>`,
+</ConfirmButton>
+
+<ConfirmMenuItem gesture="hold" variant="destructive" onConfirm={revoke}>
+  Hold to revoke
+</ConfirmMenuItem>`,
     api: [
       {
         name: "ConfirmButton",
@@ -161,8 +200,14 @@ if (await undoToast("Moved 3 files to trash")) {
           ["duration", "number", "1200, min 800"],
           ["confirmOnRelease", "boolean", "true"],
           ["cancelHoldOnLeave", "boolean", "true"],
+          ["holdFallback", '"click-again" | "none"', '"click-again"'],
           ["releaseLabel", "ReactNode", "—"],
-          ["announcements.hold", "string", '"Press and hold to confirm"'],
+          [
+            "announcements.hold",
+            "string",
+            '"Press and hold, or activate twice, to confirm"',
+          ],
+          ["announcements.fallback", "string", '"Activate again to confirm"'],
           ["announcements.ready", "string", '"Release to confirm"'],
           onCancel,
           undo,
@@ -170,15 +215,42 @@ if (await undoToast("Moved 3 files to trash")) {
           dataState,
         ],
       },
+      {
+        name: "ConfirmMenuItem",
+        rows: [
+          onConfirm,
+          ["gesture", '"click" | "click-again" | "hold"', '"click-again"'],
+          ["duration", "number", "1200, min 800"],
+          ["confirmOnRelease", "boolean", "true"],
+          ["cancelHoldOnLeave", "boolean", "true"],
+          ["holdFallback", '"click-again" | "none"', '"click-again"'],
+          ["releaseLabel", "ReactNode", "—"],
+          [
+            "announcements.hold",
+            "string",
+            '"Press and hold, or activate twice, to confirm"',
+          ],
+          ["announcements.fallback", "string", '"Activate again to confirm"'],
+          ["announcements.ready", "string", '"Release to confirm"'],
+          closeOnConfirm,
+          menu,
+          onCancel,
+          undo,
+          menuItemProps,
+          dataState,
+        ],
+      },
     ],
     behavior: [
       "The fill takes 1.2 seconds by default. Anything under 0.8 seconds is raised to 0.8, because a shorter hold is easy to trigger with a slow tap.",
       'Once the fill completes, the button is ready (data-state="ready") and confirms when the pointer or key is released on it. Show a different label while ready with releaseLabel.',
+      'Holding is a shortcut, not the only way. A screen reader activation, or a Space or Enter press let go before the fill completes, arms the button instead (data-state="armed", announced as "Activate again to confirm"), and the next activation confirms. This armed state never times out; blur or Escape clears it. A mouse or finger let go early still cancels. Turn this off with holdFallback="none".',
       "Letting go outside the button, moving off it, or losing focus cancels, even after the fill. Set cancelHoldOnLeave={false} to let the pointer leave and come back before letting go, like a native button.",
       "Set confirmOnRelease={false} to confirm the moment the fill completes. Pair it with undo, since there is no last chance to back out.",
       "With undo, the Undo button runs on click, so pressing it and sliding off does nothing.",
       "The context menu is blocked on the button so a long press on a phone doesn't open it.",
       "With prefers-reduced-motion, fills don't animate: the hold fill appears when it completes and the undo fill clears when the window ends.",
+      'ConfirmMenuItem with gesture="hold" keeps its menu open while held and closes it once the action commits. From the keyboard, hold Enter or Space, or press twice.',
     ],
     useWhen: [
       "Revoking an API key or resetting preferences.",
@@ -234,9 +306,10 @@ async function discard() {
           ["duration", "number", "1200, min 800"],
           ["confirmOnRelease", "boolean", "true"],
           ["cancelHoldOnLeave", "boolean", "true"],
+          ["holdFallback", '"click-again" | "none"', '"click-again"'],
           ["caseSensitive", "boolean", "true"],
           ["trim", "boolean", "false"],
-          ["announcements", "{ hold, ready, armed, match }", "—"],
+          ["announcements", "{ hold, ready, armed, fallback, match }", "—"],
         ],
       },
       {

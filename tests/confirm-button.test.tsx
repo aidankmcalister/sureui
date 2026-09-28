@@ -284,7 +284,7 @@ describe("ConfirmButton", () => {
     )
     const id = screen.getByRole("button").getAttribute("aria-describedby")
     expect(document.getElementById(id!.split(" ")[0])?.textContent).toBe(
-      "Press and hold to confirm"
+      "Press and hold, or activate twice, to confirm"
     )
   })
 
@@ -874,8 +874,80 @@ describe("ConfirmButton", () => {
     expect(button.getAttribute("data-state")).toBe("armed")
   })
 
-  it("hold: Space keyUp before the duration cancels", async () => {
+  it("hold fallback: Space let go early arms instead of cancelling", async () => {
     const { button, onConfirm, onCancel } = renderHold()
+    fireEvent.keyDown(button, { key: " " })
+    await act(async () => vi.advanceTimersByTime(500))
+    await act(async () => fireEvent.keyUp(button, { key: " " }))
+    expect(button.getAttribute("data-state")).toBe("armed")
+    expect(screen.getByText("Activate again to confirm")).toBeTruthy()
+    await act(async () => vi.advanceTimersByTime(10000))
+    expect(button.getAttribute("data-state")).toBe("armed")
+    expect(onCancel).not.toHaveBeenCalled()
+    fireEvent.keyDown(button, { key: "Enter" })
+    await act(async () => fireEvent.keyUp(button, { key: "Enter" }))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("hold fallback: a click with no press arms, and the next click confirms", async () => {
+    const { button, onConfirm } = renderHold()
+    await act(async () => fireEvent.click(button))
+    expect(button.getAttribute("data-state")).toBe("armed")
+    expect(onConfirm).not.toHaveBeenCalled()
+    await act(async () => fireEvent.click(button))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("hold fallback: a virtual press let go early arms without cancelling", async () => {
+    const { button, onConfirm, onCancel } = renderHold()
+    const virtual = { button: 0, width: 0.3, height: 0.3, pointerType: "touch" }
+    fireEvent.pointerDown(button, virtual)
+    await act(async () => fireEvent.pointerUp(button, virtual))
+    await act(async () => fireEvent.click(button))
+    expect(onCancel).not.toHaveBeenCalled()
+    expect(button.getAttribute("data-state")).toBe("armed")
+    fireEvent.pointerDown(button, virtual)
+    fireEvent.pointerUp(button, virtual)
+    await act(async () => fireEvent.click(button))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("hold fallback: a mouse let go early still cancels, and its click does not arm", async () => {
+    const { button, onCancel } = renderHold()
+    fireEvent.pointerDown(button, { button: 0 })
+    await act(async () => vi.advanceTimersByTime(300))
+    await act(async () => fireEvent.pointerUp(button))
+    await act(async () => fireEvent.click(button))
+    expect(onCancel).toHaveBeenCalledOnce()
+    expect(button.getAttribute("data-state")).toBe("idle")
+  })
+
+  it("hold fallback: Escape and blur clear the armed state", async () => {
+    const { button, onCancel } = renderHold()
+    await act(async () => fireEvent.click(button))
+    await act(async () => fireEvent.keyDown(button, { key: "Escape" }))
+    expect(button.getAttribute("data-state")).toBe("idle")
+    await act(async () => fireEvent.click(button))
+    await act(async () => fireEvent.blur(button))
+    expect(button.getAttribute("data-state")).toBe("idle")
+    expect(onCancel).toHaveBeenCalledTimes(2)
+  })
+
+  it("hold fallback: a click with no press undoes during the undo window", async () => {
+    const { button, onConfirm, onCancel } = renderHold({ undo: true })
+    await act(async () => fireEvent.click(button))
+    await act(async () => fireEvent.click(button))
+    expect(button.getAttribute("data-state")).toBe("undo")
+    await act(async () => fireEvent.click(button))
+    expect(onCancel).toHaveBeenCalledOnce()
+    await act(async () => vi.advanceTimersByTime(6000))
+    expect(onConfirm).not.toHaveBeenCalled()
+  })
+
+  it('hold fallback: holdFallback="none" ignores clicks and cancels an early key release', async () => {
+    const { button, onConfirm, onCancel } = renderHold({ holdFallback: "none" })
+    await act(async () => fireEvent.click(button))
+    expect(button.getAttribute("data-state")).toBe("idle")
     fireEvent.keyDown(button, { key: " " })
     await act(async () => vi.advanceTimersByTime(500))
     fireEvent.keyUp(button, { key: " " })
