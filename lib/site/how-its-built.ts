@@ -23,7 +23,7 @@ export const howItsBuilt = {
     id: "core",
     label: "The core",
     paragraphs: [
-      "Every control is a thin adapter over one module, `confirmation.ts`. It owns the state machine, the gesture rules, timing and handler composition. `ConfirmButton` and `ConfirmMenuItem` call its `useConfirmation` hook. `TypeToConfirm` and `ConfirmDialog` render a `ConfirmButton`. `undoToast` reuses the undo window and the fill.",
+      "Every control is a thin adapter over one module, `confirmation.ts`. It owns the state machine, the gesture rules, timing and handler composition. `ConfirmButton` and `ConfirmMenuItem` call its `useConfirmation` hook. `TypeToConfirm`, `ConfirmDialog` and `ConfirmPopover` render a `ConfirmButton`. `undoToast` and `Undoable` reuse the undo window and the fill directly, because the thing that starts their undo isn't the thing that shows it.",
       "The controls add labels, announcements and styling. Everything on this page lives in three files: `confirmation.ts`, `undo-window.ts` and `fill.ts`.",
     ],
   } satisfies GuideSection,
