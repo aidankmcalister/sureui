@@ -45,7 +45,9 @@ describe("danger-zone-01", () => {
       () => expect(screen.getByRole("button", { name: "Resume" })),
       settled
     )
-    expect(screen.getByText("Paused")).toBeTruthy()
+    expect(
+      screen.getByText("Paused. New pushes wait until you resume.")
+    ).toBeTruthy()
   })
 
   it("deletes only after the project name is typed", async () => {

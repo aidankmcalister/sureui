@@ -1,10 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Trash2Icon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -13,13 +11,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty"
 import { ConfirmButton } from "@/components/ui/sureui/confirm-button"
 import { ConfirmDialog } from "@/components/ui/sureui/confirm-dialog"
 
@@ -48,18 +39,13 @@ function DangerZone({
 
   if (deleted) {
     return (
-      <Card className={cn("w-full", className)}>
-        <Empty role="status" className="py-10">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <Trash2Icon />
-            </EmptyMedia>
-            <EmptyTitle>{project} was deleted</EmptyTitle>
-            <EmptyDescription>
-              Its deployments, domains and data are gone.
-            </EmptyDescription>
-          </EmptyHeader>
-        </Empty>
+      <Card role="status" className={cn("w-full", className)}>
+        <CardHeader>
+          <CardTitle>{project} was deleted</CardTitle>
+          <CardDescription>
+            Its deployments, domains and data are gone.
+          </CardDescription>
+        </CardHeader>
       </Card>
     )
   }
@@ -67,10 +53,9 @@ function DangerZone({
   const rows = [
     {
       title: "Pause deployments",
-      badge: paused ? "Paused" : undefined,
       description: paused
-        ? "New pushes wait until you resume. The current deployment stays live."
-        : "New pushes stop deploying until you resume.",
+        ? "Paused. New pushes wait until you resume."
+        : "Stop deploying new pushes.",
       action: paused ? (
         <Button
           variant="outline"
@@ -101,14 +86,13 @@ function DangerZone({
     },
     {
       title: "Transfer project",
-      badge: transferred ? "Transferred" : undefined,
       description: transferred
-        ? `${owner} owns ${project} now. Members of ${team} no longer have access.`
-        : `Move ${project} from ${team} to ${transferTo}.`,
+        ? `Transferred to ${owner}.`
+        : `Move ${project} to ${transferTo}.`,
       action: transferred ? null : (
         <ConfirmDialog
           title={`Transfer ${project} to ${transferTo}?`}
-          description={`Members of ${team} lose access. Owners of ${transferTo} get it, along with its deployments and domains.`}
+          description={`Members of ${team} lose access. Owners of ${transferTo} get the project, its deployments and domains.`}
           confirmLabel="Transfer"
           onConfirm={async () => {
             await request()
@@ -123,7 +107,7 @@ function DangerZone({
     },
     {
       title: "Delete project",
-      description: "Removes every deployment, domain and its data for good.",
+      description: "Remove its deployments, domains and data.",
       action: (
         <ConfirmDialog
           title={`Delete ${project}?`}
@@ -149,30 +133,20 @@ function DangerZone({
     <Card className={cn("w-full", className)}>
       <CardHeader>
         <CardTitle>Danger zone</CardTitle>
-        <CardDescription>
-          These change who can use {project}, or remove it.
-        </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="divide-y rounded-lg border">
-          {rows.map((row) => (
-            <div
-              key={row.title}
-              className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6"
-            >
-              <div className="grid gap-1">
-                <div className="flex items-center gap-2 font-medium">
-                  {row.title}
-                  {row.badge && <Badge variant="secondary">{row.badge}</Badge>}
-                </div>
-                <p className="text-pretty text-muted-foreground">
-                  {row.description}
-                </p>
-              </div>
-              {row.action && <div className="shrink-0">{row.action}</div>}
+      <CardContent className="divide-y">
+        {rows.map((row) => (
+          <div
+            key={row.title}
+            className="flex items-center justify-between gap-4 py-4 first:pt-0 last:pb-0"
+          >
+            <div className="grid gap-1">
+              <p className="font-medium">{row.title}</p>
+              <p className="text-muted-foreground">{row.description}</p>
             </div>
-          ))}
-        </div>
+            {row.action}
+          </div>
+        ))}
       </CardContent>
     </Card>
   )
