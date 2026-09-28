@@ -1,0 +1,17 @@
+name: Feature request
+description: A new option, component or block.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The action you need to confirm
+      description: What the action is, who does it, and why the current styles don't fit.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you'd like
+      description: A prop, a component or a block. Show the API you'd want to write if you can.
+      render: tsx
