@@ -46,7 +46,7 @@ export default function Home() {
             gesture="Which one"
             href="/docs/which-one"
             title="A project danger zone"
-            description="Pause, transfer and delete, each asking a different amount."
+            description="Pause, transfer and delete each ask for a different amount of confirmation."
           >
             <DangerZone />
           </Cell>
@@ -64,7 +64,7 @@ export default function Home() {
             gesture="Type to confirm"
             href="/docs/type-to-confirm"
             title="Deleting by name"
-            description="Nothing unlocks until the exact name is typed."
+            description="Delete stays disabled until you type the exact name."
           >
             <ConfirmByName />
           </Cell>
@@ -73,7 +73,7 @@ export default function Home() {
             gesture="Dialog"
             href="/docs/dialogs"
             title="Leaving a shared workspace"
-            description="A dialog, because leaving affects everyone else in it."
+            description="A dialog, because leaving affects everyone else in the workspace."
           >
             <Workspace />
           </Cell>
@@ -105,7 +105,7 @@ export default function Home() {
             gesture="Click again"
             href="/docs/click-again"
             title="Removing a teammate"
-            description="Each row asks again in place before it removes anyone."
+            description="Each row asks for a second click before it removes anyone."
           >
             <Members />
           </Cell>

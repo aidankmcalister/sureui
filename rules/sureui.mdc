@@ -15,7 +15,7 @@ SureUI is a shadcn/ui registry of confirmation controls: undo, click again, hold
 - Restorable and routine: Undo, never a dialog.
 - Deleting one row or one small item for good: Click again.
 - A switch whose toggle is the action, like turning off two-factor authentication: `ConfirmSwitch` (`npx shadcn@latest add @sureui/confirm-switch`). It asks only in the risky direction and toggles the other at once.
-- A dialog is only for actions that need a sentence of explanation or affect other people.
+- Use a dialog only for actions that need a sentence of explanation or affect other people.
 - When one line of context is enough and the action only touches the item in front of you, use `ConfirmPopover` (`npx shadcn@latest add @sureui/confirm-popover`) instead of a dialog. Keep `ConfirmDialog` for actions that affect other people or need more than a line.
 - Use the SureUI components. Don't hand-roll timers, armed states or hold progress.
 

@@ -23,18 +23,18 @@ export const howItsBuilt = {
     id: "core",
     label: "The core",
     paragraphs: [
-      "Every control is a thin adapter over one module, `confirmation.ts`. It owns the state machine, the gesture rules, timing and handler composition. `ConfirmButton`, `ConfirmMenuItem` and `ConfirmSwitch` call its `useConfirmation` hook. `TypeToConfirm`, `ConfirmDialog` and `ConfirmPopover` render a `ConfirmButton`. `undoToast` and `Undoable` reuse the undo window and the fill directly, because the thing that starts their undo isn't the thing that shows it.",
-      "The controls add labels, announcements and styling. Everything on this page lives in three files: `confirmation.ts`, `undo-window.ts` and `fill.ts`.",
+      "Every control is a thin adapter over one module, `confirmation.ts`. It owns the state machine, the gesture rules, timing and handler composition. `ConfirmButton`, `ConfirmMenuItem` and `ConfirmSwitch` call its `useConfirmation` hook. `TypeToConfirm`, `ConfirmDialog` and `ConfirmPopover` render a `ConfirmButton`. `undoToast` and `Undoable` reuse the undo window and the fill directly, because their undo appears away from the control that started it.",
+      "The controls add labels, announcements and styling. The code on this page is in three files: `confirmation.ts`, `undo-window.ts` and `fill.ts`.",
     ],
   } satisfies GuideSection,
   states: {
     id: "states",
     label: "States",
     paragraphs: [
-      "A confirmation is always in one of six states, set as `data-state` on the trigger. Confirming is a step, not a state: with `undo` it opens the undo window, otherwise it runs `onConfirm`. If `onConfirm` throws or rejects, the control returns to idle and the error reaches your app.",
+      "A confirmation is always in one of six states, set as `data-state` on the trigger. Confirming moves between states: with `undo` it opens the undo window, otherwise it runs `onConfirm`. If `onConfirm` throws or rejects, the control returns to idle and the error reaches your app.",
     ],
     figure:
-      "State diagram. From idle, click-again goes to armed, hold goes to holding, and click goes straight to confirm. Armed confirms on a second click. Holding becomes ready when the fill completes, and ready confirms on release. Confirm opens undo when undo is on, otherwise it runs onConfirm. Undo runs onConfirm when the window ends. onConfirm goes to pending if it returns a promise. Every state can return to idle.",
+      "State diagram. From idle, click-again goes to armed, hold goes to holding, and click goes to confirm. Armed confirms on a second click. Holding becomes ready when the fill completes, and ready confirms on release. Confirm opens undo when undo is on, otherwise it runs onConfirm. Undo runs onConfirm when the window ends. onConfirm goes to pending if it returns a promise. Every state can return to idle.",
     notes: [
       {
         name: "idle",
@@ -65,11 +65,11 @@ export const howItsBuilt = {
   sections: [
     {
       id: "timing",
-      label: "Timers decide, animations draw",
+      label: "Timers and animation",
       paragraphs: [
         "Every deadline is a `setTimeout`: the click-again timeout, the hold duration and the undo window. State changes when a timer fires, never when an animation ends.",
-        "Each timed state carries a fill: where it starts and ends, how long it runs and when it started. `useFill` plays it as a Web Animation on the CSS `scale` property and sets `currentTime` from the start time, so a re-render lands on the same frame. When the undo window pauses, the animation pauses with it. A cancelled hold drains from where it got to over 200ms.",
-        "With reduced motion the fill uses `step-end` easing: it holds still and jumps at the end, and the timing doesn't change. Where Web Animations are missing, as in jsdom, `playFill` returns `null` and the control behaves the same.",
+        "Each timed state carries a fill: where it starts and ends, how long it runs and when it started. `useFill` plays it as a Web Animation on the CSS `scale` property and sets `currentTime` from the start time, so a re-render lands on the same frame. When the undo window pauses, the animation pauses with it. A cancelled hold drains back from where it stopped over 200ms.",
+        "With reduced motion the fill uses `step-end` easing: it holds still and jumps at the end, and the timing doesn't change. Where Web Animations are missing, as in jsdom, `playFill` returns `null` and the control works the same without it.",
       ],
       excerpt: {
         file: `${core}/fill.ts`,
@@ -88,8 +88,8 @@ animation.currentTime = performance.now() - fill.startedAt`,
       id: "undo-window",
       label: "The undo window",
       paragraphs: [
-        "`startUndoWindow` keeps the remaining time and a set of pause reasons: `hover`, `focus` and `hidden`. It pauses on the first reason and resumes when the last one clears, so a hidden tab and a hover don't undo each other. A window that opens while the tab is hidden waits until it's visible.",
-        "Inline controls add one rule: hover and focus only pause after they have ended once. The pointer that clicked is still over the button and the button still has focus, so the window runs. Leave and come back, by pointer or focus, and it pauses until you leave again. `pauseUndoOnHover` and `pauseUndoOnFocus` turn either off. `undoToast` pauses on the first hover or focus, since the toast appears away from what was clicked.",
+        "`startUndoWindow` keeps the remaining time and a set of pause reasons: `hover`, `focus` and `hidden`. It pauses on the first reason and resumes when the last one clears, so ending a hover doesn't resume a window that a hidden tab paused. A window that opens while the tab is hidden waits until it's visible.",
+        "Inline controls add one rule: hover and focus only pause after they have ended once. Right after the click, the pointer is still over the button and the button has focus, so the window runs. Leave and come back, by pointer or focus, and it pauses until you leave again. `pauseUndoOnHover` and `pauseUndoOnFocus` turn either off. `undoToast` pauses on the first hover or focus, since the toast appears away from what was clicked.",
         "`undo` takes `true` for 5000ms or a number of milliseconds, kept between 4000ms and 60000ms. Holds have an 800ms floor, every duration is capped at a minute, and values that aren't finite fall back to the defaults.",
       ],
       excerpt: {
@@ -108,9 +108,9 @@ animation.currentTime = performance.now() - fill.startedAt`,
       id: "handlers",
       label: "Handler composition",
       paragraphs: [
-        "`useConfirmation` returns `state`, a `fillRef` and `getTriggerProps`. A control passes its remaining props through `getTriggerProps` and spreads the result on its trigger. Every pointer, key, focus and click handler the gesture needs is composed: yours runs first, then ours, and ours always runs, so an `onClick` or `onKeyDown` you pass can't break the gesture.",
+        "`useConfirmation` returns `state`, a `fillRef` and `getTriggerProps`. A control passes its remaining props through `getTriggerProps` and spreads the result on its trigger. Every pointer, key, focus and click handler the gesture needs is composed: yours runs first, then the core's, which always runs, so an `onClick` or `onKeyDown` you pass can't break the gesture.",
         "`getTriggerProps` also sets `disabled`. Pending disables the trigger, and a disabled control keeps Undo pressable during the window.",
-        "The gesture rules exist once. `ConfirmButton` spreads the props on a `Button`, `ConfirmMenuItem` on a menu item and `ConfirmSwitch` on a switch, so all three get the same click-again and hold behavior.",
+        "`ConfirmButton` spreads the props on a `Button`, `ConfirmMenuItem` on a menu item and `ConfirmSwitch` on a switch, so all three share one implementation of click-again and hold.",
       ],
       excerpt: {
         file: `${core}/confirmation.ts`,
@@ -151,8 +151,8 @@ animation.currentTime = performance.now() - fill.startedAt`,
       id: "width",
       label: "Stable width",
       paragraphs: [
-        "Every label a control can show, the idle text, the armed prompt, the release label and Undo, sits in the same grid cell. Only the current one is visible. The others are `invisible` and `aria-hidden`, so the trigger is always as wide as its widest label and doesn't jump when the text changes.",
-        'Changes are announced through a separate polite live region, such as "Click again to confirm" or "Done. Undo is available."',
+        "Every label a control can show sits in the same grid cell: the idle text, the armed prompt, the release label and Undo. Only the current one is visible. The others are `invisible` and `aria-hidden`, so the trigger is always as wide as its widest label and doesn't jump when the text changes.",
+        'A separate polite live region announces each change, such as "Click again to confirm" or "Done. Undo is available."',
       ],
       excerpt: {
         file: `${core}/confirm-button.tsx`,
@@ -179,11 +179,11 @@ animation.currentTime = performance.now() - fill.startedAt`,
         "More than 200 Vitest tests run with `pnpm check` and in CI.",
       ],
       items: [
-        "Behavior, most of the suite: every control and block is rendered with Testing Library and driven through its public interface, with fake `setTimeout`, `clearTimeout` and `performance`. No test patches `Element.prototype.animate` or `window.matchMedia`.",
+        "Behavior, most of the suite: Testing Library renders every control and block and drives it through its public interface, with fake `setTimeout`, `clearTimeout` and `performance`. No test patches `Element.prototype.animate` or `window.matchMedia`.",
         'Registry: every file starts with `"use client"`, lives in `components/ui/sureui` and targets `@ui/sureui`, and every item declares the SureUI files, stock components and packages it imports.',
         "Docs: each props table lists exactly the props its component declares. The lists are checked against the types with `satisfies`, so a new prop fails typecheck until it's documented.",
         "Generated files: the agent rules and skill are generated from the docs data, and a test fails if the committed copies are out of date. `llms.txt` has to link every page and item and include every prop.",
-        "Smoke install, in CI: the registry is built and served locally, a fresh app is created with `shadcn init`, every item and block is installed into it, and the app is type-checked.",
+        "Smoke install, in CI: a script builds and serves the registry locally, creates a fresh app with `shadcn init`, installs every item and block into it and type-checks the app.",
       ],
     },
   ] satisfies GuideSection[],
