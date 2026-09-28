@@ -18,6 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Label } from "@/components/ui/label"
 import { ConfirmButton } from "@/components/ui/sureui/confirm-button"
 import { ConfirmMenuItem } from "@/components/ui/sureui/confirm-menu-item"
 import {
@@ -25,6 +26,7 @@ import {
   useConfirm,
 } from "@/components/ui/sureui/confirm-dialog"
 import { ConfirmPopover } from "@/components/ui/sureui/confirm-popover"
+import { ConfirmSwitch } from "@/components/ui/sureui/confirm-switch"
 import { Consequences } from "@/components/ui/sureui/consequences"
 import { TypeToConfirm } from "@/components/ui/sureui/type-to-confirm"
 import { Undoable } from "@/components/ui/sureui/undoable"
@@ -113,54 +115,88 @@ function UndoDemo() {
   )
 }
 
+function TwoFactorSetting() {
+  const report = useReport()
+  const id = React.useId()
+
+  return (
+    <div className="group flex w-full max-w-sm items-center justify-between gap-4 rounded-lg border bg-background p-3">
+      <div className="grid gap-1.5">
+        <Label htmlFor={id}>Two-factor authentication</Label>
+        <p className="text-sm text-muted-foreground group-has-[[data-state=armed]]:hidden">
+          Ask for a code at every sign-in.
+        </p>
+        <p
+          aria-hidden
+          className="hidden text-sm text-destructive group-has-[[data-state=armed]]:block"
+        >
+          Click again to turn off
+        </p>
+      </div>
+      <ConfirmSwitch
+        id={id}
+        defaultChecked
+        onConfirm={async (on) => {
+          await new Promise((resolve) => setTimeout(resolve, 600))
+          report(`onConfirm(${on}), saved`)
+        }}
+        onCancel={() => report("onCancel, disarmed")}
+      />
+    </div>
+  )
+}
+
 function ClickAgainDemo() {
   const report = useReport()
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-2">
-      <ConfirmButton
-        gesture="click-again"
-        variant="outline"
-        onConfirm={() => report("onConfirm")}
-        onCancel={() => report("onCancel, disarmed")}
-      >
-        Archive
-      </ConfirmButton>
-      <ConfirmButton
-        gesture="click-again"
-        variant="ghost"
-        size="icon"
-        aria-label="Archive"
-        confirmLabel={<CheckIcon />}
-        onConfirm={() => report("onConfirm, icon button")}
-        onCancel={() => report("onCancel, disarmed")}
-      >
-        <ArchiveIcon />
-      </ConfirmButton>
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          render={
-            <Button variant="ghost" size="icon" aria-label="More actions" />
-          }
+    <div className="flex w-full flex-col items-center gap-6">
+      <div className="flex flex-wrap items-center justify-center gap-2">
+        <ConfirmButton
+          gesture="click-again"
+          variant="outline"
+          onConfirm={() => report("onConfirm")}
+          onCancel={() => report("onCancel, disarmed")}
         >
-          <EllipsisIcon />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-auto">
-          <DropdownMenuItem onClick={() => report("Rename")}>
-            <PencilIcon />
-            Rename
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <ConfirmMenuItem
-            variant="destructive"
-            onConfirm={() => report("onConfirm, menu item")}
-            onCancel={() => report("onCancel, disarmed")}
+          Archive
+        </ConfirmButton>
+        <ConfirmButton
+          gesture="click-again"
+          variant="ghost"
+          size="icon"
+          aria-label="Archive"
+          confirmLabel={<CheckIcon />}
+          onConfirm={() => report("onConfirm, icon button")}
+          onCancel={() => report("onCancel, disarmed")}
+        >
+          <ArchiveIcon />
+        </ConfirmButton>
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <Button variant="ghost" size="icon" aria-label="More actions" />
+            }
           >
-            <Trash2Icon />
-            Delete
-          </ConfirmMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+            <EllipsisIcon />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-auto">
+            <DropdownMenuItem onClick={() => report("Rename")}>
+              <PencilIcon />
+              Rename
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <ConfirmMenuItem
+              variant="destructive"
+              onConfirm={() => report("onConfirm, menu item")}
+              onCancel={() => report("onCancel, disarmed")}
+            >
+              <Trash2Icon />
+              Delete
+            </ConfirmMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      <TwoFactorSetting />
     </div>
   )
 }
