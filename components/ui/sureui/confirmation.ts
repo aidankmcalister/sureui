@@ -5,6 +5,8 @@ import * as React from "react"
 type ConfirmationState =
   "idle" | "armed" | "holding" | "ready" | "undo" | "pending"
 
+type Gesture = "click" | "click-again" | "hold"
+
 type PauseReason = "hover" | "focus"
 
 type UndoWindow = {
@@ -23,6 +25,31 @@ type ConfirmationOptions = {
   pauseUndoOnFocus?: boolean
 }
 
+type GestureOptions = {
+  gesture?: Gesture
+  timeout?: number
+  duration?: number
+  confirmOnRelease?: boolean
+  cancelOnBlur?: boolean
+  cancelHoldOnLeave?: boolean
+  disabled?: boolean
+}
+
+type TriggerProps<T extends Element> = {
+  disabled?: boolean
+  onClick?(event: React.MouseEvent<T>): void
+  onBlur?(event: React.FocusEvent<T>): void
+  onFocus?(event: React.FocusEvent<T>): void
+  onPointerDown?(event: React.PointerEvent<T>): void
+  onPointerUp?(event: React.PointerEvent<T>): void
+  onPointerEnter?(event: React.PointerEvent<T>): void
+  onPointerLeave?(event: React.PointerEvent<T>): void
+  onPointerCancel?(event: React.PointerEvent<T>): void
+  onKeyDown?(event: React.KeyboardEvent<T>): void
+  onKeyUp?(event: React.KeyboardEvent<T>): void
+  onContextMenu?(event: React.MouseEvent<T>): void
+}
+
 function toMs(value: number, fallback: number, min: number) {
   return Number.isFinite(value)
     ? Math.min(Math.max(value, min), 60000)
@@ -39,7 +66,21 @@ function composeHandlers<E>(
   }
 }
 
-function useConfirmation(options: ConfirmationOptions) {
+function isPressKey(event: React.KeyboardEvent) {
+  return event.key === " " || event.key === "Enter"
+}
+
+function isInside(event: React.PointerEvent) {
+  const rect = event.currentTarget.getBoundingClientRect()
+  return (
+    event.clientX >= rect.left &&
+    event.clientX <= rect.right &&
+    event.clientY >= rect.top &&
+    event.clientY <= rect.bottom
+  )
+}
+
+function useConfirmationMachine(options: ConfirmationOptions) {
   const [state, setState] = React.useState<ConfirmationState>("idle")
   const fillRef = React.useRef<HTMLSpanElement>(null)
   const animationRef = React.useRef<Animation | null>(null)
@@ -174,7 +215,7 @@ function useConfirmation(options: ConfirmationOptions) {
   }, [])
 
   const hold = React.useCallback(
-    (duration: number, waitForRelease = false) => {
+    (duration: number, waitForRelease: boolean) => {
       const ms = toMs(duration, 1200, 800)
       holdStartRef.current = performance.now()
       holdDurationRef.current = ms
@@ -233,10 +274,139 @@ function useConfirmation(options: ConfirmationOptions) {
   }
 }
 
+function useConfirmation<T extends Element = HTMLElement>({
+  gesture = "click",
+  timeout = 3000,
+  duration = 1200,
+  confirmOnRelease = true,
+  cancelOnBlur = true,
+  cancelHoldOnLeave = true,
+  disabled = false,
+  ...options
+}: ConfirmationOptions & GestureOptions) {
+  const {
+    state,
+    fillRef,
+    arm,
+    hold,
+    release,
+    confirm,
+    cancel,
+    pauseUndo,
+    resumeUndo,
+  } = useConfirmationMachine(options)
+  const repeatRef = React.useRef(false)
+  const undoPressRef = React.useRef(false)
+
+  React.useEffect(() => {
+    if (state !== "armed") return
+    const timer = setTimeout(cancel, toMs(timeout, 3000, 0))
+    return () => clearTimeout(timer)
+  }, [state, timeout, cancel])
+
+  const isHold = gesture === "hold"
+  const isHolding = state === "holding" || state === "ready"
+
+  function undoFromPress() {
+    if (state !== "undo" || !undoPressRef.current) return
+    undoPressRef.current = false
+    cancel()
+  }
+
+  const handlers: Required<Omit<TriggerProps<T>, "disabled">> = {
+    onClick() {
+      if (isHold) return undoFromPress()
+      if (repeatRef.current) return
+      if (state === "undo") cancel()
+      else if (state === "armed") confirm()
+      else if (state === "idle" && gesture === "click") confirm()
+      else if (state === "idle") arm()
+    },
+    onBlur() {
+      resumeUndo("focus")
+      if (isHolding) release()
+      else if (state === "armed" && cancelOnBlur) cancel()
+    },
+    onFocus() {
+      pauseUndo("focus")
+    },
+    onPointerEnter() {
+      pauseUndo("hover")
+    },
+    onPointerLeave() {
+      resumeUndo("hover")
+      if (cancelHoldOnLeave && isHolding) release()
+    },
+    onPointerDown(event) {
+      if (!isHold || event.button !== 0) return
+      undoPressRef.current = state === "undo"
+      if (state !== "idle") return
+      const target = event.currentTarget
+      if (!cancelHoldOnLeave) target.setPointerCapture?.(event.pointerId)
+      else if (target.hasPointerCapture?.(event.pointerId))
+        target.releasePointerCapture(event.pointerId)
+      hold(duration, confirmOnRelease)
+    },
+    onPointerUp(event) {
+      if (state === "holding") release()
+      else if (state === "ready") {
+        if (isInside(event)) confirm()
+        else release()
+      }
+    },
+    onPointerCancel() {
+      if (isHolding) release()
+    },
+    onKeyDown(event) {
+      if (!isHold) {
+        repeatRef.current = event.repeat
+        return
+      }
+      if (!isPressKey(event)) return
+      event.preventDefault()
+      if (event.repeat) return
+      undoPressRef.current = state === "undo"
+      if (state === "idle") hold(duration, confirmOnRelease)
+    },
+    onKeyUp(event) {
+      if (!isHold) {
+        repeatRef.current = false
+        return
+      }
+      if (!isPressKey(event)) return
+      if (state === "holding") release()
+      else if (state === "ready") confirm()
+      else undoFromPress()
+    },
+    onContextMenu(event) {
+      if (isHold) event.preventDefault()
+    },
+  }
+
+  function getTriggerProps<P extends TriggerProps<T>>(props: P) {
+    const composed = { ...props }
+    for (const name of Object.keys(handlers) as (keyof typeof handlers)[]) {
+      const ours = handlers[name] as (event: unknown) => void
+      const theirs = props[name] as ((event: unknown) => void) | undefined
+      Object.assign(composed, { [name]: composeHandlers(theirs, ours) })
+    }
+    return {
+      ...composed,
+      disabled: (disabled && state !== "undo") || state === "pending",
+    }
+  }
+
+  return { state, fillRef, getTriggerProps }
+}
+
 export {
   useConfirmation,
+  useConfirmationMachine,
   composeHandlers,
   toMs,
   type ConfirmationState,
   type ConfirmationOptions,
+  type GestureOptions,
+  type Gesture,
+  type TriggerProps,
 }

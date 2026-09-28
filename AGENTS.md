@@ -30,7 +30,7 @@ A shadcn/ui registry of confirmation controls. Read `CONTEXT.md` for the vocabul
 
 - Every control is built on the confirmation core (`components/ui/sureui/confirmation.ts`) and shares its contract: `onConfirm` (may return a promise), `onCancel`, `undo`, Button props, `data-state`.
 - Options over opinions: behavior is a prop with a sensible default (e.g. `pauseUndoOnHover`, `announcements`). A fixed rule needs a documented reason.
-- Spread consumer props first, then attach handlers through `composeHandlers`, so consumer handlers always run.
+- Gesture rules live in the core. A control spreads `getTriggerProps(props)` on its trigger, which keeps consumer props and runs consumer handlers before the core's (through `composeHandlers`).
 - Timers decide timing. Animations are visual only and animate the CSS `scale` property, never `transform`.
 - Dialogs are optional. Only `confirm-dialog.tsx` may import `alert-dialog`. Only `undo-toast.tsx` may import `sonner`.
 - Registry files start with `"use client"`, import only from `@/components/ui/*`, `@/lib/utils` and npm packages, and have no comments.

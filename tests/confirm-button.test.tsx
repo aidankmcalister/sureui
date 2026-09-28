@@ -954,6 +954,29 @@ describe("ConfirmButton", () => {
     expect(screen.getByRole("button")).toHaveProperty("disabled", true)
   })
 
+  it("undo: disabling the button during the window keeps Undo pressable", async () => {
+    const onConfirm = vi.fn()
+    const onCancel = vi.fn()
+    const { rerender } = render(
+      <ConfirmButton undo onConfirm={onConfirm} onCancel={onCancel}>
+        Archive
+      </ConfirmButton>
+    )
+    await click(screen.getByRole("button"))
+    rerender(
+      <ConfirmButton undo disabled onConfirm={onConfirm} onCancel={onCancel}>
+        Archive
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button", { name: "Undo" })
+    expect(button).toHaveProperty("disabled", false)
+    await click(button)
+    expect(onCancel).toHaveBeenCalledOnce()
+    expect(button).toHaveProperty("disabled", true)
+    await act(async () => vi.advanceTimersByTime(6000))
+    expect(onConfirm).not.toHaveBeenCalled()
+  })
+
   it("undo: pauseUndoOnHover={false} keeps the window running on hover", async () => {
     const onConfirm = vi.fn()
     render(
