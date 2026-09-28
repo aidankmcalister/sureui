@@ -4,8 +4,8 @@ set -euo pipefail
 root="$(cd "$(dirname "$0")/.." && pwd)"
 shadcn="$root/node_modules/.bin/shadcn"
 items=(confirm-button confirm-menu-item type-to-confirm confirm-dialog undo-toast rules)
-blocks=(danger-zone-01)
-block_files=(danger-zone.tsx)
+blocks=(danger-zone-01 api-keys-01)
+block_files=(danger-zone.tsx api-keys.tsx create-key-dialog.tsx)
 port=$((20000 + RANDOM % 20000))
 
 cd "$root"

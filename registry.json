@@ -206,6 +206,36 @@
         }
       ],
       "categories": ["block", "settings"]
+    },
+    {
+      "name": "api-keys-01",
+      "type": "registry:block",
+      "title": "API Keys",
+      "description": "An API keys table with the last time each key was used, hold to revoke, and a Create key dialog that shows the new secret once with a copy button.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": [
+        "@sureui/confirm-button",
+        "badge",
+        "button",
+        "card",
+        "dialog",
+        "input",
+        "label",
+        "table"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/api-keys-01/api-keys.tsx",
+          "type": "registry:component",
+          "target": "@components/api-keys.tsx"
+        },
+        {
+          "path": "components/blocks/api-keys-01/create-key-dialog.tsx",
+          "type": "registry:component",
+          "target": "@components/create-key-dialog.tsx"
+        }
+      ],
+      "categories": ["block", "settings"]
     }
   ]
 }

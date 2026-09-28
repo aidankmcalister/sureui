@@ -44,6 +44,21 @@ const notes: BlockNote[] = [
       },
     ],
   },
+  {
+    name: "api-keys-01",
+    actions: [
+      {
+        action: "Revoke key",
+        style: "hold",
+        why: "Revoking breaks every service using the key at once and can't be taken back, but it's one row among many. A hold takes a deliberate second without a dialog, and letting go early cancels.",
+      },
+      {
+        action: "Create key",
+        style: null,
+        why: "Creating a key changes nothing that exists. The dialog is there to show the secret once, not to confirm.",
+      },
+    ],
+  },
 ]
 
 function styleName(slug: string | null) {

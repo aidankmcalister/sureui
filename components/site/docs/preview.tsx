@@ -42,7 +42,7 @@ export function Preview({
 
   return (
     <div className="border border-(--rule) bg-(--well) text-foreground">
-      <SiteTabs value={tab} onValueChange={setTab}>
+      <SiteTabs value={tab} onValueChange={setTab} className="grid-cols-1">
         <div className="flex h-10 items-center justify-between gap-4 border-b border-(--rule) pr-4 pl-2">
           <SiteTabsList>
             <SiteTab value="preview">Preview</SiteTab>
