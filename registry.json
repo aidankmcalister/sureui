@@ -208,67 +208,6 @@
       ]
     },
     {
-      "name": "confirm-switch",
-      "type": "registry:ui",
-      "title": "Confirm Switch",
-      "description": "A Switch that asks before the risky direction (turning off, by default) with a second click, a hold, a popover or a dialog, and toggles the other way at once. It shows the new value while an async onConfirm saves and reverts if it rejects.",
-      "registryDependencies": [
-        "switch",
-        "button",
-        "popover",
-        "alert-dialog",
-        "checkbox",
-        "input",
-        "label"
-      ],
-      "files": [
-        {
-          "path": "components/ui/sureui/fill.ts",
-          "type": "registry:lib",
-          "target": "@ui/sureui/fill.ts"
-        },
-        {
-          "path": "components/ui/sureui/undo-window.ts",
-          "type": "registry:lib",
-          "target": "@ui/sureui/undo-window.ts"
-        },
-        {
-          "path": "components/ui/sureui/confirmation.ts",
-          "type": "registry:lib",
-          "target": "@ui/sureui/confirmation.ts"
-        },
-        {
-          "path": "components/ui/sureui/confirm-button.tsx",
-          "type": "registry:ui",
-          "target": "@ui/sureui/confirm-button.tsx"
-        },
-        {
-          "path": "components/ui/sureui/type-to-confirm.tsx",
-          "type": "registry:ui",
-          "target": "@ui/sureui/type-to-confirm.tsx"
-        },
-        {
-          "path": "components/ui/sureui/confirm-dialog.tsx",
-          "type": "registry:ui",
-          "target": "@ui/sureui/confirm-dialog.tsx"
-        },
-        {
-          "path": "components/ui/sureui/confirm-popover.tsx",
-          "type": "registry:ui",
-          "target": "@ui/sureui/confirm-popover.tsx"
-        },
-        {
-          "path": "components/ui/sureui/confirm-switch.tsx",
-          "type": "registry:ui",
-          "target": "@ui/sureui/confirm-switch.tsx"
-        }
-      ],
-      "categories": [
-        "confirmation",
-        "switch"
-      ]
-    },
-    {
       "name": "consequences",
       "type": "registry:ui",
       "title": "Consequences",

@@ -10,7 +10,6 @@ import { Label } from "@/components/site/layout/frame"
 const sureui = new Set([
   "ConfirmButton",
   "ConfirmMenuItem",
-  "ConfirmSwitch",
   "TypeToConfirm",
   "ConfirmDialog",
   "ConfirmPopover",

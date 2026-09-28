@@ -11,7 +11,6 @@ const groups = [
     slugs: [
       "confirm-button",
       "confirm-menu-item",
-      "confirm-switch",
       "type-to-confirm",
       "confirm-dialog",
       "confirm-popover",
