@@ -4,6 +4,7 @@ import tsx from "shiki/langs/tsx.mjs"
 
 import { cn } from "@/lib/utils"
 import { CopyButton } from "@/components/site/code/copy-button"
+import { Label } from "@/components/site/layout/frame"
 
 const sureui = new Set([
   "ConfirmButton",
@@ -68,10 +69,14 @@ const highlighter = createHighlighterCoreSync({
 })
 
 export function Code({
+  label = "tsx",
   highlight = [],
+  framed = true,
   children,
 }: {
+  label?: string
   highlight?: number[]
+  framed?: boolean
   children: string
 }) {
   const { tokens } = highlighter.codeToTokens(children, {
@@ -80,14 +85,27 @@ export function Code({
   })
 
   return (
-    <div className="relative rounded-[10px] border bg-(--well) text-(--code-foreground)">
+    <div
+      className={cn(
+        "bg-(--well) text-(--code-foreground)",
+        framed && "border border-(--rule)"
+      )}
+    >
+      <div className="flex h-10 items-center justify-between border-b border-(--rule) pr-1.5 pl-4">
+        <Label
+          className={cn(label.includes(".") && "tracking-normal normal-case")}
+        >
+          {label}
+        </Label>
+        <CopyButton value={children} />
+      </div>
       <pre className="overflow-x-auto py-4 font-mono text-[13px] leading-6">
         <code className="grid min-w-fit">
           {tokens.map((line, index) => (
             <span
               key={index}
               className={cn(
-                "min-h-6 pr-12 pl-4",
+                "min-h-6 pr-4 pl-4",
                 highlight.includes(index + 1) &&
                   "border-l-2 border-(--mark) bg-(--mark)/10 pl-3.5"
               )}
@@ -121,7 +139,6 @@ export function Code({
           ))}
         </code>
       </pre>
-      <CopyButton value={children} className="absolute top-2.5 right-2.5" />
     </div>
   )
 }

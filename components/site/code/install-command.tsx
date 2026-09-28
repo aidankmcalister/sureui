@@ -51,8 +51,8 @@ export function InstallCommand({ args }: { args: string }) {
   const command = `${runners[runner]} shadcn@latest ${args}`
 
   return (
-    <div className="rounded-md border bg-(--well) text-foreground">
-      <div className="flex items-center justify-between gap-2 border-b py-1 pr-1 pl-2">
+    <div className="border border-(--rule) bg-(--well) text-foreground">
+      <div className="flex h-10 items-center justify-between gap-2 border-b border-(--rule) pr-1.5 pl-2">
         <Tabs value={runner} onValueChange={(value) => write(value as Runner)}>
           <TabsList variant="line">
             {Object.keys(runners).map((name) => (
@@ -68,7 +68,7 @@ export function InstallCommand({ args }: { args: string }) {
         </Tabs>
         <CopyButton value={command} />
       </div>
-      <p className="px-3 py-2.5 font-mono text-xs leading-5 break-all">
+      <p className="px-4 py-3 font-mono text-[13px] leading-6 break-all">
         {command}
       </p>
     </div>

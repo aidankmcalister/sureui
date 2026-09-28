@@ -35,7 +35,7 @@ export default function Installation() {
                 </div>
                 {step.command && <InstallCommand args={step.command} />}
                 {step.code && (
-                  <Code highlight={step.code.highlight}>
+                  <Code label={step.code.label} highlight={step.code.highlight}>
                     {step.code.source}
                   </Code>
                 )}

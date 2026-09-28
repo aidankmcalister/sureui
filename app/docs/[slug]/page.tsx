@@ -37,7 +37,10 @@ export default async function StylePage({ params }: Props) {
   return (
     <>
       <DocsHeader href={`/docs/${style.slug}`}>
-        <Preview figure={figure} code={<Code>{style.usage}</Code>}>
+        <Preview
+          figure={figure}
+          code={<Code framed={false}>{style.usage}</Code>}
+        >
           <Demo slug={style.slug} />
         </Preview>
       </DocsHeader>

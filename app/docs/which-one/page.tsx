@@ -1,13 +1,6 @@
 import type { Metadata } from "next"
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import { FramedTable } from "@/components/site/docs/framed-table"
 import {
   DocsHeader,
   DocsSection,
@@ -48,49 +41,26 @@ export default function WhichOne() {
         </FramedList>
       </DocsSection>
       <DocsSection label="At a glance">
-        <div className="hidden rounded-[10px] border bg-(--well) px-2 text-foreground sm:block">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Style</TableHead>
-                {columns.map((column) => (
-                  <TableHead key={column.key}>{column.label}</TableHead>
-                ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {styles.map((style) => (
-                <TableRow key={style.slug}>
-                  <TableCell className="font-medium">{style.name}</TableCell>
-                  {columns.map((column) => (
-                    <TableCell
-                      key={column.key}
-                      className="text-muted-foreground"
-                    >
-                      {style[column.key]}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-        <FramedList className="sm:hidden">
-          {styles.map((style) => (
-            <dl
-              key={style.slug}
-              className="grid gap-2 bg-(--paper) p-4 text-sm"
-            >
-              <dt className="font-semibold">{style.name}</dt>
-              {columns.map((column) => (
-                <div key={column.key} className="flex justify-between gap-4">
-                  <dt className="text-(--ink-label)">{column.label}</dt>
-                  <dd className="text-right">{style[column.key]}</dd>
-                </div>
-              ))}
-            </dl>
-          ))}
-        </FramedList>
+        <FramedTable
+          columns={[
+            { label: "Style", width: "22%", className: "font-medium" },
+            ...columns.map((column) => ({
+              label: column.label,
+              width: column.key === "bestFor" ? "36%" : "21%",
+              className: "text-(--ink-muted)",
+            })),
+          ]}
+          rows={styles.map((style) => ({
+            key: style.slug,
+            cells: [
+              <StyleLink key="name" slug={style.slug}>
+                {style.name}
+              </StyleLink>,
+              ...columns.map((column) => style[column.key]),
+            ],
+          }))}
+          className="text-sm"
+        />
       </DocsSection>
     </>
   )

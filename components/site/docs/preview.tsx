@@ -23,12 +23,16 @@ export function Preview({
   const [entry, setEntry] = React.useState("waiting for you to try it")
 
   return (
-    <div className="rounded-[10px] border bg-(--well) text-foreground">
-      <Tabs defaultValue="preview">
-        <div className="flex items-center justify-between gap-4 p-2 pr-4">
-          <TabsList>
-            <TabsTrigger value="preview">Preview</TabsTrigger>
-            <TabsTrigger value="code">Code</TabsTrigger>
+    <div className="border border-(--rule) bg-(--well) text-foreground">
+      <Tabs defaultValue="preview" className="gap-0">
+        <div className="flex h-10 items-center justify-between gap-4 border-b border-(--rule) pr-4 pl-2">
+          <TabsList variant="line">
+            <TabsTrigger value="preview" className="font-mono text-xs">
+              Preview
+            </TabsTrigger>
+            <TabsTrigger value="code" className="font-mono text-xs">
+              Code
+            </TabsTrigger>
           </TabsList>
           <Label>Fig. {figure}</Label>
         </div>
@@ -40,15 +44,13 @@ export function Preview({
           </ReportContext>
           <p
             aria-live="polite"
-            className="border-t px-4 py-2.5 font-mono text-xs text-muted-foreground"
+            className="flex items-baseline gap-3 border-t border-(--rule) px-4 py-2.5 font-mono text-xs"
           >
-            <span className="tracking-widest uppercase">Await log</span>{" "}
-            <span className="text-foreground">{entry}</span>
+            <Label>Await log</Label>
+            <span className="text-(--ink)">{entry}</span>
           </p>
         </TabsContent>
-        <TabsContent value="code">
-          <div className="px-2 pb-2">{code}</div>
-        </TabsContent>
+        <TabsContent value="code">{code}</TabsContent>
       </Tabs>
     </div>
   )

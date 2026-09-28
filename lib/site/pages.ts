@@ -25,7 +25,12 @@ export type InstallStep = {
   title: string
   body: string
   command?: string
-  code?: { lang: "json" | "tsx"; source: string; highlight: number[] }
+  code?: {
+    lang: "json" | "tsx"
+    label: string
+    source: string
+    highlight: number[]
+  }
 }
 
 export const installSteps: InstallStep[] = [
@@ -39,6 +44,7 @@ export const installSteps: InstallStep[] = [
     body: "Add `@sureui` to the registries in your `components.json`:",
     code: {
       lang: "json",
+      label: "components.json",
       source: `{
   "registries": {
     "@sureui": "${siteUrl}/r/{name}.json"
@@ -63,6 +69,7 @@ export const installSteps: InstallStep[] = [
     body: "`undoToast` shows a shadcn toast. Everything else needs no setup.",
     code: {
       lang: "tsx",
+      label: "app/layout.tsx",
       source: `import { Toaster } from "@/components/ui/sonner"
 
 export default function RootLayout({ children }) {
