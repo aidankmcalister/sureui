@@ -1,20 +1,30 @@
-# SureUI
+<div align="center">
+  <h1>SureUI</h1>
+  <img src="https://sureui.com/opengraph-image" width="640" alt="Confirmation components for shadcn/ui, built on Base UI" />
+  <p>
+    <a href="LICENSE"><img src="https://www.shieldcn.dev/github/license/aidankmcalister/sureui.svg?variant=default&amp;size=sm&amp;font=geist-mono" alt="License" /></a>
+    <a href="https://github.com/aidankmcalister/sureui/stargazers"><img src="https://www.shieldcn.dev/github/stars/aidankmcalister/sureui.svg?variant=default&amp;size=sm&amp;font=geist-mono" alt="GitHub Stars" /></a>
+  </p>
+  <p>
+    <a href="https://sureui.com/docs">Docs</a> ·
+    <a href="https://sureui.com/blocks">Blocks</a> ·
+    <a href="https://sureui.com/llms.txt">llms.txt</a>
+  </p>
+</div>
 
-Confirmation components for [shadcn/ui](https://ui.shadcn.com), built on [Base UI](https://base-ui.com). Free and open source, MIT licensed.
-
-When every action opens an "Are you sure?" dialog, people stop reading and confirm on reflex. SureUI has other ways to ask: undo, a second click, a press and hold, a typed name, or a dialog when you want one. The components install into your app with the shadcn CLI and look like stock shadcn, so they fit whatever your app already looks like.
+When every action opens an "Are you sure?" dialog, people stop reading and confirm on reflex. SureUI has other ways to ask: undo, a second click, a press and hold, a typed name, or a dialog. The components install into your app with the shadcn CLI and look like stock shadcn, so they fit whatever your app already looks like. Free and open source.
 
 | Component           | What it does                                                                |
 | ------------------- | --------------------------------------------------------------------------- |
 | `ConfirmButton`     | Confirms on a click, a second click or a press and hold, with optional undo |
 | `ConfirmMenuItem`   | The same gestures in dropdown and context menus                             |
 | `TypeToConfirm`     | Unlocks only after the exact phrase is typed                                |
-| `ConfirmDialog`     | An optional alert dialog, with an awaitable `useConfirm`                    |
+| `ConfirmDialog`     | An alert dialog around any confirmation, with an awaitable `useConfirm`     |
 | `ConfirmPopover`    | A one-line confirmation anchored to its trigger                             |
 | `Consequences`      | Lists what a confirmation will remove, with counts and names                |
 | `undoToast`         | A toast with Undo that resolves once nobody undoes                          |
 | `Undoable`          | Collapses a removed row in place to a label and an Undo button              |
-| `useUnsavedChanges` | Asks before someone leaves unsaved changes, with any router                 |
+| `useUnsavedChanges` | Asks before someone leaves a page with unsaved changes                      |
 | `useConfirmClose`   | Asks before a dialog with unsaved edits closes                              |
 | `ToolApproval`      | Approves or denies an AI SDK tool call with a gesture that matches its risk |
 
@@ -38,9 +48,11 @@ Then add the items you need. Each one installs on its own into `components/ui/su
 npx shadcn@latest add @sureui/confirm-button
 ```
 
-`undoToast` uses the shadcn `<Toaster />`. Nothing else needs mounting.
+> [!NOTE]
+> `undoToast` uses the shadcn `<Toaster />`. Nothing else needs mounting.
 
-Full docs are at [sureui.com/docs](https://sureui.com/docs). Coding agents can read [sureui.com/llms.txt](https://sureui.com/llms.txt), or every page at once in [llms-full.txt](https://sureui.com/llms-full.txt).
+> [!TIP]
+> Coding agents can read [llms.txt](https://sureui.com/llms.txt), or every docs page at once in [llms-full.txt](https://sureui.com/llms-full.txt).
 
 ## Usage
 
@@ -61,51 +73,7 @@ if (await undoToast("Deleted 3 files")) deleteFiles(ids)
 
 `onConfirm` may return a promise; the control disables itself, keeps focus, and sets `data-state="pending"` until it settles. Every control sets `data-state` to `idle`, `armed`, `holding`, `ready`, `undo` or `pending`, so you can style around it.
 
-If `onConfirm` throws or rejects, the control returns to idle and the error reaches your app unchanged.
-
-## Dialogs are optional
-
-`ConfirmDialog` wraps a `ConfirmButton` or a `TypeToConfirm` (with `phrase`) around any trigger, and closes only after `onConfirm` settles:
-
-```tsx
-<ConfirmDialog
-  title="Revoke this key?"
-  gesture="hold"
-  variant="destructive"
-  onConfirm={revoke}
->
-  <Button variant="outline">Revoke key</Button>
-</ConfirmDialog>
-```
-
-To await it inside a handler, use `useConfirm` and render its `dialog`:
-
-```tsx
-const { confirm, dialog } = useConfirm()
-
-async function onSubmit() {
-  if (await confirm({ title: "Discard changes?" })) discard()
-}
-```
-
-Pass `onConfirm` to keep the dialog open and pending until the work finishes. `confirm` then resolves `true` only if it succeeds:
-
-```tsx
-await confirm({ title: "Leave the team?", onConfirm: leaveTeam })
-```
-
-To ask before a Dialog, Sheet or Drawer with unsaved edits closes, use `useConfirmClose`:
-
-```tsx
-const { rootProps, dialog, close } = useConfirmClose(dirty)
-
-<Dialog {...rootProps}>
-  <DialogContent>
-    <ProfileForm onSaved={close} />
-    {dialog}
-  </DialogContent>
-</Dialog>
-```
+If `onConfirm` throws or rejects, the control returns to idle and the error reaches your app unchanged. Pass `onConfirmError` to handle it there instead, with an `errorLabel` that invites a retry.
 
 ## Development
 
@@ -117,7 +85,3 @@ pnpm build
 ```
 
 Registry source lives in `components/ui/sureui`. The docs pages are MDX in `content/docs`, and everything in `app`, `components/site` and `lib/site` is the docs site.
-
-## License
-
-MIT

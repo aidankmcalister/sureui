@@ -11,12 +11,10 @@ import { useLog } from "@/components/site/docs/preview"
 export default function UnsavedChangesDemo() {
   const log = useLog()
   const [page, setPage] = React.useState("General")
-  const [saved, setSaved] = React.useState("Acme")
-  const [name, setName] = React.useState(saved)
-  const dirty = name !== saved
+  const [name, setName] = React.useState("Acme")
   const { confirmLeave, dialog } = useUnsavedChanges({
-    when: dirty,
-    onDiscard: () => setName(saved),
+    when: name !== "Acme",
+    onDiscard: () => setName("Acme"),
   })
 
   async function navigate(to: string) {
@@ -37,7 +35,6 @@ export default function UnsavedChangesDemo() {
             key={item}
             variant={item === page ? "secondary" : "ghost"}
             size="sm"
-            aria-current={item === page ? "page" : undefined}
             onClick={() => navigate(item)}
           >
             {item}
@@ -45,38 +42,16 @@ export default function UnsavedChangesDemo() {
         ))}
       </nav>
       {page === "General" ? (
-        <form
-          className="grid gap-3"
-          onSubmit={(event) => {
-            event.preventDefault()
-            setSaved(name)
-            log(`Saved the team name as ${name}`)
-          }}
-        >
+        <div className="grid gap-2">
           <Label htmlFor="team-name">Team name</Label>
           <Input
             id="team-name"
             value={name}
             onChange={(event) => setName(event.target.value)}
           />
-          <div className="flex gap-2">
-            <Button type="submit" disabled={!dirty}>
-              Save
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              disabled={!dirty}
-              onClick={() => setName(saved)}
-            >
-              Discard
-            </Button>
-          </div>
-        </form>
+        </div>
       ) : (
-        <p className="text-sm text-muted-foreground">
-          {saved} is on the Free plan.
-        </p>
+        <p className="text-sm text-muted-foreground">Billing settings</p>
       )}
       {dialog}
     </div>

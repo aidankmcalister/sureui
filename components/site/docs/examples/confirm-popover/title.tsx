@@ -9,7 +9,7 @@ export default function ConfirmPopoverTitle() {
 
   return (
     <ConfirmPopover
-      title="Remove Maya Chen?"
+      title="Are you sure?"
       description="She loses access to the Design team's projects."
       confirmLabel="Remove"
       variant="destructive"

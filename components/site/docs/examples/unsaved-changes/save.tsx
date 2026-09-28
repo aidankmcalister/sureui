@@ -14,7 +14,6 @@ function wait(ms: number) {
 
 export default function UnsavedChangesSave() {
   const log = useLog()
-  const [open, setOpen] = React.useState(true)
   const [saved, setSaved] = React.useState("Ship the beta on Friday")
   const [title, setTitle] = React.useState(saved)
   const { confirmLeave, dialog } = useUnsavedChanges({
@@ -28,18 +27,7 @@ export default function UnsavedChangesSave() {
   })
 
   async function close() {
-    if (await confirmLeave()) {
-      setOpen(false)
-      log("Closed the task")
-    }
-  }
-
-  if (!open) {
-    return (
-      <Button variant="outline" onClick={() => setOpen(true)}>
-        Open task
-      </Button>
-    )
+    if (await confirmLeave()) log("Closed the task")
   }
 
   return (

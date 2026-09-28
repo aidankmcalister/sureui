@@ -29,6 +29,21 @@ export function useLog() {
   return React.useContext(LogContext)
 }
 
+function Stage({ children }: { children: React.ReactNode }) {
+  const ref = React.useRef<HTMLDivElement>(null)
+
+  React.useLayoutEffect(() => {
+    const stage = ref.current
+    if (stage) stage.style.minHeight = `${stage.offsetHeight}px`
+  }, [])
+
+  return (
+    <div ref={ref} className="grid w-full content-start justify-items-center">
+      {children}
+    </div>
+  )
+}
+
 export function Preview({
   figure,
   code,
@@ -84,7 +99,7 @@ export function Preview({
                     key={JSON.stringify(values)}
                     className="flex min-h-48 items-center justify-center p-6"
                   >
-                    {children}
+                    <Stage>{children}</Stage>
                   </div>
                 </ResetContent>
               </LogContext>

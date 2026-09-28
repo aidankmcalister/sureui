@@ -2,7 +2,6 @@
 
 import * as React from "react"
 
-import { Button } from "@/components/ui/button"
 import { useConfirm } from "@/components/ui/sureui/confirm-dialog"
 
 type UnsavedChangesOptions = {
@@ -59,32 +58,26 @@ function useUnsavedChanges(options: UnsavedChangesOptions) {
         variant: "destructive",
       })
 
-    let discarding = Promise.resolve(false)
-    if (!onSave) {
-      discarding = discard()
-    } else {
+    let discarding = false
+    if (onSave) {
       const saved = await confirm({
         title: saveTitle,
         description,
         cancelLabel: keepLabel,
         confirmLabel: saveLabel,
         onConfirm: onSave,
-        consequences: (
-          <Button
-            variant="outline"
-            className="sm:justify-self-start"
-            onClick={() => {
-              discarding = discard()
-            }}
-          >
-            {discardLabel}
-          </Button>
-        ),
+        alternative: {
+          label: discardLabel,
+          onSelect: () => {
+            discarding = true
+          },
+        },
       })
       if (saved) return true
+      if (!discarding) return false
     }
 
-    const discarded = await discarding
+    const discarded = await discard()
     if (discarded) onDiscard?.()
     return discarded
   }, [confirm])

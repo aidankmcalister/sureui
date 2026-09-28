@@ -10,7 +10,7 @@ export default function ChoosingMedium() {
     <div className="flex flex-wrap justify-center gap-2">
       <ConfirmButton
         gesture="click-again"
-        confirmLabel="Remove Maya Chen"
+        confirmLabel="Are you sure?"
         variant="outline"
         onConfirm={() => log("Removed Maya Chen from Design")}
         onCancel={() => log("Disarmed, nobody removed")}

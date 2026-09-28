@@ -3,13 +3,13 @@ title: Choosing a confirmation
 description: Match how risky an action is to the confirmation that asks for it.
 ---
 
-Carbon, GitLab Pajamas, Apple's Human Interface Guidelines and Nielsen Norman Group all sort destructive actions into three tiers. The harder an action is to take back, the more effort its confirmation asks for. A routine action that asks for too much teaches people to confirm without reading.
+[Carbon](https://carbondesignsystem.com/patterns/common-actions/), [GitLab Pajamas](https://design.gitlab.com/patterns/destructive-actions), [Apple's Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/alerts) and [Nielsen Norman Group](https://www.nngroup.com/articles/confirmation-dialog/) all sort destructive actions into three tiers. The harder an action is to take back, the more effort its confirmation asks for. A routine action that asks for too much teaches people to confirm without reading.
 
-| Risk | Actions like | Use |
-| --- | --- | --- |
-| Low | Archiving a message, removing an item from a list. Common and easy to reverse. | Undo: [Confirm Button](/docs/confirm-button) with `undo`, [Undo Toast](/docs/undo-toast) or [Undoable](/docs/undoable). |
-| Medium | Removing a member, deleting a branch, revoking a key. | A second click or a popover: [Confirm Button](/docs/confirm-button) with `gesture="click-again"`, [Confirm Menu Item](/docs/confirm-menu-item) or [Confirm Popover](/docs/confirm-popover). A hold for dangerous one-offs. |
-| High | Deleting a project, a database or an account. Irreversible, with wide impact. | A dialog that lists what goes and asks for the name: [Confirm Dialog](/docs/confirm-dialog) with `phrase`, or [Type to Confirm](/docs/type-to-confirm). |
+| Risk   | Actions like                                                                   | Use                                                                                                                                                                                                                        |
+| ------ | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Low    | Archiving a message, removing an item from a list. Common and easy to reverse. | Undo: [Confirm Button](/docs/confirm-button) with `undo`, [Undo Toast](/docs/undo-toast) or [Undoable](/docs/undoable).                                                                                                    |
+| Medium | Removing a member, deleting a branch, revoking a key.                          | A second click or a popover: [Confirm Button](/docs/confirm-button) with `gesture="click-again"`, [Confirm Menu Item](/docs/confirm-menu-item) or [Confirm Popover](/docs/confirm-popover). A hold for dangerous one-offs. |
+| High   | Deleting a project, a database or an account. Irreversible, with wide impact.  | A dialog that lists what goes and asks for the name: [Confirm Dialog](/docs/confirm-dialog) with `phrase`, or [Type to Confirm](/docs/type-to-confirm).                                                                    |
 
 ## Low risk
 
@@ -50,12 +50,12 @@ Keep this tier for the few actions that need it.
 
 [Tool Approval](/docs/tool-approval) maps its `risk` levels onto the same tiers. Deny is one click at every level.
 
-| `risk` | Approve with | Tier |
-| --- | --- | --- |
-| `"low"` | A click, then an undo window | Low |
-| `"medium"` | A second click | Medium |
-| `"high"` | A press and hold | Medium, for dangerous one-offs |
-| `"critical"` | The typed `phrase` | High |
+| `risk`       | Approve with                 | Tier                           |
+| ------------ | ---------------------------- | ------------------------------ |
+| `"low"`      | A click, then an undo window | Low                            |
+| `"medium"`   | A second click               | Medium                         |
+| `"high"`     | A press and hold             | Medium, for dangerous one-offs |
+| `"critical"` | The typed `phrase`           | High                           |
 
 ```tsx
 <ToolApproval part={part} risk="low" onRespond={addToolApprovalResponse} />
@@ -71,7 +71,7 @@ Keep this tier for the few actions that need it.
 ## Labels
 
 - Use a verb that says what happens: "Delete project", not "OK" or "Yes". The button should make sense without reading the question above it.
-- Name the thing and the count: "Remove Maya Chen", "Delete 3 files", "Delete acme-prod?".
+- Name the thing and the count: "Are you sure?", "Delete 3 files", "Delete acme-prod?".
 - Don't rely on red alone. Color doesn't reach everyone, so `variant="destructive"` goes with a label that says "Delete", never instead of it.
 - For frequent actions, skip the question and offer undo.
 

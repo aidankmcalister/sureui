@@ -302,7 +302,7 @@
       "name": "unsaved-changes",
       "type": "registry:ui",
       "title": "Unsaved Changes",
-      "description": "useUnsavedChanges({ when }) asks before someone leaves unsaved changes: the browser's prompt on reload or close, and an awaitable confirmLeave() that opens a dialog with Keep editing, Discard changes and an optional Save. It works with any router.",
+      "description": "useUnsavedChanges({ when }) asks before someone leaves unsaved changes: the browser's prompt on reload or close, and an awaitable confirmLeave() that opens a dialog with Keep editing, Discard changes and an optional Save.",
       "registryDependencies": [
         "alert-dialog",
         "button",
