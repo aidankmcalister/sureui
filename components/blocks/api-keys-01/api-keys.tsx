@@ -3,7 +3,6 @@
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
-import { Badge } from "@/components/ui/badge"
 import {
   Card,
   CardAction,
@@ -29,7 +28,6 @@ type ApiKey = {
   name: string
   prefix: string
   last4: string
-  created: string
   lastUsed: string
   revoked?: boolean
 }
@@ -45,7 +43,6 @@ const sampleKeys: ApiKey[] = [
     name: "Production",
     prefix: "sk_live_",
     last4: "4f2a",
-    created: "Mar 12, 2026",
     lastUsed: "2 minutes ago",
   },
   {
@@ -53,7 +50,6 @@ const sampleKeys: ApiKey[] = [
     name: "Billing worker",
     prefix: "sk_live_",
     last4: "9c1e",
-    created: "Jan 4, 2026",
     lastUsed: "1 hour ago",
   },
   {
@@ -61,7 +57,6 @@ const sampleKeys: ApiKey[] = [
     name: "Staging",
     prefix: "sk_test_",
     last4: "71b3",
-    created: "Nov 20, 2025",
     lastUsed: "3 days ago",
   },
   {
@@ -69,7 +64,6 @@ const sampleKeys: ApiKey[] = [
     name: "Old CI runner",
     prefix: "sk_test_",
     last4: "0d88",
-    created: "Jun 2, 2025",
     lastUsed: "4 months ago",
   },
 ]
@@ -99,7 +93,6 @@ function ApiKeys({ initialKeys = sampleKeys, className }: ApiKeysProps) {
         name,
         prefix,
         last4: secret.slice(-4),
-        created: "Just now",
         lastUsed: "Never",
       },
       ...prev,
@@ -119,80 +112,66 @@ function ApiKeys({ initialKeys = sampleKeys, className }: ApiKeysProps) {
       <CardHeader>
         <CardTitle>API keys</CardTitle>
         <CardDescription>
-          Keys let your servers call the API as your account. Revoking a key
-          stops every request that uses it right away.
+          A revoked key stops working right away.
         </CardDescription>
         <CardAction>
           <CreateKeyDialog onCreate={createKey} />
         </CardAction>
       </CardHeader>
-      <CardContent>
-        <div className="rounded-lg border">
-          <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="pl-4">Name</TableHead>
-                <TableHead className="hidden md:table-cell">Created</TableHead>
-                <TableHead className="hidden sm:table-cell">
-                  Last used
-                </TableHead>
-                <TableHead className="pr-4 text-right">
-                  <span className="sr-only">Actions</span>
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {keys.map((key) => (
-                <TableRow
-                  key={key.id}
-                  data-state={key.revoked ? "revoked" : "active"}
-                  className="hover:bg-transparent"
-                >
-                  <TableCell className="py-3 pl-4">
-                    <div
-                      className={cn(
-                        "grid gap-0.5",
-                        key.revoked && "text-muted-foreground"
-                      )}
+      <CardContent className="px-0">
+        <Table>
+          <TableHeader>
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="pl-4">Name</TableHead>
+              <TableHead className="hidden sm:table-cell">Last used</TableHead>
+              <TableHead className="pr-4 text-right">
+                <span className="sr-only">Actions</span>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {keys.map((key) => (
+              <TableRow
+                key={key.id}
+                data-state={key.revoked ? "revoked" : "active"}
+                className={cn(
+                  "hover:bg-transparent",
+                  key.revoked && "text-muted-foreground"
+                )}
+              >
+                <TableCell className="py-3 pl-4">
+                  <div className="grid gap-0.5">
+                    <span className="font-medium">{key.name}</span>
+                    <span className="font-mono text-xs text-muted-foreground">
+                      {key.prefix}••••{key.last4}
+                    </span>
+                    <span className="text-xs text-muted-foreground sm:hidden">
+                      Last used {key.lastUsed.toLowerCase()}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell className="hidden text-muted-foreground sm:table-cell">
+                  {key.lastUsed}
+                </TableCell>
+                <TableCell className="pr-4 text-right">
+                  {key.revoked ? (
+                    "Revoked"
+                  ) : (
+                    <ConfirmButton
+                      gesture="hold"
+                      variant="destructive"
+                      size="sm"
+                      aria-label={`Hold to revoke ${key.name}`}
+                      onConfirm={() => revokeKey(key.id)}
                     >
-                      <span className="flex items-center gap-2 font-medium">
-                        {key.name}
-                        {key.revoked && (
-                          <Badge variant="outline">Revoked</Badge>
-                        )}
-                      </span>
-                      <span className="font-mono text-xs text-muted-foreground">
-                        {key.prefix}••••{key.last4}
-                      </span>
-                      <span className="text-xs text-muted-foreground sm:hidden">
-                        Last used {key.lastUsed.toLowerCase()}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="hidden text-muted-foreground md:table-cell">
-                    {key.created}
-                  </TableCell>
-                  <TableCell className="hidden text-muted-foreground sm:table-cell">
-                    {key.lastUsed}
-                  </TableCell>
-                  <TableCell className="pr-4 text-right">
-                    {!key.revoked && (
-                      <ConfirmButton
-                        gesture="hold"
-                        variant="destructive"
-                        size="sm"
-                        aria-label={`Hold to revoke ${key.name}`}
-                        onConfirm={() => revokeKey(key.id)}
-                      >
-                        Hold to revoke
-                      </ConfirmButton>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+                      Hold to revoke
+                    </ConfirmButton>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </CardContent>
     </Card>
   )

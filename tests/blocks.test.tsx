@@ -86,7 +86,9 @@ describe("api-keys-01", () => {
     )
     const value = (secret as HTMLInputElement).value
     expect(value).toMatch(/^sk_live_[A-Za-z0-9]{32}$/)
-    expect(screen.getByText(/won't see this secret again/)).toBeTruthy()
+    expect(
+      screen.getByText(/won't see the secret for Deploy bot again/)
+    ).toBeTruthy()
     fireEvent.click(screen.getByRole("button", { name: "Copy secret key" }))
     await waitFor(() => expect(writeText).toHaveBeenCalledWith(value))
     fireEvent.click(screen.getByRole("button", { name: "Done" }))

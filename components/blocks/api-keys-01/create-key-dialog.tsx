@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { CheckIcon, CopyIcon, PlusIcon, TriangleAlertIcon } from "lucide-react"
+import { CheckIcon, CopyIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -76,18 +76,15 @@ function CreateKeyDialog({ onCreate }: CreateKeyDialogProps) {
         if (!next) reset()
       }}
     >
-      <DialogTrigger render={<Button size="sm" />}>
-        <PlusIcon data-icon="inline-start" />
-        Create key
-      </DialogTrigger>
+      <DialogTrigger render={<Button size="sm" />}>Create key</DialogTrigger>
       <DialogContent showCloseButton={created === null}>
         {created ? (
           <>
             <DialogHeader>
               <DialogTitle>Copy your new key</DialogTitle>
               <DialogDescription>
-                This is the only time the secret for {created.name} is shown.
-                Store it somewhere safe before you close this.
+                You won&apos;t see the secret for {created.name} again. Store it
+                somewhere safe.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-2">
@@ -109,11 +106,6 @@ function CreateKeyDialog({ onCreate }: CreateKeyDialogProps) {
                   {copied ? <CheckIcon /> : <CopyIcon />}
                 </Button>
               </div>
-              <p className="flex items-start gap-2 text-muted-foreground">
-                <TriangleAlertIcon className="mt-0.5 size-4 shrink-0" />
-                You won&apos;t see this secret again. If you lose it, revoke the
-                key and create a new one.
-              </p>
             </div>
             <DialogFooter>
               <DialogClose render={<Button />}>Done</DialogClose>
@@ -124,8 +116,7 @@ function CreateKeyDialog({ onCreate }: CreateKeyDialogProps) {
             <DialogHeader>
               <DialogTitle>Create API key</DialogTitle>
               <DialogDescription>
-                Name the key after the service that will use it, so you know
-                what breaks if you revoke it.
+                Name it after the service that will use it.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-2">
@@ -133,7 +124,7 @@ function CreateKeyDialog({ onCreate }: CreateKeyDialogProps) {
               <Input
                 id={nameId}
                 value={name}
-                placeholder="e.g. Billing worker"
+                placeholder="Billing worker"
                 autoComplete="off"
                 readOnly={pending}
                 onChange={(event) => setName(event.target.value)}
