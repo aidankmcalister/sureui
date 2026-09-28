@@ -17,10 +17,6 @@ export type Style = {
   name: string
   lead: string
   summary: string
-  question: string
-  interrupts: string
-  reads: string
-  bestFor: string
   items: string[]
   usage: string
   api: { name: string; rows: string[][] }[]
@@ -35,10 +31,6 @@ export const styles: Style[] = [
     name: "Undo",
     lead: "Act right away and give people a few seconds to take it back.",
     summary: "Runs on click, then offers a few seconds to take it back.",
-    question: "Can it be taken back?",
-    interrupts: "No",
-    reads: "No",
-    bestFor: "Trash, archive, anything you can restore",
     items: ["confirm-button", "undo-toast", "undoable"],
     usage: `<ConfirmButton undo onConfirm={moveToTrash}>
   Move to trash
@@ -133,10 +125,6 @@ if (await undoToast("Moved 3 files to trash")) {
     name: "Click again",
     lead: "The first click arms the button and the second one confirms.",
     summary: "The first click arms it, the second confirms.",
-    question: "Is it one small item people act on often?",
-    interrupts: "No",
-    reads: "No",
-    bestFor: "Single rows in a list",
     items: ["confirm-button"],
     usage: `<ConfirmButton gesture="click-again" onConfirm={archive}>
   Archive
@@ -288,10 +276,6 @@ if (await undoToast("Moved 3 files to trash")) {
     name: "Hold",
     lead: "People press and hold until the fill completes, then let go to confirm. Letting go early cancels.",
     summary: "Press and hold until it fills, then let go.",
-    question: "Could a stray tap trigger it?",
-    interrupts: "No",
-    reads: "No",
-    bestFor: "Touch screens and small resets",
     items: ["confirm-button"],
     usage: `<ConfirmButton gesture="hold" variant="destructive" onConfirm={revoke}>
   Hold to revoke
@@ -385,10 +369,6 @@ if (await undoToast("Moved 3 files to trash")) {
     name: "Dialogs",
     lead: "An optional alert dialog for actions that need a sentence of explanation, or a popover anchored to the button when one line is enough.",
     summary: "Opens a dialog or a popover when there's something to explain.",
-    question: "Does it need explaining, or affect other people?",
-    interrupts: "Yes, less with a popover",
-    reads: "Yes",
-    bestFor: "Actions that affect other people",
     items: ["confirm-dialog"],
     usage: `<ConfirmDialog
   title="Leave the Design team?"
@@ -515,10 +495,6 @@ async function discard() {
     name: "Type to confirm",
     lead: "An inline form that unlocks only after the exact phrase is typed.",
     summary: "Unlocks only after the exact name is typed.",
-    question: "Is it permanent and large?",
-    interrupts: "No, unless in a dialog",
-    reads: "Yes",
-    bestFor: "Deleting projects, databases and accounts",
     items: ["type-to-confirm", "consequences"],
     usage: `<TypeToConfirm
   phrase="acme-prod"

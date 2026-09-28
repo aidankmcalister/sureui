@@ -20,7 +20,7 @@ function importsOf(path: string) {
 }
 
 describe("registry", () => {
-  const items = registry.items.filter((item) => item.type !== "registry:item")
+  const items = registry.items
   const controls = items.filter((item) => item.type !== "registry:block")
   const blocks = items.filter((item) => item.type === "registry:block")
   const allFiles = controls.flatMap((item) => item.files)

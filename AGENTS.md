@@ -18,7 +18,6 @@ A shadcn/ui registry of confirmation controls. Read `CONTEXT.md` for the vocabul
 ## Layout
 
 - `components/ui/sureui/` holds everything SureUI ships. Nothing else is published.
-- `skills/sureui/SKILL.md` and `rules/sureui.mdc` are agent rules generated from `lib/site/` by `pnpm rules`, which `pnpm registry:build` runs. Don't edit them by hand. The `rules` registry item installs them, and `npx skills add aidankmcalister/sureui` installs the skill.
 - `components/ui/*.tsx` outside `sureui/` are stock shadcn components from the CLI. Never edit them.
 - `app/`, `components/site/` and `lib/site/` are the docs site:
   - `components/site/layout/` header, footer and page frame; `docs/` docs page pieces and demos; `code/` code blocks and install commands; `home/` the home page and its examples; `og/` the Open Graph card.
@@ -37,7 +36,7 @@ A shadcn/ui registry of confirmation controls. Read `CONTEXT.md` for the vocabul
 - State logic never touches an animation. The core reports which fill runs (`from`, `to`, `duration`, `startedAt`) and whether it is paused; `fill.ts` plays it. With `prefers-reduced-motion`, every fill jumps to its end state when its time is up instead of moving.
 - Dialogs are optional. Only `confirm-dialog.tsx` may import `alert-dialog`. Only `undo-toast.tsx` may import `sonner`.
 - Registry files start with `"use client"`, import only from `@/components/ui/*`, `@/lib/utils` and npm packages, and have no comments.
-- Every component file in `registry.json` has `"target": "@ui/sureui/<file name>"`, and every item declares every SureUI file, stock component and package it imports. The `rules` item is the exception: its files target `~/` paths in the project root.
+- Every component file in `registry.json` has `"target": "@ui/sureui/<file name>"`, and every item declares every SureUI file, stock component and package it imports.
 - Blocks (`"type": "registry:block"`, named `<thing>-01`) live in `components/blocks/<name>/` and install to `@components/<file>`. They are app code: they use SureUI controls through `registryDependencies` (`"@sureui/confirm-button"`), never inline copies, and keep sample data inline because the CLI doesn't rewrite imports between block files outside `components/`. `tests/registry.test.ts` checks that every block import is shipped or declared.
 - Base UI, not Radix: use `render={...}`, not `asChild`.
 - Match stock shadcn style: `import * as React from "react"`, `function` declarations, `type` not `interface`, one export block at the bottom.

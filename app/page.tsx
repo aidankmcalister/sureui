@@ -60,8 +60,8 @@ export default function Home() {
           <Cell
             featured
             figure={1}
-            gesture="Which one"
-            href="/docs/which-one"
+            gesture="Several styles"
+            href="/docs"
             title="A project danger zone"
             description="Pause, transfer and delete each ask for a different amount of confirmation."
           >

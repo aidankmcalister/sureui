@@ -1,7 +1,6 @@
 import registry from "@/registry.json"
 import { addArgs, siteUrl } from "@/lib/site/config"
 import {
-  agentRules,
   contract,
   contractNote,
   installSteps,
@@ -106,20 +105,6 @@ function bodies(page: Page) {
       code("tsx", contract),
     ]
   }
-  if (page.slug === "agent-rules") {
-    return [
-      `## ${agentRules.intro.label}`,
-      agentRules.intro.paragraphs.join("\n\n"),
-      `## ${agentRules.shadcn.label}`,
-      agentRules.shadcn.body,
-      command(agentRules.shadcn.command),
-      `## ${agentRules.skill.label}`,
-      agentRules.skill.body,
-      code("bash", agentRules.skill.command),
-      `## ${agentRules.contents.label}`,
-      list(agentRules.contents.items),
-    ]
-  }
   if (page.slug === "installation") {
     return installSteps.flatMap((step, index) => [
       `## ${index + 1}. ${step.title}`,
@@ -128,25 +113,7 @@ function bodies(page: Page) {
       ...(step.code ? [code(step.code.lang, step.code.source)] : []),
     ])
   }
-  return [
-    "## Questions to ask",
-    styles
-      .map(
-        (item, index) =>
-          `${index + 1}. ${item.question} [${item.name}](${styleUrl(item.slug)})`
-      )
-      .join("\n"),
-    "## At a glance",
-    table(
-      ["Style", "Interrupts", "Asks people to read", "Best for"],
-      styles.map((item) => [
-        item.name,
-        item.interrupts,
-        item.reads,
-        item.bestFor,
-      ])
-    ),
-  ]
+  return []
 }
 
 function pageMarkdown(page: Page) {
