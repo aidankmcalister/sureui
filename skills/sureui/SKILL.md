@@ -34,9 +34,9 @@ SureUI is a shadcn/ui registry of confirmation controls: undo, click again, hold
    Use it when:
    - Leaving a team or removing someone else's access.
    - The consequence takes a sentence to explain.
-   - One line is enough and the action only touches this item, like deleting a branch: use ConfirmPopover, so the page stays in view.
+   - One line is enough and the action only touches this item, like deleting a branch. Use ConfirmPopover.
    - It affects other people or takes more than a line: use ConfirmDialog.
-   - You need to await the answer inside a handler, with useConfirm.
+   - You need to await the answer inside a handler: use useConfirm.
    Use something else when:
    - It's routine and reversible: Undo.
    - One extra click is warning enough, with nothing to explain: Click again.
@@ -58,7 +58,7 @@ SureUI is a shadcn/ui registry of confirmation controls: undo, click again, hold
    Use something else when:
    - It's easy to reverse: Undo.
    - A stray tap on a phone would be costly: Hold.
-   - People need one line of context first, which ConfirmPopover gives: Dialogs.
+   - People need one line of context first (ConfirmPopover): Dialogs.
    - It can't be undone: Type to confirm.
 5. **Could a stray tap trigger it?** Use Hold. Best for: touch screens and small resets.
    Use it when:
@@ -158,14 +158,14 @@ npx shadcn@latest add @sureui/type-to-confirm @sureui/consequences
 />
 ```
 
-- Pass a Consequences list to consequences to show what the confirm removes, above the phrase input. ConfirmDialog takes the same prop, with or without a phrase.
-- Consequences is a list. Each item reads as its count, label and names, like "4 domains: acme.com, www.acme.com, api.acme.com and 1 more".
-- Names past limit, 3 by default, collapse into "and N more", a button that shows the rest and then "Show less". Set expandable={false} to keep it as text. When count is larger than the names you pass, N includes the ones you left out.
+- Pass a Consequences list to consequences to show what the confirm removes above the phrase input. ConfirmDialog takes the same prop, with or without a phrase.
+- Consequences renders a list. Each item reads as its count, label and names, like "4 domains: acme.com, www.acme.com, api.acme.com and 1 more".
+- Names past limit, 3 by default, collapse into an "and N more" button that shows the rest and then reads "Show less". Set expandable={false} to keep it as text. When count is larger than the names you pass, N includes the ones you left out.
 - The phrase must match exactly by default, including case and spaces. Relax it with caseSensitive={false} or trim.
-- Acknowledgements are optional. Leave them out and typing the phrase is enough.
+- Acknowledgements are optional. Without them, typing the phrase is enough.
 - The button is a ConfirmButton, so key-repeat clicks are ignored and its width doesn't change between Confirm and Undo.
 - The input and checkboxes clear after confirming, so after an undo the form isn't one click from running again.
-- While a promise from onConfirm is pending, the input is read-only and the button is disabled but keeps focus.
+- While onConfirm's promise is pending, the input is read-only and the button is disabled but keeps focus.
 
 ### Dialogs
 
@@ -203,11 +203,11 @@ async function discard() {
 ```
 
 - Gesture options (timeout, cancelOnBlur, duration, confirmOnRelease, cancelHoldOnLeave) apply when phrase is not set. caseSensitive, trim and announcements.match apply when it is.
-- The dialog stays open, and Cancel and Escape do nothing, while a promise from onConfirm is pending.
-- ConfirmPopover, added with @sureui/confirm-popover, is the lighter surface: a popover anchored to its trigger with one line and a confirm button. The rest of the page stays visible and usable.
-- The popover moves focus to its confirm button when it opens and back to the trigger when it closes. Cancel, Escape, a click outside and tabbing out of it all close it and call onCancel.
-- The popover stays open while a promise from onConfirm is pending, and Cancel, Escape and clicks outside do nothing. If the promise rejects, it stays open so people can try again.
-- ConfirmPopover has no undo prop. It closes once the action commits, so an Undo button inside it would close too. For a way back, use undoToast.
+- While onConfirm's promise is pending, the dialog stays open and Cancel and Escape do nothing.
+- ConfirmPopover, from @sureui/confirm-popover, is a popover anchored to its trigger with one line and a confirm button. The rest of the page stays visible and usable.
+- The popover moves focus to its confirm button when it opens and back to the trigger when it closes. Cancel, Escape, a click outside and tabbing out close it and call onCancel.
+- While onConfirm's promise is pending, the popover stays open and Cancel, Escape and clicks outside do nothing. If it rejects, the popover stays open for another try.
+- ConfirmPopover has no undo prop, because it closes when the action commits and an Undo inside it would close too. Use undoToast for a way back.
 - ConfirmSwitch with gesture="popover" or gesture="dialog" asks in a ConfirmPopover or an alert dialog before the risky direction, and toggles the safe one at once. Its props are on the Click again page.
 
 ### Undo
@@ -243,15 +243,16 @@ if (await undoToast("Moved 3 files to trash")) {
 </Undoable>
 ```
 
-- Nothing runs until the window ends: 5 seconds by default, or the number you pass. Anything under 4 seconds is raised to 4, because a shorter window ends before most people notice the mistake.
-- Undo calls onCancel, and onConfirm never runs.
-- If someone leaves the button and comes back to it, by pointer or keyboard, the window pauses until they leave again. Turn this off with pauseUndoOnHover={false} or pauseUndoOnFocus={false}. The window also pauses while the tab is hidden.
-- Disabling the button during the window keeps Undo pressable, so an action is never stuck without a way back.
-- Unmounting the control during the window drops the action without calling either handler. Closing the tab does the same.
-- undoToast pauses while the toast is hovered or has keyboard focus, and while the tab is hidden. Turn this off with pauseOnHover: false or pauseOnFocus: false.
-- For a row whose button goes away with it, wrap the row in Undoable, with render={<li />} or render={<TableRow />}. Calling remove collapses the row in place to its label and an Undo button at the same height, so the rows below don't move. In a table the label spans every column.
-- Undoable moves focus to Undo if focus was in the row, and back to the button that removed it after Undo. Its window pauses when the pointer or focus comes back to the row. Once onConfirm has run, data-state is "removed", so drop the item from your data then.
-- Keep a trash or history view too, so people can still restore things after the window closes.
+- onConfirm runs when the window ends: after 5 seconds, or the milliseconds you pass. Anything under 4 seconds is raised to 4, so people have time to notice a mistake.
+- Undo calls onCancel instead of onConfirm.
+- If the pointer or focus leaves the button and comes back, the window pauses until it leaves again, unless pauseUndoOnHover or pauseUndoOnFocus is false. A hidden tab also pauses it.
+- Undo stays pressable if the button is disabled during the window.
+- Unmounting during the window, including closing the tab, drops the action without calling either handler.
+- undoToast pauses while the toast is hovered or focused, unless you pass pauseOnHover: false or pauseOnFocus: false. It also pauses while the tab is hidden.
+- When the button leaves with its row, wrap the row in Undoable (render={<li />} or render={<TableRow />}). Calling remove collapses the row in place to its label and an Undo button at the same height, so rows below don't move. In a table the label spans every column.
+- Undoable moves focus to Undo if focus was in the row, and back to the button that removed it after Undo. Its window pauses when the pointer or focus comes back to the row.
+- Undoable sets data-state="removed" once onConfirm has run. Drop the item from your data then.
+- Keep a trash or history view for restoring things after the window ends.
 
 ### Click again
 
@@ -281,16 +282,19 @@ npx shadcn@latest add @sureui/confirm-button
 />
 ```
 
-- The button disarms after timeout, 3 seconds by default, or when focus leaves it. Keep it armed on blur with cancelOnBlur={false}.
-- Key-repeat clicks are ignored, so holding Enter can't arm and confirm in one go.
-- While a promise from onConfirm is pending, the button is disabled but keeps focus.
-- In a DropdownMenu or ContextMenu, use ConfirmMenuItem, added with @sureui/confirm-menu-item (menu="context" for a context menu). The menu stays open while the item is armed, pending or showing Undo, and closes once the action commits or Undo is pressed. Keep it open with closeOnConfirm={false} or closeOnUndo={false}.
-- Menus move focus with the highlight, so pointing at or arrowing to another item disarms a ConfirmMenuItem, like any blur.
-- Closing the menu during the undo window, with Escape or a click outside, commits the action, because Undo closes with it. Set commitUndoOnClose={false} to drop it instead.
-- For a setting where flipping the switch is the action, like two-factor authentication, use ConfirmSwitch, added with @sureui/confirm-switch. It asks only in the risky direction, turning off by default. Set confirmWhen="on" or confirmWhen="both" to change that. The other direction toggles at once and still calls onConfirm.
-- The first click arms the switch without moving it. aria-checked keeps the saved value, "Click again to turn off" is announced, and data-state="armed" lets you show a hint next to the label. Space and a click on its Label work like a click on the switch.
-- Set gesture="hold" to ask for a press and hold, gesture="popover" for a ConfirmPopover with your description, or gesture="dialog" for an alert dialog with your title. Each gesture only accepts the props it uses.
-- After confirming, the switch shows the new value while a promise from onConfirm is pending, keeps focus and ignores clicks. onCheckedChange runs once the promise resolves. If it rejects, the switch goes back to the old value.
+- The button disarms after timeout, 3 seconds by default, or when it loses focus. Set cancelOnBlur={false} to keep it armed on blur.
+- Key-repeat clicks are ignored, so holding Enter can't arm and confirm at once.
+- While onConfirm's promise is pending, the button is disabled but keeps focus.
+- In a DropdownMenu or ContextMenu, use ConfirmMenuItem from @sureui/confirm-menu-item, with menu="context" in a context menu.
+- The menu stays open while the item is armed, pending or showing Undo. It closes when the action commits or Undo is pressed, unless closeOnConfirm or closeOnUndo is false.
+- Menus move focus with the highlight, so pointing or arrowing to another item disarms a ConfirmMenuItem.
+- Closing the menu during the undo window, with Escape or a click outside, commits the action, since Undo closes with it. Set commitUndoOnClose={false} to drop the action instead.
+- When flipping a switch is the action, like turning off two-factor authentication, use ConfirmSwitch from @sureui/confirm-switch.
+- ConfirmSwitch asks only in the risky direction: turning off by default, turning on with confirmWhen="on", or both with confirmWhen="both". The safe direction toggles at once and still calls onConfirm.
+- The first click arms the switch without moving it. aria-checked keeps the saved value, it announces "Click again to turn off", and data-state="armed" lets you show a hint next to the label.
+- Space, or a click on the switch's Label, counts as a click on the switch.
+- ConfirmSwitch also takes gesture="hold", gesture="popover" (a ConfirmPopover with your description) and gesture="dialog" (an alert dialog with your title). Each gesture accepts only the props it uses.
+- While onConfirm's promise is pending, the switch shows the new value, keeps focus and ignores clicks. onCheckedChange runs when it resolves. If it rejects, the switch goes back to the old value.
 
 ### Hold
 
@@ -317,13 +321,15 @@ npx shadcn@latest add @sureui/confirm-button
 />
 ```
 
-- The fill takes 1.2 seconds by default. Anything under 0.8 seconds is raised to 0.8, because a shorter hold is easy to trigger with a slow tap.
-- Once the fill completes, the button is ready (data-state="ready") and confirms when the pointer or key is released on it. Show a different label while ready with releaseLabel.
-- Holding is a shortcut, not the only way. A screen reader activation, or a Space or Enter press let go before the fill completes, arms the button instead (data-state="armed", announced as "Activate again to confirm"), and the next activation confirms. This armed state never times out; blur or Escape clears it. A mouse or finger let go early still cancels. Turn this off with holdFallback="none".
-- Letting go outside the button, moving off it, or losing focus cancels, even after the fill. Set cancelHoldOnLeave={false} to let the pointer leave and come back before letting go, like a native button.
-- Set confirmOnRelease={false} to confirm the moment the fill completes. Pair it with undo, since there is no last chance to back out.
+- The fill takes 1.2 seconds by default. Anything under 0.8 seconds is raised to 0.8, since a slow tap can complete a shorter hold.
+- When the fill completes, the button is ready (data-state="ready") and confirms when the pointer or key is released on it. releaseLabel sets the label while ready.
+- A screen reader activation, or Space or Enter released before the fill completes, arms the button instead (data-state="armed", announced as "Activate again to confirm"), and the next activation confirms. Set holdFallback="none" to turn this off.
+- The armed state doesn't time out. Blur or Escape clears it.
+- A mouse or finger released before the fill completes cancels.
+- Releasing outside the button, moving off it or losing focus cancels, even after the fill. Set cancelHoldOnLeave={false} to let the pointer leave and come back before release, like a native button.
+- Set confirmOnRelease={false} to confirm as soon as the fill completes. Pair it with undo, since people can't back out once the fill completes.
 - With undo, the Undo button runs on click, so pressing it and sliding off does nothing.
-- The context menu is blocked on the button so a long press on a phone doesn't open it.
-- With prefers-reduced-motion, fills don't animate: the hold fill appears when it completes and the undo fill clears when the window ends.
-- ConfirmMenuItem with gesture="hold" keeps its menu open while held and closes it once the action commits. From the keyboard, hold Enter or Space, or press twice.
-- ConfirmSwitch with gesture="hold" fills its track toward the new value while held, only in the risky direction. Its props are on the Click again page.
+- The button blocks the context menu, so a long press on a phone doesn't open it.
+- With prefers-reduced-motion, fills don't animate. The hold fill appears when it completes and the undo fill clears when the window ends.
+- ConfirmMenuItem with gesture="hold" keeps the menu open while held and closes it when the action commits. From the keyboard, hold Enter or Space, or press twice.
+- ConfirmSwitch with gesture="hold" fills its track toward the new value while held, in the risky direction only. Its props are on the Click again page.

@@ -14,7 +14,7 @@ type BlockNote = {
 }
 
 export const blocksLead =
-  "Full screens built from SureUI components. Each one installs with the shadcn CLI into your `components/` folder as app code you edit, and brings the SureUI components it uses."
+  "Full screens built from SureUI components. The shadcn CLI installs each one into your `components/` folder as app code you edit, along with the SureUI components it uses."
 
 export const blocksNote =
   "The sample handlers wait 600 ms so you can see the pending state. Replace them with your API calls."
@@ -26,7 +26,7 @@ const notes: BlockNote[] = [
       {
         action: "Pause deployments",
         style: "undo",
-        why: "Pausing is easy to reverse, so it runs after a short undo window instead of asking first.",
+        why: "Pausing is easy to reverse, so it runs after an undo window without asking first.",
       },
       {
         action: "Resume",
@@ -36,7 +36,7 @@ const notes: BlockNote[] = [
       {
         action: "Transfer project",
         style: "dialogs",
-        why: "It changes access for two teams, so a dialog says who loses and who gains access first.",
+        why: "It changes access for two teams, so a dialog first says who loses access and who gains it.",
       },
       {
         action: "Delete project",
@@ -51,12 +51,12 @@ const notes: BlockNote[] = [
       {
         action: "Revoke key",
         style: "hold",
-        why: "Revoking breaks every service using the key at once and can't be taken back, but it's one row among many. A hold takes a deliberate second without a dialog, and letting go early cancels.",
+        why: "Revoking breaks every service using the key and can't be taken back, but it's one row among many. A hold takes a deliberate second without a dialog, and letting go early cancels.",
       },
       {
         action: "Create key",
         style: null,
-        why: "Creating a key changes nothing that exists. The dialog is there to show the secret once, not to confirm.",
+        why: "Creating a key changes nothing that exists. The dialog shows the secret once and asks for no confirmation.",
       },
     ],
   },
@@ -66,12 +66,12 @@ const notes: BlockNote[] = [
       {
         action: "Delete account",
         style: "type-to-confirm",
-        why: "It is permanent and removes everything you have. Typing your email and checking each acknowledgement means reading what goes before it unlocks.",
+        why: "It is permanent and removes everything you have. Typing your email and checking each acknowledgement makes you read what goes before the form unlocks.",
       },
       {
         action: "Export data",
         style: null,
-        why: "Exporting changes nothing, so it runs on one click. It sits above the delete form so you see it before you need it.",
+        why: "Exporting changes nothing, so it runs on one click. It sits above the delete form, where you see it first.",
       },
     ],
   },
@@ -81,7 +81,7 @@ const notes: BlockNote[] = [
       {
         action: "Remove from team",
         style: "click-again",
-        why: "Removing one person is small and an admin can invite them back. The menu item asks again in place and stays open until the second click, so a stray click in the menu removes nobody.",
+        why: "Removing one person is small, and an admin can invite them back. The menu item asks for a second click in place and stays open until then, so a stray click removes nobody.",
       },
       {
         action: "Make owner",
@@ -97,12 +97,12 @@ const notes: BlockNote[] = [
       {
         action: "Move to trash",
         style: "undo",
-        why: "Trashing is routine and easy to reverse, so it runs on one click. The files leave the list, so the Undo lives in a toast instead of on a control that is gone.",
+        why: "Trashing is routine and easy to reverse, so it runs on one click. The files leave the list, so Undo is in a toast rather than on a control that is gone.",
       },
       {
         action: "Restore",
         style: null,
-        why: "Restoring puts a file back, so it runs on one click. The Trash tab is a second way back once the toast has closed, so getting files back never depends on catching a timed toast (WCAG 2.2.1, Timing Adjustable).",
+        why: "Restoring puts a file back, so it runs on one click. The Trash tab still works after the toast closes, so getting files back doesn't depend on a timed toast (WCAG 2.2.1, Timing Adjustable).",
       },
       {
         action: "Empty trash",
@@ -117,7 +117,7 @@ const notes: BlockNote[] = [
       {
         action: "Archive or delete from the list",
         style: "undo",
-        why: "Clearing an inbox means many quick actions in a row. Each one runs on one click and collapses the row in place to an Undo at the same height, so the rows below don't move.",
+        why: "Clearing an inbox takes many quick actions in a row. Each runs on one click and collapses the row in place to an Undo at the same height, so the rows below don't move.",
       },
       {
         action: "Archive from the toolbar",
