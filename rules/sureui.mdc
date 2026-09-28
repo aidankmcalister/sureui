@@ -1,0 +1,237 @@
+---
+description: Picks and uses SureUI confirmation controls (undo, click again, hold, type to confirm, dialog) from the @sureui shadcn registry. Use when adding or reviewing a delete, remove, revoke, archive, reset, leave or other destructive action in a React or shadcn/ui app, and before reaching for AlertDialog or window.confirm.
+alwaysApply: false
+---
+
+# SureUI confirmations
+
+SureUI is a shadcn/ui registry of confirmation controls: undo, click again, hold, dialogs, type to confirm. Docs: https://sureui.com/docs/which-one
+
+## Rules
+
+- Don't put every destructive action behind an AlertDialog or `window.confirm`. People confirm dialogs on reflex, so the one that matters gets the same click as the rest.
+- Match the confirmation to the action. Answer the questions below in order and use the first style whose answer is yes.
+- "Taken back" means your app keeps the thing after the action runs: in a trash, an archive, or hidden. If the data is gone once `onConfirm` runs, the answer is no, even when it is quick to recreate. The undo window alone does not make an action reversible.
+- Restorable and routine: Undo, never a dialog.
+- Deleting one row or one small item for good: Click again.
+- A dialog is only for actions that need a sentence of explanation or affect other people.
+- Use the SureUI components. Don't hand-roll timers, armed states or hold progress.
+
+## Which style
+
+1. **Is it permanent and large?** Use Type to confirm. Best for: deleting projects, databases and accounts.
+   Use it when:
+   - Deleting a project, a database or an account.
+   - Nothing, including support, can bring the data back.
+   - People must read the name to be sure it's the right one.
+   Use something else when:
+   - You keep a copy for a while: Undo.
+   - It's one small item: Click again.
+   - A sentence of warning is enough: Dialogs.
+2. **Does it need explaining, or affect other people?** Use Dialogs. Best for: actions that affect other people.
+   Use it when:
+   - Leaving a team or removing someone else's access.
+   - The consequence takes a sentence to explain.
+   - You need to await the answer inside a handler, with useConfirm.
+   Use something else when:
+   - It's routine and reversible: Undo.
+   - One extra click is warning enough: Click again.
+   - It deletes something large for good: Type to confirm.
+3. **Can it be taken back?** Use Undo. Best for: trash, archive, anything you can restore.
+   Use it when:
+   - Moving files to trash, archiving mail, hiding a post.
+   - People do it many times a day and expect it to be instant.
+   - People usually spot the mistake right away.
+   Use something else when:
+   - Nothing can bring it back: Type to confirm.
+   - It affects other people and needs explaining: Dialogs.
+   - The action can't wait a few seconds: Click again.
+4. **Is it one small item people act on often?** Use Click again. Best for: single rows in a list.
+   Use it when:
+   - Archiving one message or removing one row.
+   - Space is tight and a dialog would be too much.
+   Use something else when:
+   - It's easy to reverse: Undo.
+   - A stray tap on a phone would be costly: Hold.
+   - It can't be undone: Type to confirm.
+5. **Could a stray tap trigger it?** Use Hold. Best for: touch screens and small resets.
+   Use it when:
+   - Revoking an API key or resetting preferences.
+   - Touch screens, where a second tap happens by accident.
+   Use something else when:
+   - People need to read what happens first: Dialogs.
+   - It's permanent and large: Type to confirm.
+
+## Install
+
+Add the registry to `components.json` once:
+
+```json
+{
+  "registries": {
+    "@sureui": "https://sureui.com/r/{name}.json"
+  }
+}
+```
+
+Then add the item for the style you picked:
+
+- Type to confirm: `npx shadcn@latest add @sureui/type-to-confirm`
+- Dialogs: `npx shadcn@latest add @sureui/confirm-dialog`
+- Undo: `npx shadcn@latest add @sureui/confirm-button @sureui/undo-toast`
+- Click again: `npx shadcn@latest add @sureui/confirm-button`
+- Hold: `npx shadcn@latest add @sureui/confirm-button`
+
+`undoToast` needs the shadcn `<Toaster />` in the root layout. Nothing else needs setup.
+
+## One contract
+
+Every component takes the same `onConfirm`. Return a promise and the control stays pending until it settles.
+
+- `onConfirm` runs the action. If it throws or rejects, the control returns to idle and the error reaches your code, so handle failures inside it.
+- `onCancel` runs when a confirmation is cancelled or undone.
+- `undo` is `true` for a 5 second window, or a number of milliseconds. `onConfirm` runs only after the window ends; Undo calls `onCancel` instead.
+- `ConfirmButton` takes every Button prop, such as `variant`, `size` and `disabled`.
+- `useConfirm()` returns `{ confirm, dialog }`. Render `{dialog}` once, then `await confirm(options)` resolves `true` or `false`.
+- Every control sets `data-state` ("idle" | "armed" | "holding" | "ready" | "undo" | "pending") so you can style around it.
+
+```tsx
+import { ConfirmButton } from "@/components/ui/sureui/confirm-button"
+import { TypeToConfirm } from "@/components/ui/sureui/type-to-confirm"
+import { ConfirmDialog, useConfirm } from "@/components/ui/sureui/confirm-dialog"
+import { undoToast } from "@/components/ui/sureui/undo-toast"
+```
+
+```tsx
+async function deleteProject() {
+  await api.projects.delete(id)
+}
+
+<ConfirmButton undo onConfirm={deleteProject}>Delete</ConfirmButton>
+<ConfirmButton gesture="click-again" onConfirm={deleteProject}>Delete</ConfirmButton>
+<ConfirmButton gesture="hold" onConfirm={deleteProject}>Delete</ConfirmButton>
+<TypeToConfirm phrase="acme-prod" onConfirm={deleteProject} />
+<ConfirmDialog title="Delete acme-prod?" onConfirm={deleteProject}>
+  <Button>Delete</Button>
+</ConfirmDialog>
+```
+
+## Styles
+
+### Type to confirm
+
+An inline form that unlocks only after the exact phrase is typed.
+
+```bash
+npx shadcn@latest add @sureui/type-to-confirm
+```
+
+```tsx
+<TypeToConfirm
+  phrase="acme-prod"
+  acknowledgements={["I understand active deployments will go offline."]}
+  confirmLabel="Delete project"
+  onConfirm={deleteProject}
+/>
+```
+
+- The phrase must match exactly by default, including case and spaces. Relax it with caseSensitive={false} or trim.
+- Acknowledgements are optional. Leave them out and typing the phrase is enough.
+- The button is a ConfirmButton, so key-repeat clicks are ignored and its width doesn't change between Confirm and Undo.
+- The input and checkboxes clear after confirming, so after an undo the form isn't one click from running again.
+- While a promise from onConfirm is pending, the input is read-only and the button is disabled but keeps focus.
+
+### Dialogs
+
+An optional alert dialog for actions that need a sentence of explanation.
+
+```bash
+npx shadcn@latest add @sureui/confirm-dialog
+```
+
+```tsx
+<ConfirmDialog
+  title="Leave the Design team?"
+  description="An admin can add you back later."
+  confirmLabel="Leave team"
+  variant="destructive"
+  onConfirm={leaveTeam}
+>
+  <Button variant="outline">Leave team</Button>
+</ConfirmDialog>
+
+const { confirm, dialog } = useConfirm()
+
+async function discard() {
+  if (await confirm({ title: "Discard this draft?" })) deleteDraft()
+}
+```
+
+- Gesture options (timeout, cancelOnBlur, duration, confirmOnRelease, cancelHoldOnLeave) apply when phrase is not set. caseSensitive, trim and announcements.match apply when it is.
+- The dialog stays open, and Cancel and Escape do nothing, while a promise from onConfirm is pending.
+
+### Undo
+
+Act right away and give people a few seconds to take it back.
+
+```bash
+npx shadcn@latest add @sureui/confirm-button @sureui/undo-toast
+```
+
+```tsx
+<ConfirmButton undo onConfirm={moveToTrash}>
+  Move to trash
+</ConfirmButton>
+
+if (await undoToast("Moved 3 files to trash")) {
+  await deleteFiles(ids)
+}
+```
+
+- Nothing runs until the window ends: 5 seconds by default, or the number you pass. Anything under 4 seconds is raised to 4, because a shorter window ends before most people notice the mistake.
+- Undo calls onCancel, and onConfirm never runs.
+- If someone leaves the button and comes back to it, by pointer or keyboard, the window pauses until they leave again. Turn this off with pauseUndoOnHover={false} or pauseUndoOnFocus={false}. The window also pauses while the tab is hidden.
+- Disabling the button during the window keeps Undo pressable, so an action is never stuck without a way back.
+- Unmounting the control during the window drops the action without calling either handler. Closing the tab does the same.
+- undoToast pauses while the toast is hovered or has keyboard focus, and while the tab is hidden. Turn this off with pauseOnHover: false or pauseOnFocus: false.
+- Keep a trash or history view too, so people can still restore things after the window closes.
+
+### Click again
+
+The first click arms the button and the second one confirms.
+
+```bash
+npx shadcn@latest add @sureui/confirm-button
+```
+
+```tsx
+<ConfirmButton gesture="click-again" onConfirm={archive}>
+  Archive
+</ConfirmButton>
+```
+
+- The button disarms after timeout, 3 seconds by default, or when focus leaves it. Keep it armed on blur with cancelOnBlur={false}.
+- Key-repeat clicks are ignored, so holding Enter can't arm and confirm in one go.
+- While a promise from onConfirm is pending, the button is disabled but keeps focus.
+
+### Hold
+
+People press and hold until the fill completes, then let go to confirm. Letting go early cancels.
+
+```bash
+npx shadcn@latest add @sureui/confirm-button
+```
+
+```tsx
+<ConfirmButton gesture="hold" variant="destructive" onConfirm={revoke}>
+  Hold to revoke
+</ConfirmButton>
+```
+
+- The fill takes 1.2 seconds by default. Anything under 0.8 seconds is raised to 0.8, because a shorter hold is easy to trigger with a slow tap.
+- Once the fill completes, the button is ready (data-state="ready") and confirms when the pointer or key is released on it. Show a different label while ready with releaseLabel.
+- Letting go outside the button, moving off it, or losing focus cancels, even after the fill. Set cancelHoldOnLeave={false} to let the pointer leave and come back before letting go, like a native button.
+- Set confirmOnRelease={false} to confirm the moment the fill completes. Pair it with undo, since there is no last chance to back out.
+- With undo, the Undo button runs on click, so pressing it and sliding off does nothing.
+- The context menu is blocked on the button so a long press on a phone doesn't open it.
+- With prefers-reduced-motion, fills don't animate: the hold fill appears when it completes and the undo fill clears when the window ends.

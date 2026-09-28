@@ -5,7 +5,8 @@ import { describe, expect, it } from "vitest"
 import registry from "@/registry.json"
 
 describe("registry", () => {
-  const allFiles = registry.items.flatMap((item) => item.files)
+  const items = registry.items.filter((item) => item.type !== "registry:item")
+  const allFiles = items.flatMap((item) => item.files)
   const components = allFiles.filter((file) => file.type === "registry:ui")
 
   it.each(components)("$path is a client component", ({ path }) => {
@@ -20,7 +21,7 @@ describe("registry", () => {
     }
   )
 
-  it.each(registry.items)(
+  it.each(items)(
     "$name lists every components/ui/sureui import it uses",
     (item) => {
       const filePaths = item.files.map((file) => file.path)
@@ -38,7 +39,7 @@ describe("registry", () => {
     }
   )
 
-  it.each(registry.items)(
+  it.each(items)(
     "$name declares every stock component and package it imports",
     (item) => {
       const stock =

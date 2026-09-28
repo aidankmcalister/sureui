@@ -17,7 +17,8 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "check": "pnpm lint && pnpm typecheck && pnpm test",
-    "registry:build": "shadcn build",
+    "registry:build": "pnpm rules && shadcn build",
+    "rules": "node scripts/rules.ts",
     "smoke:install": "./scripts/smoke-install.sh",
     "fix-tailwind": "tailwind-suggest-canonical-classes \"{app,components/site,components/ui/sureui}/**/*.{tsx,ts}\" --css ./app/globals.css"
   },

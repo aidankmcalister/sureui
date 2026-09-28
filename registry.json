@@ -134,6 +134,25 @@
       ],
       "docs": "Needs the shadcn <Toaster /> in your root layout.",
       "categories": ["confirmation", "toast"]
+    },
+    {
+      "name": "rules",
+      "type": "registry:item",
+      "title": "Agent Rules",
+      "description": "Rules for coding agents on which SureUI confirmation fits an action and how to use it. Installs a Cursor rule and a Claude Code skill.",
+      "files": [
+        {
+          "path": "skills/sureui/SKILL.md",
+          "type": "registry:file",
+          "target": "~/.claude/skills/sureui/SKILL.md"
+        },
+        {
+          "path": "rules/sureui.mdc",
+          "type": "registry:file",
+          "target": "~/.cursor/rules/sureui.mdc"
+        }
+      ],
+      "categories": ["confirmation", "ai"]
     }
   ]
 }
