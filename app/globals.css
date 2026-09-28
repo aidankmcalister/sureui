@@ -138,17 +138,14 @@
   --mark-text: #c2410c;
   --well: #ffffff;
   --code-foreground: #18181b;
-  --code-background: transparent;
   --code-sureui: #c2410c;
-  --code-token-keyword: #52525b;
-  --code-token-string: #2f5b85;
-  --code-token-string-expression: #2f5b85;
-  --code-token-constant: #18181b;
-  --code-token-function: #52525b;
-  --code-token-parameter: #52525b;
-  --code-token-punctuation: #71717a;
-  --code-token-comment: #6b6b73;
-  --code-token-link: #2f5b85;
+  --code-keyword: #4652b8;
+  --code-string: #0b6e79;
+  --code-tag: #1d5aa6;
+  --code-attribute: #55627a;
+  --code-number: #4652b8;
+  --code-comment: #6b7280;
+  --code-punctuation: #6b7280;
 }
 
 .dark {
@@ -160,16 +157,13 @@
   --mark: #f97316;
   --mark-text: #f97316;
   --well: #19191b;
-  --code-foreground: #f4f4f5;
-  --code-background: transparent;
+  --code-foreground: #e7e9ee;
   --code-sureui: #fb923c;
-  --code-token-keyword: #a1a1aa;
-  --code-token-string: #93b8dc;
-  --code-token-string-expression: #93b8dc;
-  --code-token-constant: #fafafa;
-  --code-token-function: #a1a1aa;
-  --code-token-parameter: #a1a1aa;
-  --code-token-punctuation: #8b8b93;
-  --code-token-comment: #8b8b93;
-  --code-token-link: #93b8dc;
+  --code-keyword: #a3adff;
+  --code-string: #7fd1c7;
+  --code-tag: #80b4ff;
+  --code-attribute: #9aa6ba;
+  --code-number: #a3adff;
+  --code-comment: #858b96;
+  --code-punctuation: #858b96;
 }
