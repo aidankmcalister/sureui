@@ -227,12 +227,15 @@ function ConfirmButton({
         aria-describedby={holdDescribedBy}
         data-state={state}
         className={cn(
-          "relative overflow-hidden",
+          "relative overflow-hidden aria-disabled:opacity-50",
           gesture === "hold" &&
             "touch-none active:not-aria-[haspopup]:translate-y-0",
           className
         )}
         disabled={disabled || state === "pending"}
+        focusableWhenDisabled={
+          props.focusableWhenDisabled || state === "pending"
+        }
         onClick={(event) => composeHandlers(onClick, handleClick)(event)}
         onBlur={(event) => composeHandlers(onBlur, handleBlur)(event)}
         onFocus={(event) =>

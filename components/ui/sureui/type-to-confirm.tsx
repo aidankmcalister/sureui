@@ -64,7 +64,8 @@ function TypeToConfirm({
       variant={variant}
       data-state={state}
       disabled={state === "undo" ? false : !ready || state === "pending"}
-      className="relative justify-self-start overflow-hidden"
+      focusableWhenDisabled={state === "pending"}
+      className="relative justify-self-start overflow-hidden aria-disabled:opacity-50"
       onClick={state === "undo" ? cancel : undefined}
       onPointerEnter={() => pauseUndo("hover")}
       onPointerLeave={() => resumeUndo("hover")}
@@ -104,7 +105,7 @@ function TypeToConfirm({
           value={value}
           autoComplete="off"
           spellCheck={false}
-          disabled={state === "pending"}
+          readOnly={state === "pending"}
           onChange={(event) => setValue(event.target.value)}
         />
         <p aria-live="polite" className="sr-only">

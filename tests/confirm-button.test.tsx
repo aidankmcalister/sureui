@@ -968,19 +968,26 @@ describe("ConfirmButton", () => {
     expect(onConfirm).toHaveBeenCalledOnce()
   })
 
-  it("async: pending onConfirm disables the button until it resolves", async () => {
+  it("async: pending onConfirm disables the button but keeps focus", async () => {
     let resolve!: () => void
     const onConfirm = vi.fn(() => new Promise<void>((res) => (resolve = res)))
     render(<ConfirmButton onConfirm={onConfirm}>Delete</ConfirmButton>)
     const button = screen.getByRole("button")
+    button.focus()
     await click(button)
     expect(button.getAttribute("data-state")).toBe("pending")
-    expect(button).toHaveProperty("disabled", true)
+    expect(button.getAttribute("aria-disabled")).toBe("true")
+    expect(button).toHaveProperty("disabled", false)
+    expect(document.activeElement).toBe(button)
+    await click(button)
+    fireEvent.keyDown(button, { key: "Enter" })
+    expect(onConfirm).toHaveBeenCalledOnce()
     await act(async () => {
       resolve()
       await Promise.resolve()
     })
     expect(button.getAttribute("data-state")).toBe("idle")
-    expect(button).toHaveProperty("disabled", false)
+    expect(button.getAttribute("aria-disabled")).toBeNull()
+    expect(document.activeElement).toBe(button)
   })
 })

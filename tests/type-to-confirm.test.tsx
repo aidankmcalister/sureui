@@ -217,14 +217,17 @@ describe("TypeToConfirm", () => {
     expect(onConfirm).toHaveBeenCalledOnce()
   })
 
-  it("async: pending onConfirm disables the button", async () => {
+  it("async: pending onConfirm disables the button but keeps focus", async () => {
     let resolve!: () => void
     const onConfirm = vi.fn(() => new Promise<void>((res) => (resolve = res)))
     render(<TypeToConfirm phrase="acme" onConfirm={onConfirm} />)
     const confirm = screen.getByRole("button", { name: "Confirm" })
     type("acme")
+    confirm.focus()
     await act(async () => fireEvent.click(confirm))
-    expect(confirm).toHaveProperty("disabled", true)
+    expect(confirm.getAttribute("aria-disabled")).toBe("true")
+    expect(document.activeElement).toBe(confirm)
+    expect(screen.getByRole("textbox")).toHaveProperty("readOnly", true)
     await act(async () => {
       resolve()
       await Promise.resolve()

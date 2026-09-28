@@ -157,7 +157,9 @@ describe("ConfirmDialog", () => {
       name: "Confirm",
     })
     fireEvent.click(confirmButton)
-    await waitFor(() => expect(confirmButton).toHaveProperty("disabled", true))
+    await waitFor(() =>
+      expect(confirmButton.getAttribute("aria-disabled")).toBe("true")
+    )
     expect(screen.getByRole("alertdialog")).toBeTruthy()
     await act(async () => {
       resolve()
