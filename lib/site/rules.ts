@@ -5,11 +5,12 @@ import { styles, type Style } from "@/lib/site/styles"
 const order = ["type-to-confirm", "dialogs", "undo", "click-again", "hold"]
 
 const description =
-  "Picks and uses SureUI confirmation controls (undo, click again, hold, type to confirm, dialog) from the @sureui shadcn registry. Use when adding or reviewing a delete, remove, revoke, archive, reset, leave or other destructive action in a React or shadcn/ui app, and before reaching for AlertDialog or window.confirm."
+  "Picks and uses SureUI confirmation controls (undo, click again, hold, type to confirm, dialog, popover) from the @sureui shadcn registry. Use when adding or reviewing a delete, remove, revoke, archive, reset, leave or other destructive action in a React or shadcn/ui app, and before reaching for AlertDialog or window.confirm."
 
 const imports = `import { ConfirmButton } from "@/components/ui/sureui/confirm-button"
 import { TypeToConfirm } from "@/components/ui/sureui/type-to-confirm"
 import { ConfirmDialog, useConfirm } from "@/components/ui/sureui/confirm-dialog"
+import { ConfirmPopover } from "@/components/ui/sureui/confirm-popover"
 import { undoToast } from "@/components/ui/sureui/undo-toast"`
 
 function styleBySlug(slug: string) {
@@ -83,6 +84,7 @@ function rulesBody() {
       "Restorable and routine: Undo, never a dialog.",
       "Deleting one row or one small item for good: Click again.",
       "A dialog is only for actions that need a sentence of explanation or affect other people.",
+      "When one line of context is enough and the action only touches the item in front of you, use `ConfirmPopover` (`npx shadcn@latest add @sureui/confirm-popover`) instead of a dialog. Keep `ConfirmDialog` for actions that affect other people or need more than a line.",
       "Use the SureUI components. Don't hand-roll timers, armed states or hold progress.",
     ]),
     "## Which style",

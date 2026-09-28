@@ -5,6 +5,7 @@ import type { Button } from "@/components/ui/button"
 import type { DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import type { ConfirmButtonProps } from "@/components/ui/sureui/confirm-button"
 import type { ConfirmDialogProps } from "@/components/ui/sureui/confirm-dialog"
+import type { ConfirmPopoverProps } from "@/components/ui/sureui/confirm-popover"
 import type { ConfirmMenuItemProps } from "@/components/ui/sureui/confirm-menu-item"
 import type { TypeToConfirmProps } from "@/components/ui/sureui/type-to-confirm"
 import type { UndoToastOptions } from "@/components/ui/sureui/undo-toast"
@@ -103,6 +104,29 @@ const confirmDialog = {
   announcements: true,
 } satisfies Record<keyof ConfirmDialogProps, true>
 
+const confirmPopover = {
+  onConfirm: true,
+  onCancel: true,
+  title: true,
+  description: true,
+  confirmLabel: true,
+  cancelLabel: true,
+  showCancel: true,
+  variant: true,
+  gesture: true,
+  children: true,
+  timeout: true,
+  cancelOnBlur: true,
+  duration: true,
+  confirmOnRelease: true,
+  cancelHoldOnLeave: true,
+  announcements: true,
+  side: true,
+  align: true,
+  open: true,
+  onOpenChange: true,
+} satisfies Record<keyof ConfirmPopoverProps, true>
+
 const undoToast = {
   message: true,
   description: true,
@@ -117,6 +141,7 @@ const documented = {
   ConfirmMenuItem: confirmMenuItem,
   TypeToConfirm: typeToConfirm,
   ConfirmDialog: confirmDialog,
+  ConfirmPopover: confirmPopover,
   "undoToast(message, options)": undoToast,
 }
 

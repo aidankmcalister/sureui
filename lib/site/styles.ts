@@ -171,6 +171,10 @@ if (await undoToast("Moved 3 files to trash")) {
     instead: [
       { when: "It's easy to reverse", slug: "undo" },
       { when: "A stray tap on a phone would be costly", slug: "hold" },
+      {
+        when: "People need one line of context first, which ConfirmPopover gives",
+        slug: "dialogs",
+      },
       { when: "It can't be undone", slug: "type-to-confirm" },
     ],
   },
@@ -264,10 +268,10 @@ if (await undoToast("Moved 3 files to trash")) {
   {
     slug: "dialogs",
     name: "Dialogs",
-    lead: "An optional alert dialog for actions that need a sentence of explanation.",
-    summary: "Opens a dialog when there's something to explain.",
+    lead: "An optional alert dialog for actions that need a sentence of explanation, or a popover anchored to the button when one line is enough.",
+    summary: "Opens a dialog or a popover when there's something to explain.",
     question: "Does it need explaining, or affect other people?",
-    interrupts: "Yes",
+    interrupts: "Yes, less with a popover",
     reads: "Yes",
     bestFor: "Actions that affect other people",
     items: ["confirm-dialog"],
@@ -280,6 +284,15 @@ if (await undoToast("Moved 3 files to trash")) {
 >
   <Button variant="outline">Leave team</Button>
 </ConfirmDialog>
+
+<ConfirmPopover
+  description="Open pull requests from this branch will close."
+  confirmLabel="Delete branch"
+  variant="destructive"
+  onConfirm={deleteBranch}
+>
+  <Button variant="outline">Delete branch</Button>
+</ConfirmPopover>
 
 const { confirm, dialog } = useConfirm()
 
@@ -313,6 +326,35 @@ async function discard() {
         ],
       },
       {
+        name: "ConfirmPopover",
+        rows: [
+          ["description", "ReactNode", "required"],
+          onConfirm,
+          ["children", "ReactElement (trigger)", "required"],
+          onCancel,
+          ["title", "string", "—"],
+          ["confirmLabel", "string", '"Confirm"'],
+          ["cancelLabel", "string", '"Cancel"'],
+          ["showCancel", "boolean", "true"],
+          ["variant", "Button variant", '"default"'],
+          gesture,
+          ["timeout", "number", "3000"],
+          ["cancelOnBlur", "boolean", "true"],
+          ["duration", "number", "1200, min 800"],
+          ["confirmOnRelease", "boolean", "true"],
+          ["cancelHoldOnLeave", "boolean", "true"],
+          ["announcements", "{ hold, ready, armed }", "—"],
+          [
+            "side",
+            '"top" | "bottom" | "left" | "right" | "inline-start" | "inline-end"',
+            '"bottom"',
+          ],
+          ["align", '"start" | "center" | "end"', '"center"'],
+          ["open", "boolean", "—"],
+          ["onOpenChange", "(open: boolean) => void", "—"],
+        ],
+      },
+      {
         name: "useConfirm()",
         rows: [
           ["returns", "{ confirm, dialog }", "—"],
@@ -329,15 +371,24 @@ async function discard() {
     behavior: [
       "Gesture options (timeout, cancelOnBlur, duration, confirmOnRelease, cancelHoldOnLeave) apply when phrase is not set. caseSensitive, trim and announcements.match apply when it is.",
       "The dialog stays open, and Cancel and Escape do nothing, while a promise from onConfirm is pending.",
+      "ConfirmPopover, added with @sureui/confirm-popover, is the lighter surface: a popover anchored to its trigger with one line and a confirm button. The rest of the page stays visible and usable.",
+      "The popover moves focus to its confirm button when it opens and back to the trigger when it closes. Cancel, Escape, a click outside and tabbing out of it all close it and call onCancel.",
+      "The popover stays open while a promise from onConfirm is pending, and Cancel, Escape and clicks outside do nothing. If the promise rejects, it stays open so people can try again.",
+      "ConfirmPopover has no undo prop. It closes once the action commits, so an Undo button inside it would close too. For a way back, use undoToast.",
     ],
     useWhen: [
       "Leaving a team or removing someone else's access.",
       "The consequence takes a sentence to explain.",
+      "One line is enough and the action only touches this item, like deleting a branch: use ConfirmPopover, so the page stays in view.",
+      "It affects other people or takes more than a line: use ConfirmDialog.",
       "You need to await the answer inside a handler, with useConfirm.",
     ],
     instead: [
       { when: "It's routine and reversible", slug: "undo" },
-      { when: "One extra click is warning enough", slug: "click-again" },
+      {
+        when: "One extra click is warning enough, with nothing to explain",
+        slug: "click-again",
+      },
       { when: "It deletes something large for good", slug: "type-to-confirm" },
     ],
   },

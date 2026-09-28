@@ -23,6 +23,7 @@ import {
   ConfirmDialog,
   useConfirm,
 } from "@/components/ui/sureui/confirm-dialog"
+import { ConfirmPopover } from "@/components/ui/sureui/confirm-popover"
 import { TypeToConfirm } from "@/components/ui/sureui/type-to-confirm"
 import { useReport } from "@/components/site/docs/preview"
 
@@ -143,6 +144,15 @@ function DialogsDemo() {
       >
         <Button variant="outline">Leave team</Button>
       </ConfirmDialog>
+      <ConfirmPopover
+        description="Open pull requests from this branch will close."
+        confirmLabel="Delete branch"
+        variant="destructive"
+        onConfirm={() => report("onConfirm, popover")}
+        onCancel={() => report("onCancel, popover")}
+      >
+        <Button variant="outline">Delete branch</Button>
+      </ConfirmPopover>
       <Button
         variant="outline"
         onClick={async () => {
