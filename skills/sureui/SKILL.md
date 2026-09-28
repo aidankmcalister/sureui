@@ -82,7 +82,7 @@ Then add the item for the style you picked:
 
 - Type to confirm: `npx shadcn@latest add @sureui/type-to-confirm`
 - Dialogs: `npx shadcn@latest add @sureui/confirm-dialog`
-- Undo: `npx shadcn@latest add @sureui/confirm-button @sureui/undo-toast`
+- Undo: `npx shadcn@latest add @sureui/confirm-button @sureui/undo-toast @sureui/undoable`
 - Click again: `npx shadcn@latest add @sureui/confirm-button`
 - Hold: `npx shadcn@latest add @sureui/confirm-button`
 
@@ -105,6 +105,7 @@ import { TypeToConfirm } from "@/components/ui/sureui/type-to-confirm"
 import { ConfirmDialog, useConfirm } from "@/components/ui/sureui/confirm-dialog"
 import { ConfirmPopover } from "@/components/ui/sureui/confirm-popover"
 import { undoToast } from "@/components/ui/sureui/undo-toast"
+import { Undoable } from "@/components/ui/sureui/undoable"
 ```
 
 ```tsx
@@ -193,7 +194,7 @@ async function discard() {
 Act right away and give people a few seconds to take it back.
 
 ```bash
-npx shadcn@latest add @sureui/confirm-button @sureui/undo-toast
+npx shadcn@latest add @sureui/confirm-button @sureui/undo-toast @sureui/undoable
 ```
 
 ```tsx
@@ -204,6 +205,21 @@ npx shadcn@latest add @sureui/confirm-button @sureui/undo-toast
 if (await undoToast("Moved 3 files to trash")) {
   await deleteFiles(ids)
 }
+
+<Undoable
+  render={<TableRow />}
+  label={`Deleted ${file.name}`}
+  onConfirm={() => deleteFile(file.id)}
+>
+  {({ remove }) => (
+    <>
+      <TableCell>{file.name}</TableCell>
+      <TableCell>
+        <Button onClick={remove}>Delete</Button>
+      </TableCell>
+    </>
+  )}
+</Undoable>
 ```
 
 - Nothing runs until the window ends: 5 seconds by default, or the number you pass. Anything under 4 seconds is raised to 4, because a shorter window ends before most people notice the mistake.
@@ -212,6 +228,8 @@ if (await undoToast("Moved 3 files to trash")) {
 - Disabling the button during the window keeps Undo pressable, so an action is never stuck without a way back.
 - Unmounting the control during the window drops the action without calling either handler. Closing the tab does the same.
 - undoToast pauses while the toast is hovered or has keyboard focus, and while the tab is hidden. Turn this off with pauseOnHover: false or pauseOnFocus: false.
+- For a row whose button goes away with it, wrap the row in Undoable, with render={<li />} or render={<TableRow />}. Calling remove collapses the row in place to its label and an Undo button at the same height, so the rows below don't move. In a table the label spans every column.
+- Undoable moves focus to Undo if focus was in the row, and back to the button that removed it after Undo. Its window pauses when the pointer or focus comes back to the row. Once onConfirm has run, data-state is "removed", so drop the item from your data then.
 - Keep a trash or history view too, so people can still restore things after the window closes.
 
 ### Click again

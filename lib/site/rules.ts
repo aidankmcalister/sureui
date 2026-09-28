@@ -11,7 +11,8 @@ const imports = `import { ConfirmButton } from "@/components/ui/sureui/confirm-b
 import { TypeToConfirm } from "@/components/ui/sureui/type-to-confirm"
 import { ConfirmDialog, useConfirm } from "@/components/ui/sureui/confirm-dialog"
 import { ConfirmPopover } from "@/components/ui/sureui/confirm-popover"
-import { undoToast } from "@/components/ui/sureui/undo-toast"`
+import { undoToast } from "@/components/ui/sureui/undo-toast"
+import { Undoable } from "@/components/ui/sureui/undoable"`
 
 function styleBySlug(slug: string) {
   return styles.find((style) => style.slug === slug)!
