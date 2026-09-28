@@ -8,9 +8,10 @@ import {
   FramedList,
   InlineCode,
   Prose,
+  StyleLink,
 } from "@/components/site/docs/sections"
 import { Label } from "@/components/site/layout/frame"
-import { contract, contractNote, intro } from "@/lib/site/pages"
+import { contract, contractNote, coreNote, intro } from "@/lib/site/pages"
 import { styles } from "@/lib/site/styles"
 
 export const metadata: Metadata = { title: "Introduction" }
@@ -54,6 +55,12 @@ export default function Introduction() {
           </p>
         </Prose>
         <Code>{contract}</Code>
+        <Prose>
+          <p>
+            <StyleLink slug={coreNote.slug}>{coreNote.link}</StyleLink>{" "}
+            {coreNote.text}
+          </p>
+        </Prose>
       </DocsSection>
     </>
   )

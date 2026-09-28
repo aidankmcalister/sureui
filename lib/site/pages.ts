@@ -9,6 +9,12 @@ export const intro = [
 export const contractNote =
   "Every component takes the same `onConfirm`. Return a promise and the control stays pending until it settles."
 
+export const coreNote = {
+  slug: "how-its-built",
+  link: "How it's built",
+  text: "walks through the confirmation core every control shares: its states, timing, undo window and tests.",
+}
+
 export const contract = `async function deleteProject() {
   await api.projects.delete(id)
 }
@@ -151,6 +157,13 @@ const docs = [
     title: "Agent rules",
     group: "Guides",
     lead: "Rules that tell coding agents which style fits an action, installed with the shadcn CLI or as a skill.",
+  },
+  {
+    href: "/docs/how-its-built",
+    slug: "how-its-built",
+    title: "How it's built",
+    group: "Guides",
+    lead: "The confirmation core every control shares: its states, timing, undo window, handlers and tests.",
   },
 ]
 

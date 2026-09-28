@@ -1,10 +1,12 @@
 import registry from "@/registry.json"
 import { blocks, blocksLead, blocksNote, type Block } from "@/lib/site/blocks"
 import { addArgs, siteUrl } from "@/lib/site/config"
+import { howItsBuilt, type GuideSection } from "@/lib/site/how-its-built"
 import {
   agentRules,
   contract,
   contractNote,
+  coreNote,
   installSteps,
   intro,
   pages,
@@ -89,6 +91,34 @@ function styleBody(style: Style) {
   ])
 }
 
+function guideSection(section: GuideSection) {
+  return [
+    `## ${section.label}`,
+    section.paragraphs.join("\n\n"),
+    ...(section.items ? [list(section.items)] : []),
+    ...(section.excerpt
+      ? [
+          `From \`${section.excerpt.file}\`:`,
+          code(
+            section.excerpt.file.endsWith(".tsx") ? "tsx" : "ts",
+            section.excerpt.source
+          ),
+        ]
+      : []),
+  ]
+}
+
+function howItsBuiltBody() {
+  const { core, states, sections } = howItsBuilt
+  return [
+    ...guideSection(core),
+    ...guideSection(states),
+    states.figure,
+    list(states.notes.map((state) => `\`${state.name}\`: ${state.note}`)),
+    ...sections.flatMap(guideSection),
+  ]
+}
+
 function bodies(page: Page) {
   const style = styles.find((item) => item.slug === page.slug)
   if (style) return styleBody(style)
@@ -105,8 +135,10 @@ function bodies(page: Page) {
       "## One contract",
       contractNote,
       code("tsx", contract),
+      `[${coreNote.link}](${styleUrl(coreNote.slug)}) ${coreNote.text}`,
     ]
   }
+  if (page.slug === "how-its-built") return howItsBuiltBody()
   if (page.slug === "agent-rules") {
     return [
       `## ${agentRules.intro.label}`,
