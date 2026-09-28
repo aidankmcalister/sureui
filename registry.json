@@ -183,6 +183,29 @@
         }
       ],
       "categories": ["confirmation", "ai"]
+    },
+    {
+      "name": "danger-zone-01",
+      "type": "registry:block",
+      "title": "Danger Zone",
+      "description": "A project settings danger zone: pause deployments with an undo window, transfer the project in a dialog, and delete it in a dialog that asks for the project name.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": [
+        "@sureui/confirm-button",
+        "@sureui/confirm-dialog",
+        "badge",
+        "button",
+        "card",
+        "empty"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/danger-zone-01/danger-zone.tsx",
+          "type": "registry:component",
+          "target": "@components/danger-zone.tsx"
+        }
+      ],
+      "categories": ["block", "settings"]
     }
   ]
 }

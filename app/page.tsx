@@ -1,9 +1,9 @@
 import { Actions } from "@/components/site/layout/actions"
 import { Band } from "@/components/site/layout/frame"
+import { DangerZone } from "@/components/blocks/danger-zone-01/danger-zone"
 import { Cell } from "@/components/site/home/cell"
 import { ApiKeys } from "@/components/site/home/examples/api-keys"
 import { ConfirmByName } from "@/components/site/home/examples/confirm-by-name"
-import { DangerZone } from "@/components/site/home/examples/danger-zone"
 import { Files } from "@/components/site/home/examples/files"
 import { Members } from "@/components/site/home/examples/members"
 import { MessageToolbar } from "@/components/site/home/examples/message-toolbar"
@@ -41,6 +41,7 @@ export default function Home() {
         <div className={grid}>
           <Cell
             featured
+            resettable
             figure={1}
             gesture="Which one"
             href="/docs/which-one"
