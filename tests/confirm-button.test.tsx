@@ -93,7 +93,7 @@ describe("ConfirmButton", () => {
     expect(onCancel).toHaveBeenCalledOnce()
   })
 
-  it("hold: confirms after the hold completes", async () => {
+  it("hold: fills, then confirms when released", async () => {
     const onConfirm = vi.fn()
     render(
       <ConfirmButton gesture="hold" onConfirm={onConfirm}>
@@ -104,7 +104,118 @@ describe("ConfirmButton", () => {
     fireEvent.pointerDown(button, { button: 0 })
     expect(button.getAttribute("data-state")).toBe("holding")
     await act(async () => vi.advanceTimersByTime(1200))
+    expect(button.getAttribute("data-state")).toBe("ready")
+    expect(onConfirm).not.toHaveBeenCalled()
+    await act(async () => fireEvent.pointerUp(button))
     expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("hold: confirmOnRelease={false} confirms when the fill completes", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmButton
+        gesture="hold"
+        confirmOnRelease={false}
+        onConfirm={onConfirm}
+      >
+        Hold to delete
+      </ConfirmButton>
+    )
+    fireEvent.pointerDown(screen.getByRole("button"), { button: 0 })
+    await act(async () => vi.advanceTimersByTime(1200))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("hold: releasing outside the button after the fill cancels", async () => {
+    const onConfirm = vi.fn()
+    const onCancel = vi.fn()
+    render(
+      <ConfirmButton gesture="hold" onConfirm={onConfirm} onCancel={onCancel}>
+        Hold to delete
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    fireEvent.pointerDown(button, { button: 0 })
+    await act(async () => vi.advanceTimersByTime(1200))
+    await act(async () =>
+      fireEvent.pointerUp(button, { clientX: 500, clientY: 500 })
+    )
+    expect(onCancel).toHaveBeenCalledOnce()
+    expect(onConfirm).not.toHaveBeenCalled()
+    expect(button.getAttribute("data-state")).toBe("idle")
+  })
+
+  it("hold: leaving the button after the fill cancels", async () => {
+    const onConfirm = vi.fn()
+    const onCancel = vi.fn()
+    render(
+      <ConfirmButton gesture="hold" onConfirm={onConfirm} onCancel={onCancel}>
+        Hold to delete
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    fireEvent.pointerDown(button, { button: 0 })
+    await act(async () => vi.advanceTimersByTime(1200))
+    await act(async () => fireEvent.pointerLeave(button))
+    await act(async () => fireEvent.pointerUp(button))
+    expect(onCancel).toHaveBeenCalledOnce()
+    expect(onConfirm).not.toHaveBeenCalled()
+  })
+
+  it("hold: cancelHoldOnLeave={false} lets the pointer leave and come back", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmButton
+        gesture="hold"
+        cancelHoldOnLeave={false}
+        onConfirm={onConfirm}
+      >
+        Hold to delete
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    fireEvent.pointerDown(button, { button: 0 })
+    fireEvent.pointerLeave(button)
+    await act(async () => vi.advanceTimersByTime(1200))
+    expect(button.getAttribute("data-state")).toBe("ready")
+    await act(async () => fireEvent.pointerUp(button))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("hold: pointerCancel after the fill cancels", async () => {
+    const onConfirm = vi.fn()
+    const onCancel = vi.fn()
+    render(
+      <ConfirmButton gesture="hold" onConfirm={onConfirm} onCancel={onCancel}>
+        Hold to delete
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    fireEvent.pointerDown(button, { button: 0 })
+    await act(async () => vi.advanceTimersByTime(1200))
+    await act(async () => fireEvent.pointerCancel(button))
+    expect(onCancel).toHaveBeenCalledOnce()
+    expect(onConfirm).not.toHaveBeenCalled()
+  })
+
+  it("hold: releaseLabel and the ready announcement show once filled", async () => {
+    render(
+      <ConfirmButton
+        gesture="hold"
+        releaseLabel="Let go to delete"
+        announcements={{ ready: "Let go now" }}
+        onConfirm={vi.fn()}
+      >
+        Hold to delete
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    fireEvent.pointerDown(button, { button: 0 })
+    await act(async () => vi.advanceTimersByTime(1200))
+    expect(screen.getByRole("button", { name: "Let go to delete" })).toBe(
+      button
+    )
+    expect(screen.getByText("Let go now")).toBeTruthy()
   })
 
   it("hold: releasing early cancels and never confirms", async () => {
@@ -134,12 +245,14 @@ describe("ConfirmButton", () => {
     const button = screen.getByRole("button")
     fireEvent.pointerDown(button, { button: 0 })
     await act(async () => vi.advanceTimersByTime(200))
-    expect(onConfirm).not.toHaveBeenCalled()
+    expect(button.getAttribute("data-state")).toBe("holding")
     await act(async () => vi.advanceTimersByTime(600))
+    expect(button.getAttribute("data-state")).toBe("ready")
+    await act(async () => fireEvent.pointerUp(button))
     expect(onConfirm).toHaveBeenCalledOnce()
   })
 
-  it("hold: Space key starts and confirms the hold", async () => {
+  it("hold: Space key starts the hold and keyUp confirms it", async () => {
     const onConfirm = vi.fn()
     render(
       <ConfirmButton gesture="hold" onConfirm={onConfirm}>
@@ -149,6 +262,8 @@ describe("ConfirmButton", () => {
     const button = screen.getByRole("button")
     fireEvent.keyDown(button, { key: " " })
     await act(async () => vi.advanceTimersByTime(1200))
+    expect(onConfirm).not.toHaveBeenCalled()
+    await act(async () => fireEvent.keyUp(button, { key: " " }))
     expect(onConfirm).toHaveBeenCalledOnce()
   })
 
@@ -213,6 +328,7 @@ describe("ConfirmButton", () => {
     fireEvent.pointerDown(button, { button: 0 })
     expect(consumerPointerDown).toHaveBeenCalledOnce()
     await act(async () => vi.advanceTimersByTime(1200))
+    await act(async () => fireEvent.pointerUp(button))
     expect(onConfirm).toHaveBeenCalledOnce()
     fireEvent.keyDown(button, { key: " " })
     expect(consumerKeyDown).toHaveBeenCalledOnce()
@@ -255,7 +371,7 @@ describe("ConfirmButton", () => {
     expect(onConfirm).toHaveBeenCalledOnce()
   })
 
-  it("hold + undo: a fresh pointerDown while undo cancels", async () => {
+  it("hold + undo: pressing Undo cancels on click, not on pointerDown", async () => {
     const onConfirm = vi.fn()
     const onCancel = vi.fn()
     render(
@@ -274,13 +390,17 @@ describe("ConfirmButton", () => {
     await act(async () => fireEvent.pointerUp(button))
     expect(button.getAttribute("data-state")).toBe("undo")
     await act(async () => fireEvent.pointerDown(button, { button: 0 }))
+    expect(button.getAttribute("data-state")).toBe("undo")
+    expect(onCancel).not.toHaveBeenCalled()
+    await act(async () => fireEvent.pointerUp(button))
+    await act(async () => fireEvent.click(button))
     expect(onCancel).toHaveBeenCalledOnce()
     expect(button.getAttribute("data-state")).toBe("idle")
     await act(async () => vi.advanceTimersByTime(6000))
     expect(onConfirm).not.toHaveBeenCalled()
   })
 
-  it("hold + undo: Space keyDown while undo cancels", async () => {
+  it("hold + undo: Space cancels on keyUp, not on keyDown", async () => {
     const onConfirm = vi.fn()
     const onCancel = vi.fn()
     render(
@@ -299,6 +419,9 @@ describe("ConfirmButton", () => {
     await act(async () => fireEvent.pointerUp(button))
     expect(button.getAttribute("data-state")).toBe("undo")
     await act(async () => fireEvent.keyDown(button, { key: " " }))
+    expect(button.getAttribute("data-state")).toBe("undo")
+    expect(onCancel).not.toHaveBeenCalled()
+    await act(async () => fireEvent.keyUp(button, { key: " " }))
     expect(onCancel).toHaveBeenCalledOnce()
     expect(button.getAttribute("data-state")).toBe("idle")
     await act(async () => vi.advanceTimersByTime(6000))
@@ -415,6 +538,7 @@ describe("ConfirmButton", () => {
     render(
       <ConfirmButton
         gesture="hold"
+        confirmOnRelease={false}
         onCancel={onCancel}
         onConfirm={() => {
           throw new Error("boom")
@@ -618,11 +742,12 @@ describe("ConfirmButton", () => {
         Hold to delete
       </ConfirmButton>
     )
-    fireEvent.pointerDown(screen.getByRole("button"), { button: 0 })
+    const button = screen.getByRole("button")
+    fireEvent.pointerDown(button, { button: 0 })
     await act(async () => vi.advanceTimersByTime(1199))
-    expect(onConfirm).not.toHaveBeenCalled()
+    expect(button.getAttribute("data-state")).toBe("holding")
     await act(async () => vi.advanceTimersByTime(1))
-    expect(onConfirm).toHaveBeenCalledOnce()
+    expect(button.getAttribute("data-state")).toBe("ready")
   })
 
   it("durations: a non-finite timeout uses the default", async () => {
@@ -671,11 +796,22 @@ describe("ConfirmButton", () => {
     expect(onConfirm).not.toHaveBeenCalled()
   })
 
-  it("hold: Enter starts and confirms the hold", async () => {
+  it("hold: Enter starts the hold and keyUp confirms it", async () => {
     const { button, onConfirm } = renderHold()
     fireEvent.keyDown(button, { key: "Enter" })
     await act(async () => vi.advanceTimersByTime(1200))
+    await act(async () => fireEvent.keyUp(button, { key: "Enter" }))
     expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("hold: blur after the fill cancels", async () => {
+    const { button, onConfirm, onCancel } = renderHold()
+    fireEvent.keyDown(button, { key: " " })
+    await act(async () => vi.advanceTimersByTime(1200))
+    await act(async () => fireEvent.blur(button))
+    await act(async () => fireEvent.keyUp(button, { key: " " }))
+    expect(onCancel).toHaveBeenCalledOnce()
+    expect(onConfirm).not.toHaveBeenCalled()
   })
 
   it("hold: blur while holding cancels", async () => {
@@ -720,6 +856,7 @@ describe("ConfirmButton", () => {
     const { button, onCancel } = renderHold({ undo: true })
     fireEvent.keyDown(button, { key: " " })
     await act(async () => vi.advanceTimersByTime(1200))
+    await act(async () => fireEvent.keyUp(button, { key: " " }))
     expect(button.getAttribute("data-state")).toBe("undo")
     fireEvent.keyDown(button, { key: " ", repeat: true })
     expect(button.getAttribute("data-state")).toBe("undo")

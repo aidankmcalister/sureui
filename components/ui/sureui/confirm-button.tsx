@@ -15,14 +15,18 @@ type ConfirmButtonProps = React.ComponentProps<typeof Button> &
   ConfirmationOptions & {
     gesture?: "click" | "click-again" | "hold"
     confirmLabel?: React.ReactNode
+    releaseLabel?: React.ReactNode
     undoLabel?: React.ReactNode
     announcements?: {
       hold?: string
+      ready?: string
       armed?: string
       undo?: string
     }
     timeout?: number
     duration?: number
+    confirmOnRelease?: boolean
+    cancelHoldOnLeave?: boolean
   }
 
 function ConfirmButton({
@@ -33,10 +37,13 @@ function ConfirmButton({
   pauseUndoOnFocus,
   gesture = "click",
   confirmLabel = "Click again to confirm",
+  releaseLabel,
   undoLabel = "Undo",
   announcements,
   timeout = 3000,
   duration = 1200,
+  confirmOnRelease = true,
+  cancelHoldOnLeave = true,
   className,
   children,
   disabled,
@@ -80,9 +87,19 @@ function ConfirmButton({
   }, [state, timeout, cancel])
 
   const repeatRef = React.useRef(false)
+  const undoPressRef = React.useRef(false)
+
+  const undoFromPress = React.useCallback(() => {
+    if (state !== "undo" || !undoPressRef.current) return
+    undoPressRef.current = false
+    cancel()
+  }, [state, cancel])
 
   const handleClick = React.useCallback(() => {
-    if (gesture === "hold") return
+    if (gesture === "hold") {
+      undoFromPress()
+      return
+    }
     if (repeatRef.current) return
     if (state === "undo") {
       cancel()
@@ -96,12 +113,12 @@ function ConfirmButton({
       if (state === "armed") confirm()
       else arm()
     }
-  }, [state, gesture, cancel, confirm, arm])
+  }, [state, gesture, cancel, confirm, arm, undoFromPress])
 
   const handleBlur = React.useCallback(() => {
     resumeUndo("focus")
     if (gesture === "hold") {
-      if (state === "holding") release()
+      if (state === "holding" || state === "ready") release()
     } else if (gesture === "click-again" && state === "armed") {
       cancel()
     }
@@ -110,26 +127,41 @@ function ConfirmButton({
   const handlePointerDown = React.useCallback(
     (event: React.PointerEvent<HTMLButtonElement>) => {
       if (event.button !== 0) return
-      if (state === "undo") {
-        cancel()
-        return
-      }
-      if (state === "idle") hold(duration)
+      undoPressRef.current = state === "undo"
+      if (state !== "idle") return
+      const target = event.currentTarget
+      if (!cancelHoldOnLeave) target.setPointerCapture?.(event.pointerId)
+      else if (target.hasPointerCapture?.(event.pointerId))
+        target.releasePointerCapture(event.pointerId)
+      hold(duration, confirmOnRelease)
     },
-    [state, hold, duration, cancel]
+    [state, hold, duration, confirmOnRelease, cancelHoldOnLeave]
   )
 
-  const handlePointerUp = React.useCallback(() => {
-    if (state === "holding") release()
-  }, [state, release])
+  const handlePointerUp = React.useCallback(
+    (event: React.PointerEvent<HTMLButtonElement>) => {
+      if (state === "holding") release()
+      if (state !== "ready") return
+      const rect = event.currentTarget.getBoundingClientRect()
+      const inside =
+        event.clientX >= rect.left &&
+        event.clientX <= rect.right &&
+        event.clientY >= rect.top &&
+        event.clientY <= rect.bottom
+      if (inside) confirm()
+      else release()
+    },
+    [state, release, confirm]
+  )
 
   const handlePointerLeave = React.useCallback(() => {
     resumeUndo("hover")
-    if (state === "holding") release()
-  }, [state, release, resumeUndo])
+    if (cancelHoldOnLeave && (state === "holding" || state === "ready"))
+      release()
+  }, [state, release, resumeUndo, cancelHoldOnLeave])
 
   const handlePointerCancel = React.useCallback(() => {
-    if (state === "holding") release()
+    if (state === "holding" || state === "ready") release()
   }, [state, release])
 
   const handleKeyDown = React.useCallback(
@@ -137,21 +169,20 @@ function ConfirmButton({
       if (event.key !== " " && event.key !== "Enter") return
       event.preventDefault()
       if (event.repeat) return
-      if (state === "undo") {
-        cancel()
-        return
-      }
-      if (state === "idle") hold(duration)
+      undoPressRef.current = state === "undo"
+      if (state === "idle") hold(duration, confirmOnRelease)
     },
-    [state, hold, duration, cancel]
+    [state, hold, duration, confirmOnRelease]
   )
 
   const handleKeyUp = React.useCallback(
     (event: React.KeyboardEvent<HTMLButtonElement>) => {
       if (event.key !== " " && event.key !== "Enter") return
       if (state === "holding") release()
+      else if (state === "ready") confirm()
+      else undoFromPress()
     },
-    [state, release]
+    [state, release, confirm, undoFromPress]
   )
 
   const handleContextMenu = React.useCallback(
@@ -161,12 +192,19 @@ function ConfirmButton({
     []
   )
 
-  const shown = state === "armed" || state === "undo" ? state : "idle"
+  const hasReleaseLabel = gesture === "hold" && releaseLabel != null
+  const shown =
+    state === "armed" ||
+    state === "undo" ||
+    (state === "ready" && hasReleaseLabel)
+      ? state
+      : "idle"
   const labels = [
     { state: "idle", node: children },
     ...(gesture === "click-again"
       ? [{ state: "armed", node: confirmLabel }]
       : []),
+    ...(hasReleaseLabel ? [{ state: "ready", node: releaseLabel }] : []),
     ...(undo ? [{ state: "undo", node: undoLabel }] : []),
   ]
 
@@ -267,14 +305,16 @@ function ConfirmButton({
         </span>
       )}
       <span aria-live="polite" className="sr-only">
-        {state === "armed"
-          ? (announcements?.armed ??
-            (typeof confirmLabel === "string"
-              ? confirmLabel
-              : "Click again to confirm"))
-          : state === "undo"
-            ? (announcements?.undo ?? "Done. Undo is available.")
-            : ""}
+        {state === "ready"
+          ? (announcements?.ready ?? "Release to confirm")
+          : state === "armed"
+            ? (announcements?.armed ??
+              (typeof confirmLabel === "string"
+                ? confirmLabel
+                : "Click again to confirm"))
+            : state === "undo"
+              ? (announcements?.undo ?? "Done. Undo is available.")
+              : ""}
       </span>
     </>
   )

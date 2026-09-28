@@ -2,7 +2,8 @@
 
 import * as React from "react"
 
-type ConfirmationState = "idle" | "armed" | "holding" | "undo" | "pending"
+type ConfirmationState =
+  "idle" | "armed" | "holding" | "ready" | "undo" | "pending"
 
 type PauseReason = "hover" | "focus"
 
@@ -173,12 +174,20 @@ function useConfirmation(options: ConfirmationOptions) {
   }, [])
 
   const hold = React.useCallback(
-    (duration: number) => {
+    (duration: number, waitForRelease = false) => {
       const ms = toMs(duration, 1200, 800)
       holdStartRef.current = performance.now()
       holdDurationRef.current = ms
       setState("holding")
-      timerRef.current = setTimeout(confirm, ms)
+      timerRef.current = setTimeout(
+        waitForRelease
+          ? () => {
+              timerRef.current = null
+              setState("ready")
+            }
+          : confirm,
+        ms
+      )
       animationRef.current =
         fillRef.current?.animate?.([{ scale: "0 1" }, { scale: "1 1" }], {
           duration: ms,
