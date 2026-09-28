@@ -17,13 +17,13 @@ export default function ConfirmDialogConsequences() {
           title="This deletes"
           variant="destructive"
           items={[
-            { label: "deployments", count: 42 },
+            { label: "Deployments", count: 42 },
             {
-              label: "domains",
+              label: "Domains",
               count: 2,
               names: ["staging.acme.com", "preview.acme.com"],
             },
-            { label: "environment variables", count: 18 },
+            { label: "Environment variables", count: 18 },
           ]}
         />
       }

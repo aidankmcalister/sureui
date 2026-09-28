@@ -5,11 +5,10 @@ import { Consequences } from "@/components/ui/sureui/consequences"
 export default function ConsequencesLongLists() {
   return (
     <Consequences
-      title="Deleting the design team removes"
+      title="Deleting the Design team removes"
       items={[
         {
-          label: "members",
-          count: 14,
+          label: "Members",
           names: [
             "Maya Chen",
             "Tom Okafor",
@@ -19,18 +18,7 @@ export default function ConsequencesLongLists() {
             "Jonas Berg",
           ],
         },
-        {
-          label: "projects",
-          count: 5,
-          names: [
-            "brand-refresh",
-            "icons",
-            "marketing-site",
-            "onboarding",
-            "pricing-page",
-          ],
-          expandable: false,
-        },
+        { label: "Deployments", count: 128 },
       ]}
       className="w-full max-w-sm"
     />

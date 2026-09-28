@@ -378,7 +378,7 @@ function Undoable({
           disabled={state === "pending"}
           focusableWhenDisabled
           onClick={cancel}
-          className="relative ml-auto overflow-hidden"
+          className="relative ml-auto overflow-hidden motion-safe:aria-disabled:animate-pulse motion-reduce:aria-disabled:opacity-50"
         >
           <span
             ref={fillRef}

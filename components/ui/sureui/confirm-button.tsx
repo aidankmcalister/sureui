@@ -102,7 +102,7 @@ function ConfirmButton({
         aria-describedby={holdDescribedBy}
         data-state={state}
         className={cn(
-          "relative overflow-hidden aria-disabled:opacity-50",
+          "relative overflow-hidden aria-disabled:opacity-50 motion-safe:data-[state=pending]:animate-pulse motion-safe:aria-disabled:data-[state=pending]:opacity-100",
           gesture === "hold" &&
             "touch-none active:not-aria-[haspopup]:translate-y-0",
           className

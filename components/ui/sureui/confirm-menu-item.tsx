@@ -180,7 +180,7 @@ function ConfirmMenuItem({
       aria-describedby={holdDescribedBy}
       data-state={state}
       className={cn(
-        "overflow-hidden",
+        "overflow-hidden motion-safe:data-[state=pending]:animate-pulse motion-safe:data-disabled:data-[state=pending]:opacity-100",
         gesture === "hold" && "touch-none",
         className
       )}

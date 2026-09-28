@@ -1,33 +1,45 @@
 # SureUI
 
-Confirmation components for [shadcn/ui](https://ui.shadcn.com). `ConfirmButton`, `TypeToConfirm` and `ConfirmDialog` share one contract: `onConfirm` (which may return a promise and shows a pending state), `onCancel`, and, for the inline controls, `undo`. `ConfirmButton` also takes every Button prop. Dialogs are optional.
+Confirmation components for [shadcn/ui](https://ui.shadcn.com), built on [Base UI](https://base-ui.com). Free and open source, MIT licensed.
 
-| Style           | Use it for                                |
-| --------------- | ----------------------------------------- |
-| Undo            | Trash, archive, anything you can restore  |
-| Click again     | Single rows in a list                     |
-| Hold            | Touch screens and small resets            |
-| Dialogs         | Actions that affect other people          |
-| Type to confirm | Deleting projects, databases and accounts |
+When every action opens an "Are you sure?" dialog, people stop reading and confirm on reflex. SureUI has other ways to ask: undo, a second click, a press and hold, a typed name, or a dialog when you want one. The components install into your app with the shadcn CLI and look like stock shadcn, so they fit whatever your app already looks like.
+
+| Component         | What it does                                                                |
+| ----------------- | --------------------------------------------------------------------------- |
+| `ConfirmButton`   | Confirms on a click, a second click or a press and hold, with optional undo |
+| `ConfirmMenuItem` | The same gestures in dropdown and context menus                             |
+| `TypeToConfirm`   | Unlocks only after the exact phrase is typed                                |
+| `ConfirmDialog`   | An optional alert dialog, with an awaitable `useConfirm`                    |
+| `ConfirmPopover`  | A one-line confirmation anchored to its trigger                             |
+| `Consequences`    | Lists what a confirmation will remove, with counts and names                |
+| `undoToast`       | A toast with Undo that resolves once nobody undoes                          |
+| `Undoable`        | Collapses a removed row in place to a label and an Undo button              |
 
 ## Install
 
-SureUI is built for [Base UI](https://base-ui.com), the shadcn/ui default.
+Add the registry to your `components.json`:
 
-```bash
-npx shadcn add @sureui/confirm-button
-npx shadcn add @sureui/type-to-confirm
-npx shadcn add @sureui/confirm-dialog
-npx shadcn add @sureui/undo-toast
+```json
+{
+  "registries": {
+    "@sureui": "https://sureui.com/r/{name}.json"
+  }
+}
 ```
 
-Each one installs on its own, into `components/ui/sureui/`. Nothing to mount. `undoToast` uses the shadcn `<Toaster />`.
+Then add the items you need. Each one installs on its own into `components/ui/sureui/`:
 
-Full docs are at [sureui.com](https://sureui.com/docs). Coding agents can read [sureui.com/llms.txt](https://sureui.com/llms.txt), or every page at once in [llms-full.txt](https://sureui.com/llms-full.txt).
+```bash
+npx shadcn@latest add @sureui/confirm-button
+```
+
+`undoToast` uses the shadcn `<Toaster />`. Nothing else needs mounting.
+
+Full docs are at [sureui.com/docs](https://sureui.com/docs). Coding agents can read [sureui.com/llms.txt](https://sureui.com/llms.txt), or every page at once in [llms-full.txt](https://sureui.com/llms-full.txt).
 
 ## Usage
 
-`ConfirmButton` is one Button with three gestures. Add `undo` to any of them for an inline undo window instead of committing right away:
+Every component takes the same `onConfirm`. `ConfirmButton` also takes every Button prop:
 
 ```tsx
 <ConfirmButton onConfirm={archive}>Archive</ConfirmButton>
@@ -86,7 +98,7 @@ pnpm check
 pnpm build
 ```
 
-Registry source lives in `components/ui/sureui`. Everything in `app`, `components/site` and `lib/site` is the docs site.
+Registry source lives in `components/ui/sureui`. The docs pages are MDX in `content/docs`, and everything in `app`, `components/site` and `lib/site` is the docs site.
 
 ## License
 

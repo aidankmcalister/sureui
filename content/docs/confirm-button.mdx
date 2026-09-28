@@ -49,7 +49,7 @@ Moving off the button or losing focus also cancels, even after the fill. Set `co
 
 ### Pending
 
-Return a promise from `onConfirm` and the button stays pending until it settles. If it rejects, the button goes back to idle.
+Return a promise from `onConfirm` and the button pulses until it settles. If it rejects, the button goes back to idle.
 
 <Example name="confirm-button/pending" />
 
@@ -102,4 +102,4 @@ The button sets `data-state`, so you can style around it.
 - Key repeat is ignored, so holding Enter can't arm and confirm at once.
 - Each state change is announced in a polite live region. Replace the English text with `announcements`.
 - Screen reader and keyboard users can confirm a hold with two activations. Set `holdFallback="none"` to turn this off.
-- With `prefers-reduced-motion`, fills jump to their end state instead of moving.
+- With `prefers-reduced-motion`, fills jump to their end state instead of moving, and a pending button dims instead of pulsing.

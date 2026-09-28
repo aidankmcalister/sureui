@@ -65,9 +65,9 @@ function Consequences({
         data-slot="consequences"
         data-variant={variant}
         className={cn(
-          "grid gap-3 rounded-lg border bg-muted/50 p-4 text-sm",
+          "overflow-hidden rounded-xl bg-card text-sm text-card-foreground ring-1 ring-foreground/10",
           variant === "destructive" &&
-            "border-destructive/30 bg-destructive/5 dark:bg-destructive/10",
+            "bg-destructive/5 ring-destructive/20 dark:bg-destructive/10",
           className
         )}
         {...props}
@@ -77,8 +77,9 @@ function Consequences({
             id={titleId}
             data-slot="consequences-title"
             className={cn(
-              "leading-snug font-medium text-muted-foreground",
-              variant === "destructive" && "text-destructive"
+              "border-b bg-muted/50 px-3 py-2 font-medium",
+              variant === "destructive" &&
+                "border-destructive/20 bg-destructive/10 text-destructive dark:bg-destructive/15"
             )}
           >
             {title}
@@ -88,7 +89,10 @@ function Consequences({
           role="list"
           data-slot="consequences-list"
           aria-labelledby={title ? titleId : undefined}
-          className="grid gap-3"
+          className={cn(
+            "divide-y",
+            variant === "destructive" && "divide-destructive/20"
+          )}
         >
           {items?.map((item, index) => (
             <ConsequencesItem key={index} {...item} />
@@ -123,63 +127,87 @@ function ConsequencesItem({
     names.length > 0 ? Math.max(count ?? 0, names.length) - shown.length : 0
   const more = moreLabel ?? context.moreLabel
 
+  const total = count ?? (names.length > 0 ? names.length : undefined)
+  const hasNames = shown.length > 0 || hidden > 0
+
   return (
     <li
       data-slot="consequences-item"
-      className={cn("flex gap-3", className)}
+      className={cn(
+        "grid gap-x-3 gap-y-0.5 px-3 py-2.5",
+        icon
+          ? "grid-cols-[auto_minmax(0,1fr)_auto]"
+          : "grid-cols-[minmax(0,1fr)_auto]",
+        className
+      )}
       {...props}
     >
       {icon && (
         <span
           aria-hidden="true"
           className={cn(
-            "mt-0.5 flex shrink-0 text-muted-foreground [&_svg]:size-4",
+            "col-start-1 row-span-3 row-start-1 flex h-5 items-center text-muted-foreground [&_svg]:size-4",
             context.variant === "destructive" && "text-destructive"
           )}
         >
           {icon}
         </span>
       )}
-      <div className="grid min-w-0 content-start gap-0.5">
-        <span className="font-medium tabular-nums">
-          {count !== undefined && <>{count} </>}
-          {label}
-          {(shown.length > 0 || hidden > 0) && (
-            <span className="sr-only">:</span>
+      <span className={cn("leading-5", icon ? "col-start-2" : "col-start-1")}>
+        {label}
+      </span>
+      {total !== undefined && (
+        <span
+          data-slot="consequences-count"
+          className={cn(
+            "row-start-1 text-right leading-5 font-medium tabular-nums",
+            icon ? "col-start-3" : "col-start-2"
+          )}
+        >
+          <span className="sr-only">, </span>
+          {total}
+        </span>
+      )}
+      {hasNames && <span className="sr-only">: </span>}
+      {hasNames && (
+        <span
+          id={namesId}
+          data-slot="consequences-names"
+          className={cn(
+            "text-xs leading-4 text-pretty break-words text-muted-foreground",
+            icon ? "col-start-2" : "col-start-1"
+          )}
+        >
+          {shown.join(", ")}
+          {hidden > 0 &&
+            !(canExpand && !expanded) &&
+            `${shown.length > 0 ? " " : ""}${more(hidden)}`}
+          {canExpand && (
+            <>
+              {" "}
+              <button
+                type="button"
+                aria-expanded={expanded}
+                aria-controls={namesId}
+                className="rounded-sm font-medium text-foreground underline-offset-4 outline-none hover:underline focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                onClick={() => setExpanded((open) => !open)}
+              >
+                {expanded ? (lessLabel ?? context.lessLabel) : more(hidden)}
+              </button>
+            </>
           )}
         </span>
-        {(shown.length > 0 || hidden > 0) && (
-          <span
-            id={namesId}
-            data-slot="consequences-names"
-            className="text-pretty break-words text-muted-foreground"
-          >
-            {shown.join(", ")}
-            {hidden > 0 &&
-              !(canExpand && !expanded) &&
-              `${shown.length > 0 ? " " : ""}${more(hidden)}`}
-            {canExpand && (
-              <>
-                {" "}
-                <button
-                  type="button"
-                  aria-expanded={expanded}
-                  aria-controls={namesId}
-                  className="rounded-sm font-medium text-foreground underline-offset-4 outline-none hover:underline focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                  onClick={() => setExpanded((open) => !open)}
-                >
-                  {expanded ? (lessLabel ?? context.lessLabel) : more(hidden)}
-                </button>
-              </>
-            )}
-          </span>
-        )}
-        {description && (
-          <span className="text-pretty text-muted-foreground">
-            {description}
-          </span>
-        )}
-      </div>
+      )}
+      {description && (
+        <span
+          className={cn(
+            "text-xs leading-4 text-pretty text-muted-foreground",
+            icon ? "col-start-2" : "col-start-1"
+          )}
+        >
+          {description}
+        </span>
+      )}
     </li>
   )
 }

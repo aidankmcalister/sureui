@@ -7,9 +7,9 @@ export default function ConsequencesDemo() {
     <Consequences
       title="Deleting acme-prod removes"
       items={[
-        { label: "deployments", count: 128 },
+        { label: "Deployments", count: 128 },
         {
-          label: "domains",
+          label: "Domains",
           count: 4,
           names: [
             "acme.com",
@@ -18,7 +18,7 @@ export default function ConsequencesDemo() {
             "status.acme.com",
           ],
         },
-        { label: "environment variables", count: 23 },
+        { label: "Environment variables", count: 23 },
       ]}
       className="w-full max-w-sm"
     />

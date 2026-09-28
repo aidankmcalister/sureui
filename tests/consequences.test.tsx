@@ -34,20 +34,27 @@ describe("Consequences", () => {
     expect(within(list).getAllByRole("listitem")).toHaveLength(3)
   })
 
-  it("reads each item as its count, label and names", () => {
+  it("reads each item as its label, count and names", () => {
     render(
       <Consequences
-        items={[{ label: "projects", count: 3, names: projects }]}
+        items={[{ label: "Projects", count: 3, names: projects }]}
       />
     )
     expect(screen.getByRole("listitem").textContent).toBe(
-      "3 projects:acme-web, acme-api, docs"
+      "Projects, 3: acme-web, acme-api, docs"
     )
   })
 
-  it("reads a count without names as just the count and label", () => {
-    render(<Consequences items={[{ label: "deployments", count: 128 }]} />)
-    expect(screen.getByRole("listitem").textContent).toBe("128 deployments")
+  it("reads a count without names as just the label and count", () => {
+    render(<Consequences items={[{ label: "Deployments", count: 128 }]} />)
+    expect(screen.getByRole("listitem").textContent).toBe("Deployments, 128")
+  })
+
+  it("counts the names when no count is given", () => {
+    render(<Consequences items={[{ label: "Projects", names: projects }]} />)
+    expect(screen.getByRole("listitem").textContent).toBe(
+      "Projects, 3: acme-web, acme-api, docs"
+    )
   })
 
   it("shows names up to limit, then and N more", () => {

@@ -17,8 +17,8 @@ import { Consequences } from "@/components/ui/sureui/consequences"
 <Consequences
   title="Deleting acme-prod removes"
   items={[
-    { label: "deployments", count: 128 },
-    { label: "domains", count: 4, names: ["acme.com", "www.acme.com"] },
+    { label: "Deployments", count: 128 },
+    { label: "Domains", count: 4, names: ["acme.com", "www.acme.com"] },
   ]}
 />
 ```
@@ -29,13 +29,15 @@ import { Consequences } from "@/components/ui/sureui/consequences"
 
 ### Long lists
 
-Names past `limit` collapse into an "and N more" button. Set `expandable={false}` to keep it as text.
+Names past `limit` collapse into an "and N more" button. The count comes from the names, or from `count` when there are none to list.
 
 <Example name="consequences/long-lists" />
 
+If you only have some of the names, pass the total as `count` and "and N more" includes the rest. Set `expandable={false}` to keep it as text.
+
 ### Destructive
 
-`variant="destructive"` tints the list. Items can also be `ConsequencesItem` children, each with an `icon` and a `description`.
+`variant="destructive"` tints the whole list.
 
 <Example name="consequences/destructive" />
 

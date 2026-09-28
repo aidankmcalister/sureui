@@ -1,7 +1,5 @@
 "use client"
 
-import { EllipsisIcon } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -16,12 +14,8 @@ export default function ConfirmMenuItemHold() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger
-        render={
-          <Button variant="outline" size="icon" aria-label="Key actions" />
-        }
-      >
-        <EllipsisIcon />
+      <DropdownMenuTrigger render={<Button variant="outline" />}>
+        Actions
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-auto">
         <ConfirmMenuItem

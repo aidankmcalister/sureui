@@ -15,11 +15,11 @@ export default function TypeToConfirmConsequences() {
           title="This deletes"
           items={[
             {
-              label: "projects",
+              label: "Projects",
               count: 3,
               names: ["acme-prod", "acme-staging", "marketing-site"],
             },
-            { label: "members", count: 14 },
+            { label: "Members", count: 14 },
             { label: "API keys", count: 2 },
           ]}
         />
