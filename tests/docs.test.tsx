@@ -60,10 +60,15 @@ const confirmDialog = {
   phrase: true,
   acknowledgements: true,
   children: true,
-} satisfies Record<
-  Exclude<keyof ConfirmDialogProps, "pauseUndoOnHover" | "pauseUndoOnFocus">,
-  true
->
+  timeout: true,
+  cancelOnBlur: true,
+  duration: true,
+  confirmOnRelease: true,
+  cancelHoldOnLeave: true,
+  caseSensitive: true,
+  trim: true,
+  announcements: true,
+} satisfies Record<keyof ConfirmDialogProps, true>
 
 const undoToast = {
   message: true,
