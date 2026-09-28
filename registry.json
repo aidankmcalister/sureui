@@ -139,6 +139,41 @@
       "categories": ["confirmation", "dialog"]
     },
     {
+      "name": "confirm-popover",
+      "type": "registry:ui",
+      "title": "Confirm Popover",
+      "description": "A popover anchored to any trigger with one line about the consequence and a ConfirmButton, for actions that need a sentence but not a dialog. Stays open while an async onConfirm is pending.",
+      "registryDependencies": ["popover", "button"],
+      "files": [
+        {
+          "path": "components/ui/sureui/fill.ts",
+          "type": "registry:lib",
+          "target": "@ui/sureui/fill.ts"
+        },
+        {
+          "path": "components/ui/sureui/undo-window.ts",
+          "type": "registry:lib",
+          "target": "@ui/sureui/undo-window.ts"
+        },
+        {
+          "path": "components/ui/sureui/confirmation.ts",
+          "type": "registry:lib",
+          "target": "@ui/sureui/confirmation.ts"
+        },
+        {
+          "path": "components/ui/sureui/confirm-button.tsx",
+          "type": "registry:ui",
+          "target": "@ui/sureui/confirm-button.tsx"
+        },
+        {
+          "path": "components/ui/sureui/confirm-popover.tsx",
+          "type": "registry:ui",
+          "target": "@ui/sureui/confirm-popover.tsx"
+        }
+      ],
+      "categories": ["confirmation", "popover"]
+    },
+    {
       "name": "undo-toast",
       "type": "registry:lib",
       "title": "Undo Toast",

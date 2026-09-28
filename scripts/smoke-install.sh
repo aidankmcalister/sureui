@@ -3,7 +3,7 @@ set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
 shadcn="$root/node_modules/.bin/shadcn"
-items=(confirm-button confirm-menu-item type-to-confirm confirm-dialog undo-toast rules)
+items=(confirm-button confirm-menu-item type-to-confirm confirm-dialog confirm-popover undo-toast rules)
 blocks=(danger-zone-01 api-keys-01 delete-account-01)
 block_files=(danger-zone.tsx api-keys.tsx create-key-dialog.tsx delete-account.tsx)
 port=$((20000 + RANDOM % 20000))
@@ -57,7 +57,7 @@ for block in "${blocks[@]}"; do
   "$shadcn" add "@sureui/$block" --yes --overwrite --silent
 done
 
-for file in fill.ts undo-window.ts confirmation.ts confirm-button.tsx confirm-menu-item.tsx type-to-confirm.tsx confirm-dialog.tsx undo-toast.tsx; do
+for file in fill.ts undo-window.ts confirmation.ts confirm-button.tsx confirm-menu-item.tsx type-to-confirm.tsx confirm-dialog.tsx confirm-popover.tsx undo-toast.tsx; do
   test -f "components/ui/sureui/$file" || { echo "Missing components/ui/sureui/$file"; exit 1; }
 done
 
