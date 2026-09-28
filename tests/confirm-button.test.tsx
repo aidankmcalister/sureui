@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen } from "@testing-library/react"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import { ConfirmButton } from "@/components/ui/sureui/confirm-button"
 
@@ -7,8 +7,22 @@ beforeEach(() => {
   vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "performance"] })
 })
 
+afterEach(() => {
+  Reflect.deleteProperty(document, "visibilityState")
+})
+
 async function click(button: HTMLElement) {
   await act(async () => fireEvent.click(button))
+}
+
+function setVisibility(state: DocumentVisibilityState) {
+  Object.defineProperty(document, "visibilityState", {
+    configurable: true,
+    get: () => state,
+  })
+  act(() => {
+    document.dispatchEvent(new Event("visibilitychange"))
+  })
 }
 
 describe("ConfirmButton", () => {
@@ -611,6 +625,45 @@ describe("ConfirmButton", () => {
     await click(button)
     fireEvent.pointerEnter(button)
     fireEvent.focus(button)
+    await act(async () => vi.advanceTimersByTime(5000))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("undo: pauses while the tab is hidden", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmButton undo onConfirm={onConfirm}>
+        Archive
+      </ConfirmButton>
+    )
+    await click(screen.getByRole("button"))
+    await act(async () => vi.advanceTimersByTime(1000))
+    setVisibility("hidden")
+    await act(async () => vi.advanceTimersByTime(20000))
+    expect(onConfirm).not.toHaveBeenCalled()
+    setVisibility("visible")
+    await act(async () => vi.advanceTimersByTime(3999))
+    expect(onConfirm).not.toHaveBeenCalled()
+    await act(async () => vi.advanceTimersByTime(1))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("undo: a hidden tab and hover pause independently", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmButton undo onConfirm={onConfirm}>
+        Archive
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await click(button)
+    fireEvent.pointerLeave(button)
+    fireEvent.pointerEnter(button)
+    setVisibility("hidden")
+    fireEvent.pointerLeave(button)
+    await act(async () => vi.advanceTimersByTime(20000))
+    expect(onConfirm).not.toHaveBeenCalled()
+    setVisibility("visible")
     await act(async () => vi.advanceTimersByTime(5000))
     expect(onConfirm).toHaveBeenCalledOnce()
   })

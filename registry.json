@@ -11,6 +11,11 @@
       "registryDependencies": ["button"],
       "files": [
         {
+          "path": "components/ui/sureui/undo-window.ts",
+          "type": "registry:lib",
+          "target": "@ui/sureui/undo-window.ts"
+        },
+        {
           "path": "components/ui/sureui/confirmation.ts",
           "type": "registry:lib",
           "target": "@ui/sureui/confirmation.ts"
@@ -31,6 +36,11 @@
       "registryDependencies": ["button", "checkbox", "input", "label"],
       "files": [
         {
+          "path": "components/ui/sureui/undo-window.ts",
+          "type": "registry:lib",
+          "target": "@ui/sureui/undo-window.ts"
+        },
+        {
           "path": "components/ui/sureui/confirmation.ts",
           "type": "registry:lib",
           "target": "@ui/sureui/confirmation.ts"
@@ -50,6 +60,11 @@
       "description": "An optional alert dialog that wraps a ConfirmButton or TypeToConfirm as its confirm action, closing only after an async onConfirm settles. Includes useConfirm, which returns an awaitable confirm() and a dialog element you render yourself.",
       "registryDependencies": ["alert-dialog", "button", "checkbox", "input", "label"],
       "files": [
+        {
+          "path": "components/ui/sureui/undo-window.ts",
+          "type": "registry:lib",
+          "target": "@ui/sureui/undo-window.ts"
+        },
         {
           "path": "components/ui/sureui/confirmation.ts",
           "type": "registry:lib",
@@ -81,6 +96,11 @@
       "dependencies": ["sonner"],
       "registryDependencies": ["button", "sonner"],
       "files": [
+        {
+          "path": "components/ui/sureui/undo-window.ts",
+          "type": "registry:lib",
+          "target": "@ui/sureui/undo-window.ts"
+        },
         {
           "path": "components/ui/sureui/undo-toast.tsx",
           "type": "registry:lib",
