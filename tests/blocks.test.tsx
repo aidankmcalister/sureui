@@ -11,10 +11,13 @@ import { describe, expect, it, vi } from "vitest"
 
 import { AgentApproval } from "@/components/blocks/agent-approval-01/agent-approval"
 import { ApiKeys } from "@/components/blocks/api-keys-01/api-keys"
+import { BulkActions } from "@/components/blocks/bulk-actions-01/bulk-actions"
 import { DangerZone } from "@/components/blocks/danger-zone-01/danger-zone"
 import { DeleteAccount } from "@/components/blocks/delete-account-01/delete-account"
 import { FileManager } from "@/components/blocks/file-manager-01/file-manager"
 import { Inbox } from "@/components/blocks/inbox-01/inbox"
+import { Reauth } from "@/components/blocks/reauth-01/reauth"
+import { ScheduledDeletion } from "@/components/blocks/scheduled-deletion-01/scheduled-deletion"
 import { TeamMembers } from "@/components/blocks/team-members-01/team-members"
 import { blockPreviewNames } from "@/components/site/blocks/previews"
 import registry from "@/registry.json"
@@ -362,5 +365,206 @@ describe("agent-approval-01", () => {
       fireEvent.click(within(call).getByRole("button", { name: "Deny" }))
     )
     expect(within(call).getByText("Denied")).toBeTruthy()
+  })
+})
+
+describe("bulk-actions-01", () => {
+  function titles() {
+    return within(screen.getByRole("list", { name: "Issues" }))
+      .getAllByRole("listitem")
+      .map((item) => item.textContent)
+      .join()
+  }
+
+  it("hides a small batch during the undo window and Undo brings it back selected", async () => {
+    useHoldTimers()
+    render(<BulkActions />)
+    fireEvent.click(screen.getByRole("checkbox", { name: /Login form/ }))
+    fireEvent.click(screen.getByRole("checkbox", { name: /webhook/ }))
+    const remove = screen.getByRole("button", { name: "Delete 2 issues" })
+    await act(async () => fireEvent.click(remove))
+    expect(titles()).not.toMatch(/Login form|webhook/)
+    expect(screen.getByText("Deleted 2 issues")).toBeTruthy()
+
+    await act(async () =>
+      fireEvent.click(screen.getByRole("button", { name: "Undo" }))
+    )
+    expect(titles()).toMatch(/Login form.*webhook/)
+    expect(
+      screen
+        .getByRole("checkbox", { name: /Login form/ })
+        .getAttribute("aria-checked")
+    ).toBe("true")
+    expect(screen.getByText("2 selected")).toBeTruthy()
+
+    await act(async () => fireEvent.click(remove))
+    await act(async () => vi.advanceTimersByTime(6000))
+    await waitFor(() => expect(screen.getByText("Select all")), settled)
+    expect(titles()).not.toMatch(/Login form|webhook/)
+  })
+
+  it("deletes a few issues on a second click", async () => {
+    render(<BulkActions />)
+    for (const name of [/Login form/, /webhook/, /Dark mode/])
+      fireEvent.click(screen.getByRole("checkbox", { name }))
+    const remove = screen.getByRole("button", { name: "Delete 3 issues" })
+    await act(async () => fireEvent.click(remove))
+    expect(remove.getAttribute("data-state")).toBe("armed")
+    expect(titles()).toMatch(/Login form/)
+    await act(async () => fireEvent.click(remove))
+    await waitFor(
+      () => expect(titles()).not.toMatch(/Login form|webhook|Dark mode/),
+      settled
+    )
+  })
+
+  it("asks for the count before deleting every issue", async () => {
+    render(<BulkActions />)
+    fireEvent.click(screen.getByRole("checkbox", { name: "Select all" }))
+    expect(screen.getByText("8 selected")).toBeTruthy()
+    fireEvent.click(screen.getByRole("button", { name: "Delete 8 issues" }))
+    const dialog = await screen.findByRole("alertdialog")
+    const confirm = within(dialog).getByRole("button", {
+      name: "Delete 8 issues",
+    })
+    expect(confirm.hasAttribute("disabled")).toBe(true)
+    fireEvent.change(within(dialog).getByRole("textbox"), {
+      target: { value: "8" },
+    })
+    await waitFor(() => expect(confirm.hasAttribute("disabled")).toBe(false))
+    fireEvent.click(confirm)
+    await screen.findByText("No open issues", undefined, settled)
+  })
+})
+
+describe("scheduled-deletion-01", () => {
+  function trashed() {
+    return within(screen.getByRole("list", { name: "Trash" }))
+      .getAllByRole("listitem")
+      .map((item) => item.textContent)
+      .join()
+  }
+
+  it("schedules deletion 30 days out and keeps the workspace on Keep", async () => {
+    render(<ScheduledDeletion />)
+    fireEvent.click(screen.getByRole("button", { name: "Delete" }))
+    const dialog = await screen.findByRole("alertdialog")
+    expect(within(dialog).getByText(/deleted for good on Jun 11/)).toBeTruthy()
+    fireEvent.click(
+      within(dialog).getByRole("button", { name: "Schedule deletion" })
+    )
+    await screen.findByText(
+      "Scheduled for deletion on Jun 11",
+      undefined,
+      settled
+    )
+    expect(screen.queryByRole("button", { name: "Delete" })).toBeNull()
+    fireEvent.click(screen.getByRole("button", { name: "Keep" }))
+    await screen.findByRole("button", { name: "Delete" }, settled)
+    expect(screen.queryByText(/Scheduled for deletion/)).toBeNull()
+    expect(screen.getByText("Acme won't be deleted.")).toBeTruthy()
+  })
+
+  it("shows when each project in the trash is deleted", () => {
+    render(<ScheduledDeletion />)
+    expect(trashed()).toMatch(
+      /marketing-siteDeletes on Jun 8.*legacy-apiDeletes on May 30.*hackweek-demoDeletes on May 15/
+    )
+  })
+
+  it("restores a project and deletes another forever on a full hold", async () => {
+    useHoldTimers()
+    render(<ScheduledDeletion />)
+    await act(async () =>
+      fireEvent.click(
+        screen.getByRole("button", { name: "Restore marketing-site" })
+      )
+    )
+    await waitFor(() => expect(trashed()).not.toMatch(/marketing-site/))
+    expect(screen.getByText("Restored marketing-site.")).toBeTruthy()
+
+    const hold = screen.getByRole("button", {
+      name: "Hold to delete legacy-api forever",
+    })
+    fireEvent.pointerDown(hold, { button: 0 })
+    await act(async () => vi.advanceTimersByTime(500))
+    await act(async () => fireEvent.pointerUp(hold))
+    expect(trashed()).toMatch(/legacy-api/)
+
+    fireEvent.pointerDown(hold, { button: 0 })
+    await act(async () => vi.advanceTimersByTime(1200))
+    await act(async () => fireEvent.pointerUp(hold))
+    await waitFor(() => expect(trashed()).not.toMatch(/legacy-api/), settled)
+    expect(screen.getByText("Deleted legacy-api forever.")).toBeTruthy()
+  })
+})
+
+describe("reauth-01", () => {
+  async function submitCode(code: string) {
+    const dialog = await screen.findByRole("dialog")
+    fireEvent.change(within(dialog).getByRole("textbox", { name: "Code" }), {
+      target: { value: code },
+    })
+    await act(async () =>
+      fireEvent.click(within(dialog).getByRole("button", { name: "Verify" }))
+    )
+    return dialog
+  }
+
+  it("asks for a code, shows an error on a wrong one, then saves", async () => {
+    render(<Reauth />)
+    fireEvent.change(screen.getByRole("textbox", { name: "Billing email" }), {
+      target: { value: "finance@example.com" },
+    })
+    fireEvent.click(screen.getByRole("button", { name: "Save" }))
+    const dialog = await submitCode("000000")
+    expect(within(dialog).getByRole("alert").textContent).toBe(
+      "That code didn't work. Try again."
+    )
+    expect(screen.getByText("Invoices go to billing@example.com.")).toBeTruthy()
+
+    await submitCode("123456")
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
+    await screen.findByText("Invoices go to finance@example.com.")
+  })
+
+  it("cancels the action when the dialog is dismissed", async () => {
+    render(<Reauth />)
+    const remove = screen.getByRole("button", { name: "Remove" })
+    await act(async () => fireEvent.click(remove))
+    await act(async () => fireEvent.click(remove))
+    const dialog = await screen.findByRole("dialog")
+    expect(within(dialog).getByText("This demo accepts 123456.")).toBeTruthy()
+    fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }))
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
+    await waitFor(() => expect(remove.getAttribute("data-state")).toBe("idle"))
+    expect(screen.getByText("Card ending 4242")).toBeTruthy()
+  })
+
+  it("skips the code while verified and asks again once it expires", async () => {
+    vi.useFakeTimers({
+      toFake: ["setTimeout", "clearTimeout", "performance"],
+      shouldAdvanceTime: true,
+    })
+    const verify = vi.fn(async (code: string) => code === "424242")
+    render(<Reauth verify={verify} rememberFor={60 * 60 * 1000} />)
+    const email = screen.getByRole("textbox", { name: "Billing email" })
+    fireEvent.change(email, { target: { value: "finance@example.com" } })
+    fireEvent.click(screen.getByRole("button", { name: "Save" }))
+    const dialog = await submitCode("424242")
+    expect(within(dialog).queryByText(/demo/)).toBeNull()
+    await screen.findByText("Invoices go to finance@example.com.")
+
+    const remove = screen.getByRole("button", { name: "Remove" })
+    await act(async () => fireEvent.click(remove))
+    await act(async () => fireEvent.click(remove))
+    await screen.findByText("No card on file", undefined, settled)
+    expect(screen.queryByRole("dialog")).toBeNull()
+    expect(verify).toHaveBeenCalledTimes(1)
+
+    await act(async () => vi.advanceTimersByTime(60 * 60 * 1000))
+    fireEvent.change(email, { target: { value: "ap@example.com" } })
+    fireEvent.click(screen.getByRole("button", { name: "Save" }))
+    expect(await screen.findByRole("dialog")).toBeTruthy()
   })
 })

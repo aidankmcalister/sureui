@@ -11,7 +11,10 @@ import type {
   ConsequencesItemProps,
   ConsequencesProps,
 } from "@/components/ui/sureui/consequences"
-import type { ToolApprovalProps } from "@/components/ui/sureui/tool-approval"
+import type {
+  ToolApprovalBatchProps,
+  ToolApprovalProps,
+} from "@/components/ui/sureui/tool-approval"
 import type { TypeToConfirmProps } from "@/components/ui/sureui/type-to-confirm"
 import type { UndoToastOptions } from "@/components/ui/sureui/undo-toast"
 import type { UndoableProps } from "@/components/ui/sureui/undoable"
@@ -209,8 +212,27 @@ const toolApproval = {
   undo: true,
   timeout: true,
   duration: true,
+  scopes: true,
+  scopeLabels: true,
   className: true,
 } satisfies Record<keyof ToolApprovalProps, true>
+
+const toolApprovalBatch = {
+  parts: true,
+  onRespond: true,
+  risk: true,
+  phrase: true,
+  approveLabel: true,
+  denyLabel: true,
+  approvedLabel: true,
+  deniedLabel: true,
+  undo: true,
+  timeout: true,
+  duration: true,
+  scopes: true,
+  scopeLabels: true,
+  className: true,
+} satisfies Record<keyof ToolApprovalBatchProps, true>
 
 const documented = {
   ConfirmButton: confirmButton,
@@ -223,6 +245,7 @@ const documented = {
   "undoToast(message, options)": undoToast,
   Undoable: undoable,
   ToolApproval: toolApproval,
+  ToolApprovalBatch: toolApprovalBatch,
 }
 
 function tableAfter(heading: string) {

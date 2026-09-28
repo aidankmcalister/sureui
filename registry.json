@@ -302,7 +302,10 @@
       "name": "tool-approval",
       "type": "registry:ui",
       "title": "Tool Approval",
-      "description": "Approve or deny an AI SDK tool call with a gesture that matches its risk: undo for low, click again for medium, hold for high and a typed phrase for critical. Pass addToolApprovalResponse from useChat as onRespond.",
+      "description": "Approve or deny an AI SDK tool call, or a batch of them, with a gesture that matches its risk: undo for low, click again for medium, hold for high and a typed phrase for critical. Pass addToolApprovalResponse from useChat as onRespond.",
+      "dependencies": [
+        "@base-ui/react"
+      ],
       "registryDependencies": [
         "button",
         "checkbox",
@@ -525,6 +528,83 @@
       "categories": [
         "block",
         "ai"
+      ]
+    },
+    {
+      "name": "bulk-actions-01",
+      "type": "registry:block",
+      "title": "Bulk Actions",
+      "description": "An issue list with row checkboxes whose delete asks for more as the count grows: an undo window for one or two, a second click for a few, and the typed count for more.",
+      "registryDependencies": [
+        "@sureui/confirm-button",
+        "@sureui/confirm-dialog",
+        "button",
+        "card",
+        "checkbox"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/bulk-actions-01/bulk-actions.tsx",
+          "type": "registry:component",
+          "target": "@components/bulk-actions.tsx"
+        }
+      ],
+      "categories": [
+        "block",
+        "tables"
+      ]
+    },
+    {
+      "name": "scheduled-deletion-01",
+      "type": "registry:block",
+      "title": "Scheduled Deletion",
+      "description": "Workspace settings where Delete schedules the workspace for deletion after a 30-day grace period with a Keep banner, and a Trash list restores projects or deletes them forever on a hold.",
+      "registryDependencies": [
+        "@sureui/confirm-button",
+        "@sureui/confirm-dialog",
+        "button",
+        "card"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/scheduled-deletion-01/scheduled-deletion.tsx",
+          "type": "registry:component",
+          "target": "@components/scheduled-deletion.tsx"
+        }
+      ],
+      "categories": [
+        "block",
+        "settings"
+      ]
+    },
+    {
+      "name": "reauth-01",
+      "type": "registry:block",
+      "title": "Re-authentication",
+      "description": "Billing settings that ask for a 6-digit code before changing the billing email or removing a card, show an inline error on a wrong code, and don't ask again for 2 hours. The demo verify accepts 123456.",
+      "registryDependencies": [
+        "@sureui/confirm-button",
+        "button",
+        "card",
+        "dialog",
+        "input",
+        "label"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/reauth-01/reauth.tsx",
+          "type": "registry:component",
+          "target": "@components/reauth.tsx"
+        },
+        {
+          "path": "components/blocks/reauth-01/reauth-dialog.tsx",
+          "type": "registry:component",
+          "target": "@components/reauth-dialog.tsx"
+        }
+      ],
+      "categories": [
+        "block",
+        "settings"
       ]
     }
   ]

@@ -41,12 +41,12 @@ export function CheckMark() {
         <path
           d={check}
           stroke="currentColor"
-          className="opacity-[0.03] dark:opacity-[0.04]"
+          className="opacity-[0.02] dark:opacity-[0.025]"
         />
         <path
           d={check}
           stroke="url(#check-mark-hatch)"
-          className="opacity-[0.16] dark:opacity-[0.22]"
+          className="opacity-[0.1] dark:opacity-[0.13]"
         />
       </svg>
     </div>

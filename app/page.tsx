@@ -9,13 +9,13 @@ import {
 } from "@/components/site/layout/frame"
 import { cn } from "@/lib/utils"
 import { Cell } from "@/components/site/home/cell"
-import { ApiKeys } from "@/components/site/home/examples/api-keys"
+import { Agent } from "@/components/site/home/examples/agent"
 import { ConfirmByName } from "@/components/site/home/examples/confirm-by-name"
-import { DangerZone } from "@/components/site/home/examples/danger-zone"
-import { Files } from "@/components/site/home/examples/files"
-import { Members } from "@/components/site/home/examples/members"
-import { MessageToolbar } from "@/components/site/home/examples/message-toolbar"
-import { Preferences } from "@/components/site/home/examples/preferences"
+import { Database } from "@/components/site/home/examples/database"
+import { Notifications } from "@/components/site/home/examples/notifications"
+import { Sessions } from "@/components/site/home/examples/sessions"
+import { Variables } from "@/components/site/home/examples/variables"
+import { Webhooks } from "@/components/site/home/examples/webhooks"
 import { Workspace } from "@/components/site/home/examples/workspace"
 
 const title = "SureUI · Confirmation components for shadcn/ui"
@@ -46,9 +46,9 @@ export default function Home() {
           for shadcn/ui.
         </PageTitle>
         <PageLead>
-          Hold, click again, type to confirm, undo and dialogs. You add them
-          with the shadcn CLI, and they build on the shadcn components already
-          in your app.
+          Hold to confirm, click twice, type a name, undo, or a dialog. Install
+          them with the shadcn CLI. They use the shadcn components you already
+          have.
         </PageLead>
         <Actions />
       </Band>
@@ -58,36 +58,35 @@ export default function Home() {
             Try it out.
           </h2>
           <p className="max-w-140 text-[17px] leading-7 text-pretty text-(--ink-muted)">
-            Each example is a working screen from an everyday app, like project
-            settings or a message inbox.
+            Each example is a small, working part of a real app.
           </p>
         </div>
         <div className={grid}>
           <Cell
             featured
             figure={1}
-            gesture="Several styles"
+            gesture="Mixed"
             href="/docs"
-            title="A project danger zone"
-            description="Pause, transfer and delete each ask for a different amount of confirmation."
+            title="Database settings"
+            description="Riskier actions ask for more before they run."
           >
-            <DangerZone />
+            <Database />
           </Cell>
           <Cell
             figure={2}
             gesture="Hold"
             href="/docs/confirm-button#hold"
-            title="Revoking an API key"
-            description="Press and hold. Letting go early cancels."
+            title="Sign out other devices"
+            description="Hold the button to sign out. Let go early to cancel."
           >
-            <ApiKeys />
+            <Sessions />
           </Cell>
           <Cell
             figure={3}
             gesture="Type to confirm"
             href="/docs/type-to-confirm"
-            title="Deleting by name"
-            description="Delete stays disabled until you type the exact name."
+            title="Delete a repository"
+            description="Type the repository name to turn on Delete."
           >
             <ConfirmByName />
           </Cell>
@@ -95,19 +94,19 @@ export default function Home() {
             figure={4}
             gesture="Dialog"
             href="/docs/confirm-dialog"
-            title="Leaving a shared workspace"
-            description="A dialog, because leaving affects everyone else in the workspace."
+            title="Leave a workspace"
+            description="A dialog asks first, since you need an invite to get back in."
           >
             <Workspace />
           </Cell>
           <Cell
             figure={5}
-            gesture="Hold"
-            href="/docs/confirm-button#hold"
-            title="Resetting preferences"
-            description="A longer hold for a bigger reset."
+            gesture="Tool approval"
+            href="/docs/tool-approval"
+            title="Approve an AI action"
+            description="The AI asks before it deletes a table. Hold to approve."
           >
-            <Preferences />
+            <Agent />
           </Cell>
         </div>
       </Band>
@@ -117,29 +116,29 @@ export default function Home() {
             figure={6}
             gesture="Undo"
             href="/docs/confirm-button#undo"
-            title="Clearing out shared files"
-            description="Moves to trash right away, with five seconds to undo."
+            title="Clear notifications"
+            description="Clears right away. You have 5 seconds to undo."
             className="md:col-span-2 lg:col-span-1"
           >
-            <Files />
+            <Notifications />
           </Cell>
           <Cell
             figure={7}
-            gesture="Click again"
-            href="/docs/confirm-button#click-again"
-            title="Removing a teammate"
-            description="Each row asks for a second click before it removes anyone."
+            gesture="Menu item"
+            href="/docs/confirm-menu-item"
+            title="Delete a variable"
+            description="Click Delete in the menu, then click again to confirm."
           >
-            <Members />
+            <Variables />
           </Cell>
           <Cell
             figure={8}
-            gesture="Hold · Click again"
-            href="/docs/confirm-button#hold"
-            title="Tidying a message"
-            description="Icon buttons: click again to archive, hold to delete."
+            gesture="Undoable"
+            href="/docs/undoable"
+            title="Remove a webhook"
+            description="The row shows Undo for a few seconds before it goes."
           >
-            <MessageToolbar />
+            <Webhooks />
           </Cell>
         </div>
       </Band>

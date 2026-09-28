@@ -50,6 +50,112 @@ const { messages, addToolApprovalResponse } = useChat({
 
 It shows Approve and Deny while the part is `approval-requested`, and the outcome once it's answered. `sendAutomaticallyWhen` continues the conversation after you respond.
 
+### Other frameworks
+
+`part` only needs a `state` and an `approval.id`, so any agent framework that pauses for approval can drive `ToolApproval`. Build a part for each pending call, then turn `onRespond` into that framework's answer. `ToolApprovalBatch` calls `onRespond` for every pending call, in order, in the same event, which suits frameworks that resume all pending calls in one request.
+
+Both components approve or deny a call as it is. They don't edit tool arguments before approval yet, so LangChain's `edit` decision and AG-UI's `editedArgs` aren't covered.
+
+### OpenAI Agents SDK
+
+A tool with `needsApproval: true` pauses the run, and `result.interruptions` lists the pending calls. Approve or reject each one on its `RunState`, then run again with that state ([human-in-the-loop guide](https://openai.github.io/openai-agents-js/guides/human-in-the-loop/)). `alwaysApprove` and `alwaysReject` last for the rest of the run, which matches the `"session"` scope.
+
+```tsx
+<ToolApproval
+  part={{ state: "approval-requested", approval: { id: call.callId } }}
+  scopes={["once", "session"]}
+  onRespond={(response) => respond(serializedState, response)}
+/>
+```
+
+```tsx
+"use server"
+
+import { run, RunState } from "@openai/agents"
+
+export async function respond(serializedState, { id, approved, scope }) {
+  const state = await RunState.fromString(agent, serializedState)
+  const item = state
+    .getInterruptions()
+    .find((interruption) => interruption.rawItem.callId === id)
+  if (approved) state.approve(item, { alwaysApprove: scope === "session" })
+  else state.reject(item, { alwaysReject: scope === "session" })
+  return run(agent, state)
+}
+```
+
+### LangChain and LangGraph
+
+`humanInTheLoopMiddleware` interrupts with an `actionRequests` list and resumes with one decision per request, in the same order ([human-in-the-loop](https://docs.langchain.com/oss/javascript/langchain/human-in-the-loop), [frontend guide](https://docs.langchain.com/oss/javascript/langchain/frontend/human-in-the-loop)):
+
+```tsx
+import { useStream } from "@langchain/react"
+
+import { ToolApprovalBatch } from "@/components/ui/sureui/tool-approval"
+
+const stream = useStream({ apiUrl, assistantId: "agent" })
+const requests = stream.interrupt?.value?.actionRequests ?? []
+const parts = requests.map((_, index) => ({
+  state: "approval-requested",
+  approval: { id: `${stream.interrupt.id}:${index}` },
+}))
+const decisions = []
+
+<ToolApprovalBatch
+  parts={parts}
+  onRespond={({ approved }) => {
+    decisions.push({ type: approved ? "approve" : "reject" })
+    if (decisions.length === parts.length) {
+      stream.submit(null, { command: { resume: { decisions } } })
+    }
+  }}
+/>
+```
+
+With your own `interrupt()` calls in a LangGraph node, resume with `new Command({ resume })`, or a map of interrupt id to value when several are pending ([interrupts](https://docs.langchain.com/oss/javascript/langgraph/interrupts)).
+
+### Mastra
+
+A tool created with `requireApproval: true` suspends the stream with a `tool-call-approval` chunk whose payload has `toolCallId`, `toolName` and `args`. Answer it with `approveToolCall` or `declineToolCall` ([human-in-the-loop](https://mastra.ai/docs/agents/human-in-the-loop)):
+
+```tsx
+<ToolApproval
+  part={{ state: "approval-requested", approval: { id: chunk.payload.toolCallId } }}
+  onRespond={({ id, approved }) =>
+    approved
+      ? agent.approveToolCall({ runId: stream.runId, toolCallId: id })
+      : agent.declineToolCall({ runId: stream.runId, toolCallId: id })
+  }
+/>
+```
+
+Call the agent methods where the agent runs, usually a route handler or server action.
+
+### AG-UI
+
+A run that needs approval ends with a `RUN_FINISHED` event whose outcome is `interrupt`. The next run must answer every open interrupt in `resume`, with `{ approved }` as the payload for a tool call ([interrupts](https://docs.ag-ui.com/concepts/interrupts)). `@ag-ui/client` keeps the open ones in `agent.pendingInterrupts`:
+
+```tsx
+import { HttpAgent } from "@ag-ui/client"
+
+import { ToolApprovalBatch } from "@/components/ui/sureui/tool-approval"
+
+const agent = new HttpAgent({ url: "/api/agent" })
+const parts = agent.pendingInterrupts.map((interrupt) => ({
+  state: "approval-requested",
+  approval: { id: interrupt.id },
+}))
+const resume = []
+
+<ToolApprovalBatch
+  parts={parts}
+  onRespond={({ id, approved }) => {
+    resume.push({ interruptId: id, status: "resolved", payload: { approved } })
+    if (resume.length === parts.length) return agent.runAgent({ resume })
+  }}
+/>
+```
+
 ## Examples
 
 ### Low risk
@@ -78,6 +184,30 @@ Approve unlocks once `phrase` is typed, like a project or repository name.
 
 Deny is one click at every level.
 
+### Batch
+
+`ToolApprovalBatch` answers every pending call at once. Its Approve uses the gesture of the riskiest call, and it calls `onRespond` once per call. Pass `risk` as a function to grade each part. Parts that aren't `approval-requested` are skipped.
+
+<Example name="tool-approval/batch" />
+
+```tsx
+import { isToolUIPart } from "ai"
+
+import { ToolApprovalBatch } from "@/components/ui/sureui/tool-approval"
+
+<ToolApprovalBatch
+  parts={message.parts.filter(isToolUIPart)}
+  risk={(part) => (part.type === "tool-deleteProject" ? "high" : "low")}
+  onRespond={addToolApprovalResponse}
+/>
+```
+
+### Scope
+
+Pass `scopes` to let people choose how long an answer holds: once, this session or always. The first entry starts selected, and `onRespond` receives it as `scope` with Approve and Deny. SureUI doesn't store permissions: keep the answer for the session or save it, and skip `ToolApproval` for that tool next time. `addToolApprovalResponse` ignores `scope`, so you can pass it on unchanged.
+
+<Example name="tool-approval/scopes" />
+
 ## API reference
 
 ### ToolApproval
@@ -87,7 +217,7 @@ Deny is one click at every level.
 | Prop | Type | Default |
 | --- | --- | --- |
 | `part` | `{ state, approval?: { id, approved?, reason? } }` | required |
-| `onRespond` | `({ id, approved, reason? }) => void \| PromiseLike<unknown>` | required |
+| `onRespond` | `({ id, approved, reason?, scope? }) => void \| PromiseLike<unknown>` | required |
 | `risk` | `"low" \| "medium" \| "high" \| "critical"` | `"medium"` |
 | `phrase` | `string` | required with `"critical"` |
 | `approveLabel` | `string` | `"Approve"`, or `"Hold to approve"` for `"high"` |
@@ -97,13 +227,38 @@ Deny is one click at every level.
 | `undo` | `boolean \| number` | `true` |
 | `timeout` | `number` | `3000` |
 | `duration` | `number` | `1200` |
+| `scopes` | `("once" \| "session" \| "always")[]` | — |
+| `scopeLabels` | `{ group?, once?, session?, always? }` | `{ group: "Remember", once: "Once", session: "This session", always: "Always" }` |
 | `className` | `string` | — |
 
-`undo` applies to `"low"`, `timeout` to `"medium"` and `duration` to `"high"`.
+`undo` applies to `"low"`, `timeout` to `"medium"` and `duration` to `"high"`. `scope` is only sent when `scopes` is set.
+
+### ToolApprovalBatch
+
+Takes the same props as `ToolApproval`, with `parts` in place of `part`.
+
+| Prop | Type | Default |
+| --- | --- | --- |
+| `parts` | `ToolApprovalPart[]` | required |
+| `onRespond` | `({ id, approved, reason?, scope? }) => void \| PromiseLike<unknown>` | required |
+| `risk` | `ToolApprovalRisk \| (part) => ToolApprovalRisk` | `"medium"` |
+| `phrase` | `string` | `"approve all"` |
+| `approveLabel` | `string` | `"Approve all"`, or `"Hold to approve all"` for `"high"` |
+| `denyLabel` | `string` | `"Deny all"` |
+| `approvedLabel` | `ReactNode` | `"Approved"` |
+| `deniedLabel` | `ReactNode` | `"Denied"` |
+| `undo` | `boolean \| number` | `true` |
+| `timeout` | `number` | `3000` |
+| `duration` | `number` | `1200` |
+| `scopes` | `("once" \| "session" \| "always")[]` | — |
+| `scopeLabels` | `{ group?, once?, session?, always? }` | `{ group: "Remember", once: "Once", session: "This session", always: "Always" }` |
+| `className` | `string` | — |
+
+`phrase` applies when the riskiest call is `"critical"`. The outcome shows once every part is answered the same way. When the pending calls change, a gesture in progress starts over.
 
 ### Data attributes
 
-The root sets `data-slot="tool-approval"` and `data-state`.
+The root sets `data-slot="tool-approval"` (or `"tool-approval-batch"`) and `data-state`. The scope choice sets `data-slot="tool-approval-scope"`.
 
 | Value | When |
 | --- | --- |
@@ -114,4 +269,5 @@ The root sets `data-slot="tool-approval"` and `data-state`.
 ## Accessibility
 
 - Approve uses the same announcements as [Confirm Button](/docs/confirm-button#accessibility) and [Type to Confirm](/docs/type-to-confirm#accessibility), including the second-click fallback for a hold.
-- Only one response is ever sent. Deny is disabled during a low-risk undo window and while a response is pending, and both buttons come back if the response fails.
+- Only one response is ever sent per call. Deny is disabled during a low-risk undo window and while a response is pending, and both buttons come back if the response fails. In a batch, only the calls whose response failed come back.
+- The scope choice is a radio group named by `scopeLabels.group`, so arrow keys move between options.

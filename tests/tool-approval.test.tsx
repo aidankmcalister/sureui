@@ -4,6 +4,8 @@ import { beforeEach, describe, expect, expectTypeOf, it, vi } from "vitest"
 
 import {
   ToolApproval,
+  ToolApprovalBatch,
+  type ToolApprovalBatchProps,
   type ToolApprovalPart,
   type ToolApprovalProps,
 } from "@/components/ui/sureui/tool-approval"
@@ -163,5 +165,241 @@ describe("ToolApproval", () => {
       />
     )
     expect(screen.getByText("Denied: Not now")).toBeTruthy()
+  })
+})
+
+describe("ToolApproval scopes", () => {
+  it("shows no scope choice by default", () => {
+    render(<ToolApproval part={requested} onRespond={vi.fn()} />)
+    expect(screen.queryByRole("radiogroup")).toBeNull()
+  })
+
+  it("sends the chosen scope with the response", async () => {
+    const onRespond = vi.fn()
+    render(
+      <ToolApproval
+        part={requested}
+        scopes={["once", "session", "always"]}
+        onRespond={onRespond}
+      />
+    )
+    expect(screen.getByRole("radiogroup", { name: "Remember" })).toBeTruthy()
+    expect(
+      screen.getByRole("radio", { name: "Once" }).getAttribute("aria-checked")
+    ).toBe("true")
+    await click(screen.getByRole("radio", { name: "This session" }))
+    const approve = screen.getByRole("button", { name: "Approve" })
+    await click(approve)
+    await click(approve)
+    expect(onRespond).toHaveBeenCalledWith({
+      id: "approval_1",
+      approved: true,
+      scope: "session",
+    })
+  })
+
+  it("sends the scope with a denial too, and takes custom labels", async () => {
+    const onRespond = vi.fn()
+    render(
+      <ToolApproval
+        part={requested}
+        scopes={["once", "always"]}
+        scopeLabels={{ group: "Apply", always: "Every time" }}
+        onRespond={onRespond}
+      />
+    )
+    expect(screen.getByRole("radiogroup", { name: "Apply" })).toBeTruthy()
+    await click(screen.getByRole("radio", { name: "Every time" }))
+    await click(screen.getByRole("button", { name: "Deny" }))
+    expect(onRespond).toHaveBeenCalledWith({
+      id: "approval_1",
+      approved: false,
+      scope: "always",
+    })
+  })
+})
+
+function call(id: string, risk: "low" | "medium" | "high" | "critical") {
+  return { state: "approval-requested", approval: { id }, risk }
+}
+
+describe("ToolApprovalBatch", () => {
+  it("accepts AI SDK tool parts and addToolApprovalResponse", () => {
+    expectTypeOf<ToolUIPart[]>().toExtend<
+      ToolApprovalBatchProps<ToolUIPart>["parts"]
+    >()
+    expectTypeOf<ChatAddToolApproveResponseFunction>().toExtend<
+      ToolApprovalBatchProps["onRespond"]
+    >()
+    expectTypeOf<(part: ToolUIPart) => "high">().toExtend<
+      NonNullable<ToolApprovalBatchProps<ToolUIPart>["risk"]>
+    >()
+  })
+
+  it("renders nothing without pending approvals", () => {
+    const { container } = render(
+      <ToolApprovalBatch
+        parts={[{ state: "input-available" }]}
+        onRespond={vi.fn()}
+      />
+    )
+    expect(container.innerHTML).toBe("")
+  })
+
+  it("responds once per pending call, in order", async () => {
+    const onRespond = vi.fn()
+    render(
+      <ToolApprovalBatch
+        parts={[
+          call("a", "medium"),
+          { state: "input-available" },
+          {
+            state: "approval-responded",
+            approval: { id: "b", approved: true },
+          },
+          call("c", "low"),
+        ]}
+        onRespond={onRespond}
+      />
+    )
+    const approve = screen.getByRole("button", { name: "Approve all" })
+    await click(approve)
+    expect(onRespond).not.toHaveBeenCalled()
+    await click(approve)
+    expect(onRespond.mock.calls).toEqual([
+      [{ id: "a", approved: true }],
+      [{ id: "c", approved: true }],
+    ])
+  })
+
+  it("follows the riskiest call in the batch", async () => {
+    const onRespond = vi.fn()
+    render(
+      <ToolApprovalBatch
+        parts={[call("a", "low"), call("b", "high"), call("c", "medium")]}
+        risk={(part) => part.risk}
+        onRespond={onRespond}
+      />
+    )
+    const approve = screen.getByRole("button", { name: /Hold to approve all/ })
+    fireEvent.pointerDown(approve, { button: 0 })
+    await act(async () => vi.advanceTimersByTime(1200))
+    expect(onRespond).toHaveBeenCalledTimes(3)
+  })
+
+  it("asks for the phrase when a call is critical", async () => {
+    const onRespond = vi.fn()
+    render(
+      <ToolApprovalBatch
+        parts={[call("a", "low"), call("b", "critical")]}
+        risk={(part) => part.risk}
+        phrase="acme-prod"
+        onRespond={onRespond}
+      />
+    )
+    const approve = screen.getByRole("button", { name: "Approve all" })
+    expect((approve as HTMLButtonElement).disabled).toBe(true)
+    fireEvent.change(screen.getByRole("textbox"), {
+      target: { value: "acme-prod" },
+    })
+    await click(approve)
+    expect(onRespond).toHaveBeenCalledTimes(2)
+  })
+
+  it("denies every pending call on one click, only once", async () => {
+    const onRespond = vi.fn()
+    render(
+      <ToolApprovalBatch
+        parts={[call("a", "medium"), call("b", "medium")]}
+        scopes={["once", "session"]}
+        onRespond={onRespond}
+      />
+    )
+    await click(screen.getByRole("radio", { name: "This session" }))
+    const deny = screen.getByRole("button", { name: "Deny all" })
+    await click(deny)
+    await click(deny)
+    expect(onRespond.mock.calls).toEqual([
+      [{ id: "a", approved: false, scope: "session" }],
+      [{ id: "b", approved: false, scope: "session" }],
+    ])
+    expect(
+      (screen.getByRole("button", { name: "Deny all" }) as HTMLButtonElement)
+        .disabled
+    ).toBe(true)
+  })
+
+  it("frees a call whose response fails, and retries only that one", async () => {
+    const onRespond = vi.fn(({ id }: { id: string }) =>
+      id === "b" ? Promise.reject(new Error("offline")) : Promise.resolve()
+    )
+    const parts = [call("a", "medium"), call("b", "medium")]
+    const { rerender } = render(
+      <ToolApprovalBatch parts={parts} onRespond={onRespond} />
+    )
+    const rejection = vi.fn()
+    process.on("unhandledRejection", rejection)
+    await click(screen.getByRole("button", { name: "Deny all" }))
+    await act(async () => {})
+    rerender(
+      <ToolApprovalBatch
+        parts={[
+          {
+            state: "approval-responded",
+            approval: { id: "a", approved: false },
+            risk: "medium",
+          },
+          parts[1],
+        ]}
+        onRespond={onRespond}
+      />
+    )
+    const deny = screen.getByRole("button", { name: "Deny all" })
+    expect((deny as HTMLButtonElement).disabled).toBe(false)
+    await click(deny)
+    expect(onRespond).toHaveBeenCalledTimes(3)
+    expect(onRespond).toHaveBeenLastCalledWith({ id: "b", approved: false })
+    await act(async () => {})
+    process.off("unhandledRejection", rejection)
+    expect(rejection).toHaveBeenCalledTimes(2)
+  })
+
+  it("starts the gesture over when a new call arrives", async () => {
+    const onRespond = vi.fn()
+    const { rerender } = render(
+      <ToolApprovalBatch parts={[call("a", "medium")]} onRespond={onRespond} />
+    )
+    await click(screen.getByRole("button", { name: "Approve all" }))
+    rerender(
+      <ToolApprovalBatch
+        parts={[call("a", "medium"), call("b", "medium")]}
+        onRespond={onRespond}
+      />
+    )
+    await click(screen.getByRole("button", { name: "Approve all" }))
+    expect(onRespond).not.toHaveBeenCalled()
+  })
+
+  it("shows the outcome once every call is answered the same way", () => {
+    const { rerender } = render(
+      <ToolApprovalBatch
+        parts={[
+          { state: "output-available", approval: { id: "a", approved: true } },
+          { state: "output-available", approval: { id: "b", approved: true } },
+        ]}
+        onRespond={vi.fn()}
+      />
+    )
+    expect(screen.getByText("Approved")).toBeTruthy()
+    rerender(
+      <ToolApprovalBatch
+        parts={[
+          { state: "output-available", approval: { id: "a", approved: true } },
+          { state: "output-denied", approval: { id: "b", approved: false } },
+        ]}
+        onRespond={vi.fn()}
+      />
+    )
+    expect(screen.queryByText("Approved")).toBeNull()
   })
 })

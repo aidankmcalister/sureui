@@ -1,0 +1,82 @@
+---
+title: Choosing a confirmation
+description: Match how risky an action is to the confirmation that asks for it.
+---
+
+Carbon, GitLab Pajamas, Apple's Human Interface Guidelines and Nielsen Norman Group all sort destructive actions into three tiers. The harder an action is to take back, the more effort its confirmation asks for. A routine action that asks for too much teaches people to confirm without reading.
+
+| Risk | Actions like | Use |
+| --- | --- | --- |
+| Low | Archiving a message, removing an item from a list. Common and easy to reverse. | Undo: [Confirm Button](/docs/confirm-button) with `undo`, [Undo Toast](/docs/undo-toast) or [Undoable](/docs/undoable). |
+| Medium | Removing a member, deleting a branch, revoking a key. | A second click or a popover: [Confirm Button](/docs/confirm-button) with `gesture="click-again"`, [Confirm Menu Item](/docs/confirm-menu-item) or [Confirm Popover](/docs/confirm-popover). A hold for dangerous one-offs. |
+| High | Deleting a project, a database or an account. Irreversible, with wide impact. | A dialog that lists what goes and asks for the name: [Confirm Dialog](/docs/confirm-dialog) with `phrase`, or [Type to Confirm](/docs/type-to-confirm). |
+
+## Low risk
+
+Do it right away and offer Undo. NN/g and Apple both recommend undo over a confirmation for frequent actions: a question people answer many times a day stops being read, and Undo only costs a click when someone made a mistake.
+
+<Example name="choosing-a-confirmation/low" />
+
+- [Confirm Button](/docs/confirm-button#undo) with `undo` when the button stays on screen.
+- [Undo Toast](/docs/undo-toast) when the control goes away, like an email archived from its own view.
+- [Undoable](/docs/undoable) when a row leaves a list or table.
+
+`onConfirm` runs when the window closes, so there is nothing to reverse on your server when someone presses Undo.
+
+## Medium risk
+
+Ask for a second, deliberate step in place, without a modal.
+
+<Example name="choosing-a-confirmation/medium" />
+
+- [Confirm Button](/docs/confirm-button#click-again) with `gesture="click-again"` arms on the first click and confirms on the second.
+- [Confirm Menu Item](/docs/confirm-menu-item) does the same in dropdown and context menus. Click again is its default.
+- [Confirm Popover](/docs/confirm-popover) when the action needs a sentence of context, like which pull requests will close.
+- `gesture="hold"` for a dangerous one-off, like revoking a production key, where a double click shouldn't count. Confirm Button, Confirm Menu Item, Confirm Popover and Confirm Dialog all take it.
+
+## High risk
+
+For an irreversible action with wide impact, show what will be lost and ask for the name of the thing. Typing the name shows people know which project they are deleting, not only that they meant to click.
+
+<Example name="choosing-a-confirmation/high" />
+
+- [Confirm Dialog](/docs/confirm-dialog#typed-phrase) with `phrase` and `consequences`.
+- [Type to Confirm](/docs/type-to-confirm) inline, like in a settings page's danger zone.
+- [Consequences](/docs/consequences) lists what goes with it, with counts and names.
+
+Keep this tier for the few actions that need it.
+
+## AI agents
+
+[Tool Approval](/docs/tool-approval) maps its `risk` levels onto the same tiers. Deny is one click at every level.
+
+| `risk` | Approve with | Tier |
+| --- | --- | --- |
+| `"low"` | A click, then an undo window | Low |
+| `"medium"` | A second click | Medium |
+| `"high"` | A press and hold | Medium, for dangerous one-offs |
+| `"critical"` | The typed `phrase` | High |
+
+```tsx
+<ToolApproval part={part} risk="low" onRespond={addToolApprovalResponse} />
+
+<ToolApproval
+  part={part}
+  risk="critical"
+  phrase={part.input.name}
+  onRespond={addToolApprovalResponse}
+/>
+```
+
+## Labels
+
+- Use a verb that says what happens: "Delete project", not "OK" or "Yes". The button should make sense without reading the question above it.
+- Name the thing and the count: "Remove Maya Chen", "Delete 3 files", "Delete acme-prod?".
+- Don't rely on red alone. Color doesn't reach everyone, so `variant="destructive"` goes with a label that says "Delete", never instead of it.
+- For frequent actions, skip the question and offer undo.
+
+## Accessibility
+
+- An undo window is a time limit under [WCAG 2.2.1 Timing Adjustable](https://www.w3.org/WAI/WCAG22/Understanding/timing-adjustable). It pauses while the pointer or focus is on the control and while the tab is hidden, and `undo` takes up to 60 seconds. For an action people may need longer to reconsider, keep a way to restore it afterwards, like a trash.
+- A hold meets [WCAG 2.5.2 Pointer Cancellation](https://www.w3.org/WAI/WCAG22/Understanding/pointer-cancellation) because letting go early cancels. Set `confirmOnRelease` to confirm on release instead, so people can still back out after the fill.
+- Keyboard and screen reader users can confirm a hold with two activations. See [Confirm Button](/docs/confirm-button#accessibility).

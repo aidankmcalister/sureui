@@ -25,18 +25,27 @@ export function Outcome({
   children: React.ReactNode
 }) {
   const reset = useReset()
+  const frameRef = React.useRef<HTMLDivElement>(null)
+
+  React.useLayoutEffect(() => {
+    const frame = frameRef.current
+    if (frame) frame.style.minHeight = `${frame.offsetHeight}px`
+  }, [])
 
   return (
-    <div className="relative grid w-full">
+    <div ref={frameRef} className="relative grid min-h-30 w-full">
       <div
         inert={done}
-        className={cn("grid w-full place-items-center", done && "opacity-0")}
+        className={cn(
+          "grid w-full content-start justify-items-center",
+          done && "opacity-0"
+        )}
       >
         {children}
       </div>
       {done && (
         <div role="status" className="absolute inset-0 flex">
-          <Empty>
+          <Empty className="gap-3 p-0">
             <EmptyHeader>
               <EmptyMedia variant="icon">{icon}</EmptyMedia>
               <EmptyTitle>{title}</EmptyTitle>
