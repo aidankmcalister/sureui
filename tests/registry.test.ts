@@ -7,11 +7,11 @@ import registry from "@/registry.json"
 type Item = (typeof registry.items)[number]
 
 function stockOf(item: Item) {
-  return "registryDependencies" in item ? item.registryDependencies : []
+  return ("registryDependencies" in item && item.registryDependencies) || []
 }
 
 function packagesOf(item: Item) {
-  return "dependencies" in item ? item.dependencies : []
+  return ("dependencies" in item && item.dependencies) || []
 }
 
 function importsOf(path: string) {

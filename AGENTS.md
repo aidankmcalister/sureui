@@ -38,6 +38,7 @@ A shadcn/ui registry of confirmation controls. Read `CONTEXT.md` for the vocabul
 - Dialogs are optional. Only `confirm-dialog.tsx` may import `alert-dialog`. Only `undo-toast.tsx` may import `sonner`.
 - Registry files start with `"use client"`, import only from `@/components/ui/*`, `@/lib/utils` and npm packages, and have no comments.
 - Every component file in `registry.json` has `"target": "@ui/sureui/<file name>"`, and every item declares every SureUI file, stock component and package it imports. The `rules` item is the exception: its files target `~/` paths in the project root.
+- Blocks (`"type": "registry:block"`, named `<thing>-01`) live in `components/blocks/<name>/` and install to `@components/<file>`. They are app code: they use SureUI controls through `registryDependencies` (`"@sureui/confirm-button"`), never inline copies, and keep sample data inline because the CLI doesn't rewrite imports between block files outside `components/`. `tests/registry.test.ts` checks that every block import is shipped or declared.
 - Base UI, not Radix: use `render={...}`, not `asChild`.
 - Match stock shadcn style: `import * as React from "react"`, `function` declarations, `type` not `interface`, one export block at the bottom.
 - Test through the public interface with Vitest fake timers. Never patch `Element.prototype.animate` or `window.matchMedia`.
