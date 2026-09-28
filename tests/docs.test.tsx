@@ -3,11 +3,13 @@ import { describe, expect, it } from "vitest"
 
 import type { Button } from "@/components/ui/button"
 import type { DropdownMenuItem } from "@/components/ui/dropdown-menu"
+import type { Switch } from "@/components/ui/switch"
 import type { ConfirmButtonProps } from "@/components/ui/sureui/confirm-button"
 import type { ConfirmCloseOptions } from "@/components/ui/sureui/confirm-close"
 import type { ConfirmDialogProps } from "@/components/ui/sureui/confirm-dialog"
 import type { ConfirmPopoverProps } from "@/components/ui/sureui/confirm-popover"
 import type { ConfirmMenuItemProps } from "@/components/ui/sureui/confirm-menu-item"
+import type { ConfirmSwitchProps } from "@/components/ui/sureui/confirm-switch"
 import type {
   ConsequencesItemProps,
   ConsequencesProps,
@@ -293,9 +295,27 @@ const toolApprovalBatch = {
   className: true,
 } satisfies Record<keyof ToolApprovalBatchProps, true>
 
+const confirmSwitch = {
+  onConfirm: true,
+  onCancel: true,
+  onConfirmError: true,
+  onCheckedChange: true,
+  confirmWhen: true,
+  undoIndicator: true,
+  undo: true,
+  pauseUndoOnHover: true,
+  pauseUndoOnFocus: true,
+  announcements: true,
+} satisfies Record<
+  | Exclude<keyof ConfirmSwitchProps, keyof React.ComponentProps<typeof Switch>>
+  | "onCheckedChange",
+  true
+>
+
 const documented = {
   ConfirmButton: confirmButton,
   ConfirmMenuItem: confirmMenuItem,
+  ConfirmSwitch: confirmSwitch,
   TypeToConfirm: typeToConfirm,
   ConfirmDialog: confirmDialog,
   ConfirmPopover: confirmPopover,

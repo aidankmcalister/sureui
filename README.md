@@ -18,6 +18,7 @@ When every action opens an "Are you sure?" dialog, people stop reading and confi
 | ------------------- | --------------------------------------------------------------------------- |
 | `ConfirmButton`     | Confirms on a click, a second click or a press and hold, with optional undo |
 | `ConfirmMenuItem`   | The same gestures in dropdown and context menus                             |
+| `ConfirmSwitch`     | A switch that moves right away and can be flipped back to undo              |
 | `TypeToConfirm`     | Unlocks only after the exact phrase is typed                                |
 | `ConfirmDialog`     | An alert dialog around any confirmation, with an awaitable `useConfirm`     |
 | `ConfirmPopover`    | A one-line confirmation anchored to its trigger                             |

@@ -17,22 +17,28 @@ function prefersReducedMotion() {
   )
 }
 
-function playFill(element: HTMLElement | null, fill: Fill) {
-  if (typeof element?.animate !== "function") return null
-  const animation = element.animate(
-    [{ scale: `${fill.from} 1` }, { scale: `${fill.to} 1` }],
-    {
-      duration: fill.duration,
-      easing: prefersReducedMotion() ? "step-end" : (fill.easing ?? "linear"),
-      fill: "forwards",
-    }
-  )
+function keyframes(element: Element, fill: Fill) {
+  if (element instanceof SVGElement)
+    return [
+      { strokeDashoffset: `${1 - fill.from}` },
+      { strokeDashoffset: `${1 - fill.to}` },
+    ]
+  return [{ scale: `${fill.from} 1` }, { scale: `${fill.to} 1` }]
+}
+
+function playFill(element: Element | null, fill: Fill) {
+  if (!element || typeof element.animate !== "function") return null
+  const animation = element.animate(keyframes(element, fill), {
+    duration: fill.duration,
+    easing: prefersReducedMotion() ? "step-end" : (fill.easing ?? "linear"),
+    fill: "forwards",
+  })
   animation.currentTime = performance.now() - fill.startedAt
   return animation
 }
 
 function useFill(
-  ref: React.RefObject<HTMLElement | null>,
+  ref: React.RefObject<Element | null>,
   fill: Fill | null,
   paused: boolean
 ) {

@@ -1,0 +1,63 @@
+---
+title: Confirm Switch
+description: A switch that moves right away and can be flipped back during the undo window.
+---
+
+<Example name="confirm-switch/demo" />
+
+## Installation
+
+<Install args="add @sureui/confirm-switch" />
+
+## Usage
+
+```tsx
+import { ConfirmSwitch } from "@/components/ui/sureui/confirm-switch"
+
+<ConfirmSwitch onConfirm={(checked) => setPublic(checked)} />
+```
+
+The switch moves as soon as it's flipped, and a small timer in its thumb empties while the undo window runs. Flipping it again during the window puts it back and calls `onCancel`. When the window ends, `onConfirm` runs with the new value and `onCheckedChange` follows.
+
+If `onConfirm` returns a promise, the switch stays pending until it settles. If it fails, the switch goes back.
+
+## Examples
+
+### One direction
+
+`confirmWhen="off"` only gives turning off an undo window. Turning on runs `onConfirm` right away. `confirmWhen="on"` does the opposite.
+
+<Example name="confirm-switch/confirm-when" />
+
+### Ring
+
+`undoIndicator="ring"` draws the timer as a ring around the switch instead of in the thumb.
+
+<Example name="confirm-switch/ring" />
+
+## API reference
+
+### ConfirmSwitch
+
+Extends the shadcn [`Switch`](https://ui.shadcn.com/docs/components/base/switch). The table lists the props it adds or changes.
+
+| Prop | Type | Default |
+| --- | --- | --- |
+| `onConfirm` | `(checked: boolean) => void \| Promise<unknown>` | required |
+| `onCancel` | `() => void` | — |
+| `onConfirmError` | `(error: unknown) => void` | — |
+| `onCheckedChange` | `(checked: boolean) => void` | — |
+| `confirmWhen` | `"on" \| "off" \| "both"` | `"both"` |
+| `undoIndicator` | `"thumb" \| "ring"` | `"thumb"` |
+| `undo` | `boolean \| number \| "manual"` | `true` |
+| `pauseUndoOnHover` | `boolean` | `true` |
+| `pauseUndoOnFocus` | `boolean` | `true` |
+| `announcements` | `{ undo?, error? }` | — |
+
+`onCheckedChange` runs only once a change is confirmed, not when the switch first moves.
+
+## Accessibility
+
+- It's a native `button` with the `switch` role, so Space and Enter flip it.
+- `aria-checked` follows the switch's position, including during the undo window.
+- The undo window and a failure are announced in a polite live region. Change the text with `announcements`.

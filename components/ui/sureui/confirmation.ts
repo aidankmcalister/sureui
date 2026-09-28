@@ -305,7 +305,10 @@ function useConfirmationMachine(
   }
 }
 
-function useConfirmation<T extends Element = HTMLElement>({
+function useConfirmation<
+  T extends Element = HTMLElement,
+  F extends Element = HTMLSpanElement,
+>({
   gesture = "click",
   timeout = 3000,
   duration = 1200,
@@ -332,7 +335,7 @@ function useConfirmation<T extends Element = HTMLElement>({
     resumeUndo,
     reset,
   } = useConfirmationMachine(options, triggerRef)
-  const fillRef = React.useRef<HTMLSpanElement>(null)
+  const fillRef = React.useRef<F>(null)
   useFill(fillRef, fill, paused)
   const armDelayRef = React.useRef(armDelay)
   const quietRef = React.useRef(false)

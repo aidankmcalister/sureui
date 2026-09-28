@@ -75,6 +75,41 @@
       ]
     },
     {
+      "name": "confirm-switch",
+      "type": "registry:ui",
+      "title": "Confirm Switch",
+      "description": "A Switch that moves right away and can be taken back: flipping it again during the undo window undoes it, and onConfirm(checked) runs when the window ends.",
+      "registryDependencies": [
+        "switch"
+      ],
+      "files": [
+        {
+          "path": "components/ui/sureui/fill.ts",
+          "type": "registry:lib",
+          "target": "@ui/sureui/fill.ts"
+        },
+        {
+          "path": "components/ui/sureui/undo-window.ts",
+          "type": "registry:lib",
+          "target": "@ui/sureui/undo-window.ts"
+        },
+        {
+          "path": "components/ui/sureui/confirmation.ts",
+          "type": "registry:lib",
+          "target": "@ui/sureui/confirmation.ts"
+        },
+        {
+          "path": "components/ui/sureui/confirm-switch.tsx",
+          "type": "registry:ui",
+          "target": "@ui/sureui/confirm-switch.tsx"
+        }
+      ],
+      "categories": [
+        "confirmation",
+        "switch"
+      ]
+    },
+    {
       "name": "type-to-confirm",
       "type": "registry:ui",
       "title": "Type to Confirm",
