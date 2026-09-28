@@ -17,6 +17,7 @@ type TypeToConfirmProps = ConfirmationOptions & {
   caseSensitive?: boolean
   trim?: boolean
   label?: React.ReactNode
+  consequences?: React.ReactNode
   announcements?: {
     match?: string
     undo?: string
@@ -43,6 +44,7 @@ function TypeToConfirm({
   caseSensitive = true,
   trim = false,
   label,
+  consequences,
   announcements,
   confirmLabel = "Confirm",
   undoLabel = "Undo",
@@ -108,6 +110,7 @@ function TypeToConfirm({
         if (ready && isIdle(buttonRef.current)) buttonRef.current?.click()
       }}
     >
+      {consequences}
       <div className="grid gap-2">
         <Label htmlFor={inputId} className="block leading-normal">
           {label ?? (

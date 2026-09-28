@@ -8,6 +8,7 @@ export const items = [
   "type-to-confirm",
   "confirm-dialog",
   "confirm-popover",
+  "consequences",
   "undo-toast",
   "undoable",
 ]
