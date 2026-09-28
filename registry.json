@@ -420,6 +420,32 @@
         }
       ],
       "categories": ["block", "settings"]
+    },
+    {
+      "name": "file-manager-01",
+      "type": "registry:block",
+      "title": "File Manager",
+      "description": "A file list where selected files move to trash with an undo toast, a Trash tab that restores them one at a time, and an Empty trash dialog that lists what goes and asks you to type a phrase.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": [
+        "@sureui/confirm-dialog",
+        "@sureui/consequences",
+        "@sureui/undo-toast",
+        "badge",
+        "button",
+        "card",
+        "checkbox",
+        "empty",
+        "tabs"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/file-manager-01/file-manager.tsx",
+          "type": "registry:component",
+          "target": "@components/file-manager.tsx"
+        }
+      ],
+      "categories": ["block", "files"]
     }
   ]
 }

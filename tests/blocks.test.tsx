@@ -6,11 +6,13 @@ import {
   waitFor,
   within,
 } from "@testing-library/react"
+import { toast, Toaster } from "sonner"
 import { describe, expect, it, vi } from "vitest"
 
 import { ApiKeys } from "@/components/blocks/api-keys-01/api-keys"
 import { DangerZone } from "@/components/blocks/danger-zone-01/danger-zone"
 import { DeleteAccount } from "@/components/blocks/delete-account-01/delete-account"
+import { FileManager } from "@/components/blocks/file-manager-01/file-manager"
 import { TeamMembers } from "@/components/blocks/team-members-01/team-members"
 import { blockDemoNames } from "@/components/site/blocks/demos"
 import { blocks } from "@/lib/site/blocks"
@@ -207,5 +209,75 @@ describe("team-members-01", () => {
     fireEvent.click(screen.getByRole("button", { name: "Actions for Sam Lee" }))
     await screen.findByRole("menuitem", { name: "Remove from team" })
     expect(screen.queryByRole("menuitem", { name: "Make owner" })).toBeNull()
+  })
+})
+
+describe("file-manager-01", () => {
+  function names(list: string) {
+    return within(screen.getByRole("list", { name: list }))
+      .getAllByRole("listitem")
+      .map((item) => item.textContent)
+  }
+
+  it("moves files to trash with an undo toast", async () => {
+    render(
+      <>
+        <FileManager />
+        <Toaster />
+      </>
+    )
+    fireEvent.click(screen.getByRole("checkbox", { name: /q3-report\.pdf/ }))
+    fireEvent.click(screen.getByRole("checkbox", { name: /meeting-notes\.md/ }))
+    fireEvent.click(screen.getByRole("button", { name: "Move to trash" }))
+    await screen.findByText("Moved 2 files to trash")
+    expect(names("Files").join()).not.toMatch(/q3-report|meeting-notes/)
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }))
+    await waitFor(() =>
+      expect(names("Files").join()).toMatch(/q3-report.*meeting-notes/)
+    )
+    act(() => {
+      toast.dismiss()
+    })
+  })
+
+  it("restores from the Trash tab after the toast is gone", async () => {
+    render(
+      <>
+        <FileManager />
+        <Toaster />
+      </>
+    )
+    fireEvent.click(screen.getByRole("checkbox", { name: /q3-report\.pdf/ }))
+    fireEvent.click(screen.getByRole("button", { name: "Move to trash" }))
+    await screen.findByText("Moved q3-report.pdf to trash")
+    act(() => {
+      toast.dismiss()
+    })
+    fireEvent.click(screen.getByRole("tab", { name: /Trash/ }))
+    await waitFor(() => expect(names("Trash").join()).toMatch(/q3-report/))
+    fireEvent.click(
+      screen.getByRole("button", { name: "Restore q3-report.pdf" })
+    )
+    fireEvent.click(screen.getByRole("tab", { name: "Files" }))
+    await waitFor(() => expect(names("Files").join()).toMatch(/q3-report/))
+  })
+
+  it("empties the trash only after the phrase is typed", async () => {
+    render(<FileManager />)
+    fireEvent.click(screen.getByRole("tab", { name: /Trash/ }))
+    fireEvent.click(await screen.findByRole("button", { name: "Empty trash" }))
+    const dialog = await screen.findByRole("alertdialog")
+    const list = within(dialog).getByRole("list", {
+      name: "What gets deleted",
+    })
+    expect(within(list).getByText("old-logo.svg, draft-v1.docx")).toBeTruthy()
+    const confirm = within(dialog).getByRole("button", { name: "Empty trash" })
+    expect(confirm.hasAttribute("disabled")).toBe(true)
+    fireEvent.change(within(dialog).getByRole("textbox"), {
+      target: { value: "empty trash" },
+    })
+    await waitFor(() => expect(confirm.hasAttribute("disabled")).toBe(false))
+    fireEvent.click(confirm)
+    await screen.findByText("Trash is empty", undefined, settled)
   })
 })

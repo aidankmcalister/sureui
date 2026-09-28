@@ -9,6 +9,7 @@ export type BlockAction = {
 
 type BlockNote = {
   name: string
+  setup?: string
   actions: BlockAction[]
 }
 
@@ -86,6 +87,28 @@ const notes: BlockNote[] = [
         action: "Make owner",
         style: "dialogs",
         why: "It changes what two people can do, and you can't take it back yourself. The dialog says what the new owner gets and what you lose before anything changes.",
+      },
+    ],
+  },
+  {
+    name: "file-manager-01",
+    setup:
+      "The undo toast needs the shadcn `<Toaster />` in your root layout. Without it, files move to trash with no Undo.",
+    actions: [
+      {
+        action: "Move to trash",
+        style: "undo",
+        why: "Trashing is routine and easy to reverse, so it runs on one click. The files leave the list, so the Undo lives in a toast instead of on a control that is gone.",
+      },
+      {
+        action: "Restore",
+        style: null,
+        why: "Restoring puts a file back, so it runs on one click. The Trash tab is a second way back once the toast has closed, so getting files back never depends on catching a timed toast (WCAG 2.2.1, Timing Adjustable).",
+      },
+      {
+        action: "Empty trash",
+        style: "type-to-confirm",
+        why: "It deletes every file in the trash for good. The dialog lists them and asks you to type empty trash before it unlocks.",
       },
     ],
   },

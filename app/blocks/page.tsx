@@ -103,6 +103,11 @@ function BlockSection({ block, index }: { block: Block; index: number }) {
             ))}{" "}
             and the SureUI components it uses.
           </p>
+          {block.setup && (
+            <p className="text-sm text-pretty text-(--ink-muted) [&_code]:font-mono [&_code]:text-[0.9em] [&_code]:text-(--ink)">
+              <InlineCode>{block.setup}</InlineCode>
+            </p>
+          )}
         </div>
       </div>
     </section>
