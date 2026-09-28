@@ -1,4 +1,4 @@
-import { addArgs, items, siteUrl } from "@/lib/site/config"
+import { addArgs, githubUrl, items, siteUrl } from "@/lib/site/config"
 import { styles } from "@/lib/site/styles"
 
 export const intro = [
@@ -87,6 +87,35 @@ export default function RootLayout({ children }) {
   },
 ]
 
+export const agentRules = {
+  intro: {
+    label: "What it is",
+    paragraphs: [
+      "Coding agents tend to put every delete behind an alert dialog. The agent rules give them the questions from the Which one page, in order, with install commands and usage for each style and the contract every control shares.",
+      "The rules are generated from the same data as these docs, so they change when the docs do.",
+    ],
+  },
+  shadcn: {
+    label: "Install with shadcn",
+    body: "With the `@sureui` registry in your `components.json`, add the `rules` item. It writes a Cursor rule to `.cursor/rules/sureui.mdc` and a Claude Code skill to `.claude/skills/sureui/SKILL.md`.",
+    command: addArgs(["rules"]),
+  },
+  skill: {
+    label: "Install as a skill",
+    body: "The same rules are an agent skill in the SureUI repository. The skills CLI asks which agents to install it for.",
+    command: `npx skills add ${githubUrl.replace("https://github.com/", "")}`,
+  },
+  contents: {
+    label: "What's in it",
+    items: [
+      "The five questions, in order, each with examples and when to use something else.",
+      "What counts as reversible, so a delete that can't be restored doesn't get Undo.",
+      "The install command, usage and behavior of each style.",
+      "The shared contract: `onConfirm`, `onCancel`, `undo` and `data-state`.",
+    ],
+  },
+}
+
 const docs = [
   {
     href: "/docs",
@@ -115,6 +144,13 @@ const docs = [
     title: "Which one should I use?",
     group: "Guides",
     lead: "A quick guide, if you're not sure where to start.",
+  },
+  {
+    href: "/docs/agent-rules",
+    slug: "agent-rules",
+    title: "Agent rules",
+    group: "Guides",
+    lead: "Rules that tell coding agents which style fits an action, installed with the shadcn CLI or as a skill.",
   },
 ]
 

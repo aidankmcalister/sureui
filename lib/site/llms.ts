@@ -1,6 +1,7 @@
 import registry from "@/registry.json"
 import { addArgs, siteUrl } from "@/lib/site/config"
 import {
+  agentRules,
   contract,
   contractNote,
   installSteps,
@@ -103,6 +104,20 @@ function bodies(page: Page) {
       "## One contract",
       contractNote,
       code("tsx", contract),
+    ]
+  }
+  if (page.slug === "agent-rules") {
+    return [
+      `## ${agentRules.intro.label}`,
+      agentRules.intro.paragraphs.join("\n\n"),
+      `## ${agentRules.shadcn.label}`,
+      agentRules.shadcn.body,
+      command(agentRules.shadcn.command),
+      `## ${agentRules.skill.label}`,
+      agentRules.skill.body,
+      code("bash", agentRules.skill.command),
+      `## ${agentRules.contents.label}`,
+      list(agentRules.contents.items),
     ]
   }
   if (page.slug === "installation") {

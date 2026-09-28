@@ -4,6 +4,8 @@ import { describe, expect, it } from "vitest"
 import registry from "@/registry.json"
 import prompts from "@/tests/fixtures/rules-prompts.json"
 import { addArgs } from "@/lib/site/config"
+import { pageMarkdown } from "@/lib/site/llms"
+import { getPage } from "@/lib/site/pages"
 import { ruleFiles, rulesBody } from "@/lib/site/rules"
 import { styles } from "@/lib/site/styles"
 
@@ -38,5 +40,11 @@ describe("agent rules", () => {
     expect(new Set(prompts.map(({ expected }) => expected))).toEqual(
       new Set(slugs)
     )
+  })
+
+  it("the guide shows both ways to install", () => {
+    const markdown = pageMarkdown(getPage("/docs/agent-rules")!)
+    expect(markdown).toContain("npx shadcn@latest add @sureui/rules")
+    expect(markdown).toContain("npx skills add aidankmcalister/sureui")
   })
 })
