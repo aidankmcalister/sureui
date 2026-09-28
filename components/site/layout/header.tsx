@@ -1,12 +1,12 @@
 import Link from "next/link"
 
-import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Band, Label, tapTarget } from "@/components/site/layout/frame"
 import { GitHubIcon } from "@/components/site/layout/github-icon"
 import { SiteLink } from "@/components/site/layout/site-link"
 import { githubUrl } from "@/lib/site/config"
 import { ThemeToggle } from "@/components/site/layout/theme-toggle"
+import { siteButton } from "@/components/site/ui/button"
 
 const links = [
   { href: "/docs", label: "Docs" },
@@ -38,7 +38,7 @@ export function Header() {
         <SiteLink
           href={githubUrl}
           aria-label="GitHub"
-          className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
+          className={siteButton({ variant: "ghost", size: "icon" })}
         >
           <GitHubIcon />
         </SiteLink>

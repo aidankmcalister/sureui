@@ -28,7 +28,7 @@ export function FramedTable({
               <th
                 key={column.label}
                 scope="col"
-                className="h-10 px-4 font-normal"
+                className="px-4 pt-3.5 pb-2.5 align-bottom font-normal"
               >
                 <Label>{column.label}</Label>
               </th>

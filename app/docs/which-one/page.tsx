@@ -43,10 +43,12 @@ export default function WhichOne() {
       <DocsSection label="At a glance">
         <FramedTable
           columns={[
-            { label: "Style", width: "22%", className: "font-medium" },
+            { label: "Style", width: "20%", className: "font-medium" },
             ...columns.map((column) => ({
               label: column.label,
-              width: column.key === "bestFor" ? "36%" : "21%",
+              width: { interrupts: "20%", reads: "25%", bestFor: "35%" }[
+                column.key
+              ],
               className: "text-(--ink-muted)",
             })),
           ]}

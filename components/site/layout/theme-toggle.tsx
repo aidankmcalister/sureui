@@ -3,20 +3,20 @@
 import { MoonIcon, SunIcon } from "lucide-react"
 import { useTheme } from "next-themes"
 
-import { Button } from "@/components/ui/button"
+import { SiteButton } from "@/components/site/ui/button"
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme()
 
   return (
-    <Button
+    <SiteButton
       variant="ghost"
-      size="icon-sm"
+      size="icon"
       aria-label="Toggle theme"
       onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
     >
       <SunIcon className="hidden dark:block" />
       <MoonIcon className="dark:hidden" />
-    </Button>
+    </SiteButton>
   )
 }

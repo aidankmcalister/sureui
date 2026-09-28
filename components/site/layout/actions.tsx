@@ -1,8 +1,8 @@
 import Link from "next/link"
 
-import { buttonVariants } from "@/components/ui/button"
 import { GitHubIcon } from "@/components/site/layout/github-icon"
 import { SiteLink } from "@/components/site/layout/site-link"
+import { siteButton } from "@/components/site/ui/button"
 import { githubUrl } from "@/lib/site/config"
 
 export function Actions() {
@@ -10,14 +10,14 @@ export function Actions() {
     <div className="flex gap-2">
       <Link
         href="/docs/installation"
-        className={buttonVariants({ size: "lg" })}
+        className={siteButton({ variant: "primary", size: "lg" })}
       >
         Get started
       </Link>
       <SiteLink
         href={githubUrl}
         aria-label="GitHub"
-        className={buttonVariants({ variant: "outline", size: "icon-lg" })}
+        className={siteButton({ size: "icon-lg" })}
       >
         <GitHubIcon />
       </SiteLink>

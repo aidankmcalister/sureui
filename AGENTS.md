@@ -23,6 +23,7 @@ A shadcn/ui registry of confirmation controls. Read `CONTEXT.md` for the vocabul
   - `components/site/layout/` header, footer and page frame; `docs/` docs page pieces and demos; `code/` code blocks and install commands; `home/` the home page and its examples; `og/` the Open Graph card.
   - `lib/site/` holds the content, not components: `config.ts` (URLs, registry items), `styles.ts` (one entry per confirmation style, with its props and behavior), `pages.ts` (docs pages and their copy), `llms.ts` (builds `llms.txt` and the markdown pages from that data).
   - Docs copy lives in `lib/site/`, so the HTML pages and `llms.txt` never disagree. Edit it there, not in the page files.
+  - The site has its own look, separate from the product. SureUI's controls are built on stock shadcn, so site chrome must never use stock `components/ui/*`: use `components/site/ui/` (site button, tabs, drawer, built on Base UI) and the frame pieces in `components/site/layout/frame.tsx`. Only the demos in `components/site/docs/demos.tsx` and the home examples render stock shadcn, because they show the product.
 - `tests/` holds Vitest tests. `tests/registry.test.ts` guards `registry.json`.
 
 ## Rules for registry code

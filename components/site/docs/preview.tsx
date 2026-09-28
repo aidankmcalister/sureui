@@ -2,7 +2,12 @@
 
 import * as React from "react"
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  SiteTab,
+  SiteTabPanel,
+  SiteTabs,
+  SiteTabsList,
+} from "@/components/site/ui/tabs"
 import { Label } from "@/components/site/layout/frame"
 
 const ReportContext = React.createContext<(entry: string) => void>(() => {})
@@ -24,19 +29,15 @@ export function Preview({
 
   return (
     <div className="border border-(--rule) bg-(--well) text-foreground">
-      <Tabs defaultValue="preview" className="gap-0">
+      <SiteTabs defaultValue="preview">
         <div className="flex h-10 items-center justify-between gap-4 border-b border-(--rule) pr-4 pl-2">
-          <TabsList variant="line">
-            <TabsTrigger value="preview" className="font-mono text-xs">
-              Preview
-            </TabsTrigger>
-            <TabsTrigger value="code" className="font-mono text-xs">
-              Code
-            </TabsTrigger>
-          </TabsList>
+          <SiteTabsList>
+            <SiteTab value="preview">Preview</SiteTab>
+            <SiteTab value="code">Code</SiteTab>
+          </SiteTabsList>
           <Label>Fig. {figure}</Label>
         </div>
-        <TabsContent value="preview">
+        <SiteTabPanel value="preview">
           <ReportContext value={setEntry}>
             <div className="flex min-h-64 items-center justify-center p-6">
               {children}
@@ -49,9 +50,9 @@ export function Preview({
             <Label>Await log</Label>
             <span className="text-(--ink)">{entry}</span>
           </p>
-        </TabsContent>
-        <TabsContent value="code">{code}</TabsContent>
-      </Tabs>
+        </SiteTabPanel>
+        <SiteTabPanel value="code">{code}</SiteTabPanel>
+      </SiteTabs>
     </div>
   )
 }

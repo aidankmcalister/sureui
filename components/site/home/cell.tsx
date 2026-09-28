@@ -55,7 +55,7 @@ export function Cell({
           {description}
         </p>
       </div>
-      <div className="mt-auto rounded-lg border bg-(--well) p-5 text-foreground">
+      <div className="mt-auto border border-(--rule) bg-(--well) p-5 text-foreground">
         {children}
       </div>
     </article>

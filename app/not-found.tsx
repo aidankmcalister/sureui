@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 
-import { buttonVariants } from "@/components/ui/button"
 import { Band } from "@/components/site/layout/frame"
+import { siteButton } from "@/components/site/ui/button"
 
 export const metadata: Metadata = { title: "Page not found" }
 
@@ -22,13 +22,13 @@ export default function NotFound() {
           the home page are both a click away.
         </p>
         <div className="flex flex-wrap gap-2">
-          <Link href="/docs" className={buttonVariants({ size: "lg" })}>
+          <Link
+            href="/docs"
+            className={siteButton({ variant: "primary", size: "lg" })}
+          >
             Read the docs
           </Link>
-          <Link
-            href="/"
-            className={buttonVariants({ variant: "outline", size: "lg" })}
-          >
+          <Link href="/" className={siteButton({ size: "lg" })}>
             Go home
           </Link>
         </div>
