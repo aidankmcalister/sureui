@@ -145,7 +145,9 @@ const demos: Record<string, () => React.ReactNode> = {
   "type-to-confirm": TypeToConfirmDemo,
 }
 
+export const demoSlugs = Object.keys(demos)
+
 export function Demo({ slug }: { slug: string }) {
   const Component = demos[slug]
-  return <Component />
+  return Component ? <Component /> : null
 }

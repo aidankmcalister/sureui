@@ -8,7 +8,13 @@ import {
   pages,
   type Page,
 } from "@/lib/site/pages"
-import { styles, type Style } from "@/lib/site/styles"
+import {
+  sectionsFor,
+  styles,
+  whenLabels,
+  type Style,
+  type StyleSectionId,
+} from "@/lib/site/styles"
 
 const description =
   "Confirmation components for shadcn/ui: undo, click again, hold, type to confirm and dialogs. Installed with the shadcn CLI from the `@sureui` registry and built on Base UI."
@@ -44,15 +50,12 @@ function list(items: string[]) {
   return items.map((item) => `- ${item}`).join("\n")
 }
 
-function styleBody(style: Style) {
-  return [
-    "## Installation",
-    command(addArgs(style.items)),
-    "## Usage",
-    code("tsx", style.usage),
-    ...(style.behavior ? ["## How it behaves", list(style.behavior)] : []),
-    "## Props",
-    ...style.api.flatMap((api) => [
+function styleSection(style: Style, id: StyleSectionId) {
+  if (id === "installation") return [command(addArgs(style.items))]
+  if (id === "usage") return [code("tsx", style.usage)]
+  if (id === "behavior") return [list(style.behavior ?? [])]
+  if (id === "props") {
+    return style.api.flatMap((api) => [
       ...(style.api.length > 1 ? [`### ${api.name}`] : []),
       table(
         ["Prop", "Type", "Default"],
@@ -62,10 +65,12 @@ function styleBody(style: Style) {
           value,
         ])
       ),
-    ]),
-    "## Use it when",
+    ])
+  }
+  return [
+    `### ${whenLabels.use}`,
     list(style.useWhen),
-    "## Reach for something else when",
+    `### ${whenLabels.instead}`,
     list(
       style.instead.map((item) => {
         const other = styles.find((entry) => entry.slug === item.slug)
@@ -73,6 +78,13 @@ function styleBody(style: Style) {
       })
     ),
   ]
+}
+
+function styleBody(style: Style) {
+  return sectionsFor(style).flatMap((section) => [
+    `## ${section.label}`,
+    ...styleSection(style, section.id),
+  ])
 }
 
 function bodies(page: Page) {

@@ -14,7 +14,7 @@ import { Preview } from "@/components/site/docs/preview"
 import { PropsTable } from "@/components/site/docs/props-table"
 import { InstallCommand } from "@/components/site/code/install-command"
 import { addArgs } from "@/lib/site/config"
-import { getStyle, styles } from "@/lib/site/styles"
+import { getStyle, sectionsFor, styles, whenLabels } from "@/lib/site/styles"
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -44,59 +44,63 @@ export default async function StylePage({ params }: Props) {
           <Demo slug={style.slug} />
         </Preview>
       </DocsHeader>
-      <DocsSection label="Installation">
-        <InstallCommand args={addArgs(style.items)} />
-      </DocsSection>
-      <DocsSection label="Usage">
-        <Code>{style.usage}</Code>
-      </DocsSection>
-      {style.behavior && (
-        <DocsSection label="How it behaves">
-          <ul className="grid max-w-160 list-disc gap-3 pl-5 text-sm text-pretty marker:text-(--ink-label)">
-            {style.behavior.map((item) => (
-              <li key={item}>{item}</li>
+      {sectionsFor(style).map((section) => (
+        <DocsSection
+          key={section.id}
+          label={section.label}
+          className={section.id === "props" ? "gap-6" : undefined}
+        >
+          {section.id === "installation" && (
+            <InstallCommand args={addArgs(style.items)} />
+          )}
+          {section.id === "usage" && <Code>{style.usage}</Code>}
+          {section.id === "behavior" && (
+            <ul className="grid max-w-160 list-disc gap-3 pl-5 text-sm text-pretty marker:text-(--ink-label)">
+              {(style.behavior ?? []).map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          )}
+          {section.id === "props" &&
+            style.api.map((api) => (
+              <div key={api.name} className="grid gap-3">
+                {style.api.length > 1 && (
+                  <h3 className="font-mono text-sm font-medium">{api.name}</h3>
+                )}
+                <PropsTable rows={api.rows} />
+              </div>
             ))}
-          </ul>
+          {section.id === "when" && (
+            <div className="grid gap-px border border-(--rule) bg-(--rule) md:grid-cols-2">
+              <div className="grid content-start gap-4 bg-(--paper) p-5">
+                <Label>{whenLabels.use}</Label>
+                <ul className="grid gap-3 text-sm">
+                  {style.useWhen.map((item) => (
+                    <li key={item} className="flex gap-3">
+                      <CheckIcon className="mt-0.5 size-4 shrink-0 text-(--ink-label)" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="grid content-start gap-4 bg-(--paper) p-5">
+                <Label>{whenLabels.instead}</Label>
+                <ul className="grid gap-3 text-sm">
+                  {style.instead.map((item) => (
+                    <li key={item.slug} className="grid gap-0.5">
+                      <span className="text-(--ink-muted)">{item.when}</span>
+                      <StyleLink slug={item.slug}>
+                        {styles.find((other) => other.slug === item.slug)?.name}{" "}
+                        →
+                      </StyleLink>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          )}
         </DocsSection>
-      )}
-      <DocsSection label="Props" className="gap-6">
-        {style.api.map((api) => (
-          <div key={api.name} className="grid gap-3">
-            {style.api.length > 1 && (
-              <h3 className="font-mono text-sm font-medium">{api.name}</h3>
-            )}
-            <PropsTable rows={api.rows} />
-          </div>
-        ))}
-      </DocsSection>
-      <DocsSection label="When to use it">
-        <div className="grid gap-px border border-(--rule) bg-(--rule) md:grid-cols-2">
-          <div className="grid content-start gap-4 bg-(--paper) p-5">
-            <Label>Use it when</Label>
-            <ul className="grid gap-3 text-sm">
-              {style.useWhen.map((item) => (
-                <li key={item} className="flex gap-3">
-                  <CheckIcon className="mt-0.5 size-4 shrink-0 text-(--ink-label)" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="grid content-start gap-4 bg-(--paper) p-5">
-            <Label>Reach for something else when</Label>
-            <ul className="grid gap-3 text-sm">
-              {style.instead.map((item) => (
-                <li key={item.slug} className="grid gap-0.5">
-                  <span className="text-(--ink-muted)">{item.when}</span>
-                  <StyleLink slug={item.slug}>
-                    {styles.find((other) => other.slug === item.slug)?.name} →
-                  </StyleLink>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </DocsSection>
+      ))}
     </>
   )
 }
