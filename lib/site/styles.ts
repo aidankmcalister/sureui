@@ -102,7 +102,7 @@ if (await undoToast("Moved 3 files to trash")) {
     interrupts: "No",
     reads: "No",
     bestFor: "Single rows in a list",
-    items: ["confirm-button", "confirm-menu-item"],
+    items: ["confirm-button"],
     usage: `<ConfirmButton gesture="click-again" onConfirm={archive}>
   Archive
 </ConfirmButton>
@@ -160,7 +160,7 @@ if (await undoToast("Moved 3 files to trash")) {
       "The button disarms after timeout, 3 seconds by default, or when focus leaves it. Keep it armed on blur with cancelOnBlur={false}.",
       "Key-repeat clicks are ignored, so holding Enter can't arm and confirm in one go.",
       "While a promise from onConfirm is pending, the button is disabled but keeps focus.",
-      'In a DropdownMenu or ContextMenu, use ConfirmMenuItem (menu="context" for a context menu). The menu stays open while the item is armed, pending or showing Undo, and closes once the action commits or Undo is pressed. Keep it open with closeOnConfirm={false} or closeOnUndo={false}.',
+      'In a DropdownMenu or ContextMenu, use ConfirmMenuItem, added with @sureui/confirm-menu-item (menu="context" for a context menu). The menu stays open while the item is armed, pending or showing Undo, and closes once the action commits or Undo is pressed. Keep it open with closeOnConfirm={false} or closeOnUndo={false}.',
       "Menus move focus with the highlight, so pointing at or arrowing to another item disarms a ConfirmMenuItem, like any blur.",
       "Closing the menu during the undo window, with Escape or a click outside, commits the action, because Undo closes with it. Set commitUndoOnClose={false} to drop it instead.",
     ],
@@ -183,7 +183,7 @@ if (await undoToast("Moved 3 files to trash")) {
     interrupts: "No",
     reads: "No",
     bestFor: "Touch screens and small resets",
-    items: ["confirm-button", "confirm-menu-item"],
+    items: ["confirm-button"],
     usage: `<ConfirmButton gesture="hold" variant="destructive" onConfirm={revoke}>
   Hold to revoke
 </ConfirmButton>

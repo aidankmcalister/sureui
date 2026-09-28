@@ -208,11 +208,20 @@ npx shadcn@latest add @sureui/confirm-button
 <ConfirmButton gesture="click-again" onConfirm={archive}>
   Archive
 </ConfirmButton>
+
+<DropdownMenuContent>
+  <ConfirmMenuItem variant="destructive" onConfirm={remove}>
+    Delete
+  </ConfirmMenuItem>
+</DropdownMenuContent>
 ```
 
 - The button disarms after timeout, 3 seconds by default, or when focus leaves it. Keep it armed on blur with cancelOnBlur={false}.
 - Key-repeat clicks are ignored, so holding Enter can't arm and confirm in one go.
 - While a promise from onConfirm is pending, the button is disabled but keeps focus.
+- In a DropdownMenu or ContextMenu, use ConfirmMenuItem, added with @sureui/confirm-menu-item (menu="context" for a context menu). The menu stays open while the item is armed, pending or showing Undo, and closes once the action commits or Undo is pressed. Keep it open with closeOnConfirm={false} or closeOnUndo={false}.
+- Menus move focus with the highlight, so pointing at or arrowing to another item disarms a ConfirmMenuItem, like any blur.
+- Closing the menu during the undo window, with Escape or a click outside, commits the action, because Undo closes with it. Set commitUndoOnClose={false} to drop it instead.
 
 ### Hold
 
@@ -226,6 +235,10 @@ npx shadcn@latest add @sureui/confirm-button
 <ConfirmButton gesture="hold" variant="destructive" onConfirm={revoke}>
   Hold to revoke
 </ConfirmButton>
+
+<ConfirmMenuItem gesture="hold" variant="destructive" onConfirm={revoke}>
+  Hold to revoke
+</ConfirmMenuItem>
 ```
 
 - The fill takes 1.2 seconds by default. Anything under 0.8 seconds is raised to 0.8, because a shorter hold is easy to trigger with a slow tap.
@@ -235,3 +248,4 @@ npx shadcn@latest add @sureui/confirm-button
 - With undo, the Undo button runs on click, so pressing it and sliding off does nothing.
 - The context menu is blocked on the button so a long press on a phone doesn't open it.
 - With prefers-reduced-motion, fills don't animate: the hold fill appears when it completes and the undo fill clears when the window ends.
+- ConfirmMenuItem with gesture="hold" keeps its menu open while held and closes it once the action commits. Hold Enter or Space to confirm from the keyboard.
