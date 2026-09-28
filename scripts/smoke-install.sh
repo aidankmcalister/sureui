@@ -3,9 +3,17 @@ set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
 shadcn="$root/node_modules/.bin/shadcn"
-items=(confirm-button confirm-menu-item type-to-confirm confirm-dialog confirm-popover undo-toast rules)
-blocks=(danger-zone-01 api-keys-01 delete-account-01)
-block_files=(danger-zone.tsx api-keys.tsx create-key-dialog.tsx delete-account.tsx)
+list() {
+  node -e '
+    const registry = require(process.argv[1])
+    const blocks = process.argv[2] === "blocks"
+    for (const item of registry.items) {
+      if ((item.type === "registry:block") === blocks) console.log(item.name)
+    }
+  ' "$root/registry.json" "$1"
+}
+read -r -a items <<<"$(list items | tr "\n" " ")"
+read -r -a blocks <<<"$(list blocks | tr "\n" " ")"
 port=$((20000 + RANDOM % 20000))
 
 cd "$root"
@@ -57,16 +65,35 @@ for block in "${blocks[@]}"; do
   "$shadcn" add "@sureui/$block" --yes --overwrite --silent
 done
 
-for file in fill.ts undo-window.ts confirmation.ts confirm-button.tsx confirm-menu-item.tsx type-to-confirm.tsx confirm-dialog.tsx confirm-popover.tsx undo-toast.tsx; do
-  test -f "components/ui/sureui/$file" || { echo "Missing components/ui/sureui/$file"; exit 1; }
-done
-
-for file in "${block_files[@]}"; do
-  test -f "components/$file" || { echo "Missing components/$file"; exit 1; }
-done
-
-cmp .claude/skills/sureui/SKILL.md "$root/skills/sureui/SKILL.md"
-cmp .cursor/rules/sureui.mdc "$root/rules/sureui.mdc"
+node -e '
+  const fs = require("node:fs")
+  const path = require("node:path")
+  const [registryPath, root] = process.argv.slice(1)
+  const registry = require(registryPath)
+  const places = [
+    ["@ui/", "components/ui/"],
+    ["@components/", "components/"],
+    ["~/", ""],
+  ]
+  let missing = 0
+  for (const item of registry.items) {
+    for (const file of item.files) {
+      const [alias, dir] = places.find(([prefix]) => file.target.startsWith(prefix))
+      const installed = dir + file.target.slice(alias.length)
+      if (!fs.existsSync(installed)) {
+        console.log(`Missing ${installed} from ${item.name}`)
+        missing++
+      } else if (alias === "~/") {
+        const source = fs.readFileSync(path.join(root, file.path))
+        if (!source.equals(fs.readFileSync(installed))) {
+          console.log(`${installed} differs from ${file.path}`)
+          missing++
+        }
+      }
+    }
+  }
+  process.exit(missing ? 1 : 0)
+' "$root/registry.json" "$root"
 
 pnpm exec tsc --noEmit
 echo "All ${#items[@]} items and ${#blocks[@]} blocks installed and type-checked"

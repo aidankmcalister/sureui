@@ -39,6 +39,7 @@ type ConfirmPopoverProps = Pick<ConfirmationOptions, "onConfirm" | "onCancel"> &
       hold?: string
       ready?: string
       armed?: string
+      fallback?: string
     }
   }
 

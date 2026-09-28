@@ -120,6 +120,7 @@ const confirmPopover = {
   duration: true,
   confirmOnRelease: true,
   cancelHoldOnLeave: true,
+  holdFallback: true,
   announcements: true,
   side: true,
   align: true,

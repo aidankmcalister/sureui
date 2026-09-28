@@ -343,7 +343,8 @@ async function discard() {
           ["duration", "number", "1200, min 800"],
           ["confirmOnRelease", "boolean", "true"],
           ["cancelHoldOnLeave", "boolean", "true"],
-          ["announcements", "{ hold, ready, armed }", "—"],
+          ["holdFallback", '"click-again" | "none"', '"click-again"'],
+          ["announcements", "{ hold, ready, armed, fallback }", "—"],
           [
             "side",
             '"top" | "bottom" | "left" | "right" | "inline-start" | "inline-end"',
