@@ -7,6 +7,10 @@ import type { ConfirmButtonProps } from "@/components/ui/sureui/confirm-button"
 import type { ConfirmDialogProps } from "@/components/ui/sureui/confirm-dialog"
 import type { ConfirmPopoverProps } from "@/components/ui/sureui/confirm-popover"
 import type { ConfirmMenuItemProps } from "@/components/ui/sureui/confirm-menu-item"
+import type {
+  ConsequencesItemProps,
+  ConsequencesProps,
+} from "@/components/ui/sureui/consequences"
 import type { TypeToConfirmProps } from "@/components/ui/sureui/type-to-confirm"
 import type { UndoToastOptions } from "@/components/ui/sureui/undo-toast"
 import type { UndoableProps } from "@/components/ui/sureui/undoable"
@@ -130,6 +134,37 @@ const confirmPopover = {
   open: true,
   onOpenChange: true,
 } satisfies Record<keyof ConfirmPopoverProps, true>
+const consequences = {
+  items: true,
+  title: true,
+  variant: true,
+  limit: true,
+  expandable: true,
+  moreLabel: true,
+  lessLabel: true,
+  children: true,
+} satisfies Record<
+  Exclude<
+    keyof ConsequencesProps,
+    Exclude<keyof React.ComponentProps<"div">, "title" | "children">
+  >,
+  true
+>
+
+const consequencesItem = {
+  label: true,
+  count: true,
+  names: true,
+  icon: true,
+  description: true,
+  limit: true,
+  expandable: true,
+  moreLabel: true,
+  lessLabel: true,
+} satisfies Record<
+  Exclude<keyof ConsequencesItemProps, keyof React.ComponentProps<"li">>,
+  true
+>
 
 const undoToast = {
   message: true,
@@ -165,6 +200,8 @@ const documented = {
   TypeToConfirm: typeToConfirm,
   ConfirmDialog: confirmDialog,
   ConfirmPopover: confirmPopover,
+  Consequences: consequences,
+  ConsequencesItem: consequencesItem,
   "undoToast(message, options)": undoToast,
   Undoable: undoable,
 }
