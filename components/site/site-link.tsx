@@ -7,5 +7,6 @@ export function SiteLink({
   if (href.startsWith("http")) {
     return <a href={href} target="_blank" rel="noreferrer" {...props} />
   }
+  if (/\.\w+$/.test(href)) return <a href={href} {...props} />
   return <Link href={href} {...props} />
 }

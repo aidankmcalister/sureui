@@ -6,6 +6,7 @@ import { githubUrl } from "@/components/site/styles"
 
 const links = [
   { href: "/docs", label: "Docs" },
+  { href: "/llms.txt", label: "llms.txt" },
   { href: `${githubUrl}/issues`, label: "Issues" },
 ]
 
