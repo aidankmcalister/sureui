@@ -11,6 +11,11 @@
       "registryDependencies": ["button"],
       "files": [
         {
+          "path": "components/ui/sureui/fill.ts",
+          "type": "registry:lib",
+          "target": "@ui/sureui/fill.ts"
+        },
+        {
           "path": "components/ui/sureui/undo-window.ts",
           "type": "registry:lib",
           "target": "@ui/sureui/undo-window.ts"
@@ -35,6 +40,11 @@
       "description": "An inline form that only calls onConfirm after the exact phrase is typed and every acknowledgement is checked, with optional inline undo and an async pending state.",
       "registryDependencies": ["button", "checkbox", "input", "label"],
       "files": [
+        {
+          "path": "components/ui/sureui/fill.ts",
+          "type": "registry:lib",
+          "target": "@ui/sureui/fill.ts"
+        },
         {
           "path": "components/ui/sureui/undo-window.ts",
           "type": "registry:lib",
@@ -65,6 +75,11 @@
       "description": "An optional alert dialog that wraps a ConfirmButton or TypeToConfirm as its confirm action, closing only after an async onConfirm settles. Includes useConfirm, which returns an awaitable confirm() and a dialog element you render yourself.",
       "registryDependencies": ["alert-dialog", "button", "checkbox", "input", "label"],
       "files": [
+        {
+          "path": "components/ui/sureui/fill.ts",
+          "type": "registry:lib",
+          "target": "@ui/sureui/fill.ts"
+        },
         {
           "path": "components/ui/sureui/undo-window.ts",
           "type": "registry:lib",
@@ -101,6 +116,11 @@
       "dependencies": ["sonner"],
       "registryDependencies": ["button", "sonner"],
       "files": [
+        {
+          "path": "components/ui/sureui/fill.ts",
+          "type": "registry:lib",
+          "target": "@ui/sureui/fill.ts"
+        },
         {
           "path": "components/ui/sureui/undo-window.ts",
           "type": "registry:lib",

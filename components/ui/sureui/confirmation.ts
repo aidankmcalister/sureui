@@ -2,6 +2,7 @@
 
 import * as React from "react"
 
+import { useFill, type Fill } from "@/components/ui/sureui/fill"
 import {
   startUndoWindow,
   type UndoWindow,
@@ -84,8 +85,8 @@ function isInside(event: React.PointerEvent) {
 
 function useConfirmationMachine(options: ConfirmationOptions) {
   const [state, setState] = React.useState<ConfirmationState>("idle")
-  const fillRef = React.useRef<HTMLSpanElement>(null)
-  const animationRef = React.useRef<Animation | null>(null)
+  const [fill, setFill] = React.useState<Fill | null>(null)
+  const [paused, setPaused] = React.useState(false)
   const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
   const holdStartRef = React.useRef(0)
   const holdDurationRef = React.useRef(0)
@@ -105,34 +106,32 @@ function useConfirmationMachine(options: ConfirmationOptions) {
     }
   }, [])
 
-  const cancelAnimation = React.useCallback(() => {
-    animationRef.current?.cancel?.()
-    animationRef.current = null
-  }, [])
+  React.useEffect(() => clearTimer, [clearTimer])
 
-  React.useEffect(() => {
-    return () => {
-      clearTimer()
-      cancelAnimation()
-    }
-  }, [clearTimer, cancelAnimation])
+  const enter = React.useCallback(
+    (next: ConfirmationState, nextFill: Fill | null = null) => {
+      setState(next)
+      setFill(nextFill)
+      setPaused(false)
+    },
+    []
+  )
 
   const commit = React.useCallback(
     (run: ConfirmationOptions["onConfirm"]) => {
       clearTimer()
-      cancelAnimation()
       let result: ReturnType<ConfirmationOptions["onConfirm"]>
       try {
         result = run()
       } catch (error) {
-        setState("idle")
+        enter("idle")
         throw error
       }
       if (
         result &&
         typeof (result as PromiseLike<unknown>).then === "function"
       ) {
-        setState("pending")
+        enter("pending")
         ;(async () => {
           try {
             await result
@@ -141,33 +140,29 @@ function useConfirmationMachine(options: ConfirmationOptions) {
           }
         })()
       } else {
-        setState("idle")
+        enter("idle")
       }
     },
-    [clearTimer, cancelAnimation]
+    [clearTimer, enter]
   )
 
   const confirm = React.useCallback(() => {
     const { undo, onConfirm } = optionsRef.current
     clearTimer()
     if (!undo) return commit(onConfirm)
-    cancelAnimation()
-    setState("undo")
     const undoWindow = startUndoWindow({
       duration: undo,
       onExpire: () => commit(onConfirm),
-      onPauseChange: (paused) => {
-        if (paused) animationRef.current?.pause?.()
-        else animationRef.current?.play?.()
-      },
+      onPauseChange: setPaused,
     })
     undoRef.current = { window: undoWindow, pausable: new Set() }
-    animationRef.current =
-      fillRef.current?.animate?.([{ scale: "1 1" }, { scale: "0 1" }], {
-        duration: undoWindow.duration,
-        easing: "linear",
-      }) ?? null
-  }, [commit, clearTimer, cancelAnimation])
+    enter("undo", {
+      from: 1,
+      to: 0,
+      duration: undoWindow.duration,
+      startedAt: performance.now(),
+    })
+  }, [commit, clearTimer, enter])
 
   const pauseUndo = React.useCallback((reason: PauseReason) => {
     const { pauseUndoOnHover = true, pauseUndoOnFocus = true } =
@@ -185,15 +180,20 @@ function useConfirmationMachine(options: ConfirmationOptions) {
   }, [])
 
   const arm = React.useCallback(() => {
-    setState("armed")
-  }, [])
+    enter("armed")
+  }, [enter])
 
   const hold = React.useCallback(
     (duration: number, waitForRelease: boolean) => {
       const ms = toMs(duration, 1200, 800)
       holdStartRef.current = performance.now()
       holdDurationRef.current = ms
-      setState("holding")
+      enter("holding", {
+        from: 0,
+        to: 1,
+        duration: ms,
+        startedAt: holdStartRef.current,
+      })
       timerRef.current = setTimeout(
         waitForRelease
           ? () => {
@@ -203,41 +203,37 @@ function useConfirmationMachine(options: ConfirmationOptions) {
           : confirm,
         ms
       )
-      animationRef.current =
-        fillRef.current?.animate?.([{ scale: "0 1" }, { scale: "1 1" }], {
-          duration: ms,
-          easing: "linear",
-          fill: "forwards",
-        }) ?? null
     },
-    [confirm]
+    [confirm, enter]
   )
 
   const release = React.useCallback(() => {
-    const elapsed = performance.now() - holdStartRef.current
-    const fraction = Math.min(elapsed / holdDurationRef.current, 1)
+    const now = performance.now()
+    const fraction = Math.min(
+      (now - holdStartRef.current) / holdDurationRef.current,
+      1
+    )
     clearTimer()
-    cancelAnimation()
-    setState("idle")
-    if (!window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches) {
-      fillRef.current?.animate?.(
-        [{ scale: `${fraction} 1` }, { scale: "0 1" }],
-        { duration: 200, easing: "ease-out" }
-      )
-    }
+    enter("idle", {
+      from: fraction,
+      to: 0,
+      duration: 200,
+      startedAt: now,
+      easing: "ease-out",
+    })
     optionsRef.current.onCancel?.()
-  }, [clearTimer, cancelAnimation])
+  }, [clearTimer, enter])
 
   const cancel = React.useCallback(() => {
     clearTimer()
-    cancelAnimation()
-    setState("idle")
+    enter("idle")
     optionsRef.current.onCancel?.()
-  }, [clearTimer, cancelAnimation])
+  }, [clearTimer, enter])
 
   return {
     state,
-    fillRef,
+    fill,
+    paused,
     arm,
     hold,
     release,
@@ -260,7 +256,8 @@ function useConfirmation<T extends Element = HTMLElement>({
 }: ConfirmationOptions & GestureOptions) {
   const {
     state,
-    fillRef,
+    fill,
+    paused,
     arm,
     hold,
     release,
@@ -269,6 +266,8 @@ function useConfirmation<T extends Element = HTMLElement>({
     pauseUndo,
     resumeUndo,
   } = useConfirmationMachine(options)
+  const fillRef = React.useRef<HTMLSpanElement>(null)
+  useFill(fillRef, fill, paused)
   const repeatRef = React.useRef(false)
   const undoPressRef = React.useRef(false)
 

@@ -20,7 +20,7 @@ for item in "${items[@]}"; do
   "$shadcn" add "$root/public/r/$item.json" --yes --overwrite --silent
 done
 
-for file in undo-window.ts confirmation.ts confirm-button.tsx type-to-confirm.tsx confirm-dialog.tsx undo-toast.tsx; do
+for file in fill.ts undo-window.ts confirmation.ts confirm-button.tsx type-to-confirm.tsx confirm-dialog.tsx undo-toast.tsx; do
   test -f "components/ui/sureui/$file" || { echo "Missing components/ui/sureui/$file"; exit 1; }
 done
 

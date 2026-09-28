@@ -4,6 +4,7 @@ import * as React from "react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
+import { playFill } from "@/components/ui/sureui/fill"
 import { startUndoWindow } from "@/components/ui/sureui/undo-window"
 
 type UndoToastOptions = {
@@ -40,7 +41,7 @@ function undoToast(
 ) {
   return new Promise<boolean>((resolve) => {
     let settled = false
-    let animation: Animation | undefined
+    let animation: Animation | null = null
 
     const settle = (value: boolean) => {
       if (settled) return
@@ -72,15 +73,13 @@ function undoToast(
     const track = (fill: HTMLSpanElement | null) => {
       const toaster = fill?.closest("[data-sonner-toaster]")
       if (!fill || !toaster) return
-      animation = fill.animate?.([{ scale: "1 1" }, { scale: "0 1" }], {
+      animation = playFill(fill, {
+        from: 1,
+        to: 0,
         duration: countdown.duration,
-        easing: "linear",
-        fill: "forwards",
+        startedAt: performance.now() - countdown.elapsed(),
       })
-      if (animation) {
-        animation.currentTime = countdown.elapsed()
-        if (countdown.paused()) animation.pause()
-      }
+      if (countdown.paused()) animation?.pause()
 
       const onPointerEnter = () => countdown.pause("hover")
       const onPointerLeave = () => countdown.resume("hover")
@@ -107,7 +106,7 @@ function undoToast(
 
       return () => {
         animation?.cancel()
-        animation = undefined
+        animation = null
         toaster.removeEventListener("pointerenter", onPointerEnter)
         toaster.removeEventListener("pointerleave", onPointerLeave)
         toaster.removeEventListener("focusin", onFocusIn)
