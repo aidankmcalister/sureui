@@ -27,6 +27,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty"
+import { Consequences } from "@/components/ui/sureui/consequences"
 import { TypeToConfirm } from "@/components/ui/sureui/type-to-confirm"
 
 type DeleteAccountProps = {
@@ -36,24 +37,43 @@ type DeleteAccountProps = {
 
 const deletes = [
   {
-    icon: FolderIcon,
-    title: "12 projects",
-    detail: "Their deployments, domains and environment variables.",
+    icon: <FolderIcon />,
+    label: "projects",
+    count: 12,
+    names: [
+      "acme-web",
+      "acme-api",
+      "acme-docs",
+      "marketing-site",
+      "status-page",
+      "billing-service",
+      "auth-proxy",
+      "image-cdn",
+      "blog",
+      "changelog",
+      "design-system",
+      "playground",
+    ],
+    description: "Their deployments, domains and environment variables.",
   },
   {
-    icon: ReceiptTextIcon,
-    title: "38 invoices",
-    detail: "Your billing history and saved payment methods.",
+    icon: <ReceiptTextIcon />,
+    label: "invoices",
+    count: 38,
+    description: "Your billing history and saved payment methods.",
   },
   {
-    icon: UsersIcon,
-    title: "Membership in 3 teams",
-    detail: "You leave each team. The teams and their projects stay.",
+    icon: <UsersIcon />,
+    label: "Membership in 3 teams",
+    names: ["Design", "Platform", "Growth"],
+    description: "You leave each team. The teams and their projects stay.",
   },
   {
-    icon: KeyRoundIcon,
-    title: "4 API keys",
-    detail: "Requests that use them start failing right away.",
+    icon: <KeyRoundIcon />,
+    label: "API keys",
+    count: 4,
+    names: ["Production", "Staging", "CI", "Local"],
+    description: "Requests that use them start failing right away.",
   },
 ]
 
@@ -139,25 +159,17 @@ function DeleteAccount({
                 : "Export requested"}
           </Button>
         </div>
-        <div className="grid gap-3">
-          <h3 className="font-medium">What gets deleted</h3>
-          <ul className="grid gap-3 sm:grid-cols-2">
-            {deletes.map((item) => (
-              <li key={item.title} className="flex gap-3">
-                <item.icon className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
-                <div className="grid gap-0.5">
-                  <span className="font-medium">{item.title}</span>
-                  <span className="text-pretty text-muted-foreground">
-                    {item.detail}
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
         <div className="border-t pt-6">
           <TypeToConfirm
             phrase={email}
+            consequences={
+              <Consequences
+                title="What gets deleted"
+                variant="destructive"
+                className="sm:*:data-[slot=consequences-list]:grid-cols-2 sm:*:data-[slot=consequences-list]:gap-x-6"
+                items={deletes}
+              />
+            }
             caseSensitive={false}
             trim
             label={

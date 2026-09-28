@@ -80,7 +80,7 @@ Add the registry to `components.json` once:
 
 Then add the item for the style you picked:
 
-- Type to confirm: `npx shadcn@latest add @sureui/type-to-confirm`
+- Type to confirm: `npx shadcn@latest add @sureui/type-to-confirm @sureui/consequences`
 - Dialogs: `npx shadcn@latest add @sureui/confirm-dialog`
 - Undo: `npx shadcn@latest add @sureui/confirm-button @sureui/undo-toast @sureui/undoable`
 - Click again: `npx shadcn@latest add @sureui/confirm-button`
@@ -129,18 +129,35 @@ async function deleteProject() {
 An inline form that unlocks only after the exact phrase is typed.
 
 ```bash
-npx shadcn@latest add @sureui/type-to-confirm
+npx shadcn@latest add @sureui/type-to-confirm @sureui/consequences
 ```
 
 ```tsx
 <TypeToConfirm
   phrase="acme-prod"
+  consequences={
+    <Consequences
+      title="This deletes"
+      items={[
+        { label: "deployments", count: 128 },
+        {
+          label: "domains",
+          count: 4,
+          names: ["acme.com", "www.acme.com", "api.acme.com", "status.acme.com"],
+        },
+        { label: "environment variables", count: 23 },
+      ]}
+    />
+  }
   acknowledgements={["I understand active deployments will go offline."]}
   confirmLabel="Delete project"
   onConfirm={deleteProject}
 />
 ```
 
+- Pass a Consequences list to consequences to show what the confirm removes, above the phrase input. ConfirmDialog takes the same prop, with or without a phrase.
+- Consequences is a list. Each item reads as its count, label and names, like "4 domains: acme.com, www.acme.com, api.acme.com and 1 more".
+- Names past limit, 3 by default, collapse into "and N more", a button that shows the rest and then "Show less". Set expandable={false} to keep it as text. When count is larger than the names you pass, N includes the ones you left out.
 - The phrase must match exactly by default, including case and spaces. Relax it with caseSensitive={false} or trim.
 - Acknowledgements are optional. Leave them out and typing the phrase is enough.
 - The button is a ConfirmButton, so key-repeat clicks are ignored and its width doesn't change between Confirm and Undo.

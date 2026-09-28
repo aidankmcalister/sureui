@@ -25,6 +25,7 @@ import {
   useConfirm,
 } from "@/components/ui/sureui/confirm-dialog"
 import { ConfirmPopover } from "@/components/ui/sureui/confirm-popover"
+import { Consequences } from "@/components/ui/sureui/consequences"
 import { TypeToConfirm } from "@/components/ui/sureui/type-to-confirm"
 import { Undoable } from "@/components/ui/sureui/undoable"
 import { useReport } from "@/components/site/docs/preview"
@@ -228,6 +229,25 @@ function TypeToConfirmDemo() {
   return (
     <TypeToConfirm
       phrase="acme-prod"
+      consequences={
+        <Consequences
+          title="This deletes"
+          items={[
+            { label: "deployments", count: 128 },
+            {
+              label: "domains",
+              count: 4,
+              names: [
+                "acme.com",
+                "www.acme.com",
+                "api.acme.com",
+                "status.acme.com",
+              ],
+            },
+            { label: "environment variables", count: 23 },
+          ]}
+        />
+      }
       acknowledgements={["I understand active deployments will go offline."]}
       confirmLabel="Delete project"
       onConfirm={() => report("onConfirm")}

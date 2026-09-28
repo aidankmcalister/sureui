@@ -114,6 +114,11 @@ describe("delete-account-01", () => {
       exportButton.compareDocumentPosition(deleteButton) &
         Node.DOCUMENT_POSITION_FOLLOWING
     ).toBeTruthy()
+    const list = screen.getByRole("list", { name: "What gets deleted" })
+    expect(
+      list.compareDocumentPosition(screen.getByRole("textbox")) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
     for (const item of [
       "12 projects",
       "38 invoices",

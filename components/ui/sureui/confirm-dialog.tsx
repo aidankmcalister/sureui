@@ -29,6 +29,7 @@ type ConfirmDialogOptions = Pick<
   Omit<GestureOptions, "disabled"> & {
     title: string
     description?: React.ReactNode
+    consequences?: React.ReactNode
     cancelLabel?: string
     confirmLabel?: string
     variant?: ConfirmButtonProps["variant"]
@@ -131,6 +132,7 @@ function useConfirm() {
 function ConfirmContent({
   title,
   description,
+  consequences,
   cancelLabel = "Cancel",
   confirmLabel = "Confirm",
   variant = "default",
@@ -158,9 +160,11 @@ function ConfirmContent({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         )}
       </AlertDialogHeader>
+      {!phrase && consequences}
       {phrase ? (
         <TypeToConfirm
           phrase={phrase}
+          consequences={consequences}
           caseSensitive={caseSensitive}
           trim={trim}
           acknowledgements={acknowledgements}
