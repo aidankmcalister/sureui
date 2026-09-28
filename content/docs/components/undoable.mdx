@@ -41,9 +41,19 @@ Pass `render={<TableRow />}` to wrap a table row. The label and Undo go in one c
 
 ### Undo duration
 
-The window lasts 5 seconds, or the milliseconds you pass to `undo`.
+The window lasts 5 seconds, or the milliseconds you pass to `undo` between 4 and 60 seconds.
 
 <Example name="undoable/undo-duration" />
+
+With `undo="manual"`, Undo stays until people move on: a press outside the row or focus moving elsewhere runs `onConfirm`.
+
+### Focus after removal
+
+If focus was in the row when `onConfirm` finishes, it moves to the same control in the next row, else the previous row, else the list, which gets `tabindex="-1"`. Rows still showing Undo are skipped. `focusAfterRemove` receives the row and returns the element to focus instead, or `null` to leave focus alone.
+
+### Errors
+
+If `onConfirm` throws or rejects, the row comes back. Pass `onConfirmError` to receive the error instead of having it rethrown.
 
 ## API reference
 
@@ -56,13 +66,15 @@ The table lists the props it adds to the element it renders.
 | `...elementProps` | props of the `render` element | — |
 | `onConfirm` | `() => void \| Promise<unknown>` | required |
 | `onCancel` | `() => void` | — |
+| `onConfirmError` | `(error: unknown) => void` | — |
 | `children` | `ReactNode \| (({ remove, state }) => ReactNode)` | — |
 | `render` | `ReactElement` | `<div />` |
 | `label` | `ReactNode` | `"Deleted"` |
 | `undoLabel` | `ReactNode` | `"Undo"` |
-| `undo` | `boolean \| number` | `true` |
+| `undo` | `boolean \| number \| "manual"` | `true` |
 | `pauseUndoOnHover` | `boolean` | `true` |
 | `pauseUndoOnFocus` | `boolean` | `true` |
+| `focusAfterRemove` | `(row: HTMLElement) => HTMLElement \| null` | next row, previous row, then the list |
 | `announcements` | `{ undo? }` | — |
 
 ### Data attributes
@@ -79,5 +91,10 @@ The rendered element sets `data-state`. Drop the item from your data once it's `
 ## Accessibility
 
 - If focus was in the row, it moves to Undo, and back to the button that removed the row after Undo.
+- Once the row is removed, focus moves to a neighboring row or the list, so it isn't lost to the page.
 - The label and "Undo is available." are announced in a polite live region. Change the text with `announcements`.
 - With `prefers-reduced-motion`, the fill on Undo doesn't move.
+
+### WCAG
+
+- 2.2.1 Timing Adjustable: `undo="manual"` meets it, since Undo has no time limit. A numeric `undo` stops at 60 seconds.

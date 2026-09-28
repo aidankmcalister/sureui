@@ -28,6 +28,8 @@ import { ConfirmDialog } from "@/components/ui/sureui/confirm-dialog"
 
 If `onConfirm` returns a promise, the dialog stays open until it settles.
 
+`variant` styles only the confirm button. The trigger is your own element, so an outline trigger can open a destructive confirm step, as above.
+
 ## Examples
 
 ### Typed phrase
@@ -36,11 +38,45 @@ With `phrase`, the confirm button stays disabled until people type it. `acknowle
 
 <Example name="confirm-dialog/typed-phrase" />
 
+### Several phrases
+
+Pass `phrase` an array to ask for more than one field, such as the project name and a fixed sentence. Each field has its own label, and the button unlocks once every one matches.
+
+<Example name="confirm-dialog/several-phrases" />
+
+### Choices
+
+Each item in `choices` adds a checkbox that doesn't block confirming. `onConfirm` receives their values by `name`, as they were when the person confirmed.
+
+<Example name="confirm-dialog/choices" />
+
+### Alternative
+
+`alternative` adds a softer action next to the destructive one, such as archiving instead of deleting. It doesn't need the phrase, and `onCancel` doesn't run. If `onSelect` returns a promise, the dialog stays open until it settles.
+
+<Example name="confirm-dialog/alternative" />
+
+### Initial focus
+
+Focus starts on Cancel. `initialFocus="confirm"` starts on the confirm button, for actions that are easy to reverse, and `"none"` focuses the dialog itself. With `phrase`, focus starts in the first field, and `"confirm"` does the same, since the confirm button stays disabled until the phrase matches.
+
+Keep `"cancel"` for anything that deletes data or can't be undone. The WAI-ARIA [dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) advises focusing the least destructive action when the step isn't easily reversed.
+
+<Example name="confirm-dialog/initial-focus" />
+
 ### Hold
 
 `gesture` works as on [Confirm Button](/docs/confirm-button), here with `"hold"`.
 
 <Example name="confirm-dialog/hold" />
+
+### Arm delay
+
+`armDelay` ignores the confirm button for that many milliseconds after the dialog opens, so a double click on the trigger can't pass through to it. It works as on [Confirm Popover](/docs/confirm-popover#arm-delay).
+
+### Errors
+
+With `onConfirmError`, a failed `onConfirm` keeps the dialog open and the error goes to your handler. `errorLabel` replaces the confirm label until the next activation, which tries again.
 
 ### Consequences
 
@@ -64,25 +100,31 @@ For a way back after it closes, use [Undo Toast](/docs/undo-toast).
 | --- | --- | --- |
 | `title` | `string` | required |
 | `children` | `ReactElement` | required |
-| `onConfirm` | `() => void \| Promise<unknown>` | required |
+| `onConfirm` | `(choices: Record<string, boolean>) => void \| Promise<unknown>` | required |
 | `onCancel` | `() => void` | — |
+| `onConfirmError` | `(error: unknown) => void` | — |
 | `description` | `ReactNode` | — |
 | `consequences` | `ReactNode` | — |
 | `confirmLabel` | `string` | `"Confirm"` |
 | `cancelLabel` | `string` | `"Cancel"` |
+| `errorLabel` | `string` | — |
 | `variant` | [`Button`](https://ui.shadcn.com/docs/components/base/button) `variant` | `"default"` |
+| `initialFocus` | `"cancel" \| "confirm" \| "none"` | `"cancel"`, the first field with `phrase` |
+| `alternative` | `{ label: ReactNode, onSelect: () => void \| Promise<unknown> }` | — |
 | `gesture` | `"click" \| "click-again" \| "hold"` | `"click"` |
+| `armDelay` | `number` | `0` |
 | `timeout` | `number` | `3000` |
 | `cancelOnBlur` | `boolean` | `true` |
 | `duration` | `number` | `1200` |
 | `confirmOnRelease` | `boolean` | `false` |
 | `cancelHoldOnLeave` | `boolean` | `true` |
 | `holdFallback` | `"click-again" \| "none"` | `"click-again"` |
-| `phrase` | `string` | — |
+| `phrase` | `string \| string[]` | — |
 | `caseSensitive` | `boolean` | `true` |
 | `trim` | `boolean` | `false` |
 | `acknowledgements` | `string[]` | — |
-| `announcements` | `{ armed?, hold?, fallback?, ready?, match? }` | — |
+| `choices` | `{ name: string, label: ReactNode, defaultChecked?: boolean }[]` | — |
+| `announcements` | `{ armed?, hold?, fallback?, ready?, match?, error? }` | — |
 
 ### useConfirm()
 
@@ -90,12 +132,18 @@ Takes no arguments.
 
 | Name | Type | Description |
 | --- | --- | --- |
-| `confirm` | `(options: ConfirmOptions) => Promise<boolean>` | Opens the dialog. Resolves `false` on cancel, when another `confirm()` replaces it, or on unmount. |
+| `confirm` | `(options: ConfirmOptions) => Promise<boolean>` | Opens the dialog. Resolves `false` on cancel, after `alternative`, when another `confirm()` replaces it, or on unmount. |
 | `dialog` | `ReactElement` | The dialog. Render it once. |
 | `ConfirmOptions` | `object` | `ConfirmDialog` props without `children` and `onCancel`. `onConfirm` is optional. |
 
 ## Accessibility
 
 - The dialog has the `alertdialog` role, named by `title` and described by `description`.
-- Focus moves into the dialog when it opens and back to the trigger when it closes.
-- While `onConfirm` is pending, Cancel and Escape do nothing and the confirm button keeps focus.
+- Focus moves into the dialog when it opens, to Cancel by default, and back to the trigger when it closes.
+- While `onConfirm` is pending, Cancel and Escape do nothing and the confirm button keeps focus. The same holds for the alternative's button while `onSelect` is pending.
+- With several phrases, each field has its own label and announces its own match.
+
+### WCAG
+
+- 2.2.1 Timing Adjustable: the dialog has no time limit. `timeout` only disarms `click-again`, and never runs or drops the action.
+- 2.5.2 Pointer Cancellation: `gesture="hold"` meets it, because releasing early or moving off the button cancels.

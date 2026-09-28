@@ -5,6 +5,7 @@ import * as React from "react"
 import { useFill, type Fill } from "@/components/ui/sureui/fill"
 import {
   startUndoWindow,
+  type UndoDuration,
   type UndoWindow,
 } from "@/components/ui/sureui/undo-window"
 
@@ -23,7 +24,8 @@ type InlineUndo = {
 type ConfirmationOptions = {
   onConfirm: () => void | Promise<unknown>
   onCancel?: () => void
-  undo?: boolean | number
+  onConfirmError?: (error: unknown) => void
+  undo?: UndoDuration
   pauseUndoOnHover?: boolean
   pauseUndoOnFocus?: boolean
 }
@@ -36,6 +38,7 @@ type GestureOptions = {
   cancelOnBlur?: boolean
   cancelHoldOnLeave?: boolean
   holdFallback?: "click-again" | "none"
+  armDelay?: number
   disabled?: boolean
 }
 
@@ -115,10 +118,14 @@ function isInside(event: React.PointerEvent) {
   )
 }
 
-function useConfirmationMachine(options: ConfirmationOptions) {
+function useConfirmationMachine(
+  options: ConfirmationOptions,
+  triggerRef: React.RefObject<Element | null>
+) {
   const [state, setState] = React.useState<ConfirmationState>("idle")
   const [fill, setFill] = React.useState<Fill | null>(null)
   const [paused, setPaused] = React.useState(false)
+  const [failed, setFailed] = React.useState(false)
   const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
   const holdStartRef = React.useRef(0)
   const holdDurationRef = React.useRef(0)
@@ -145,9 +152,17 @@ function useConfirmationMachine(options: ConfirmationOptions) {
       setState(next)
       setFill(nextFill)
       setPaused(false)
+      setFailed(false)
     },
     []
   )
+
+  const fail = React.useCallback((error: unknown) => {
+    setFailed(true)
+    const { onConfirmError } = optionsRef.current
+    if (!onConfirmError) throw error
+    onConfirmError(error)
+  }, [])
 
   const commit = React.useCallback(
     (run: ConfirmationOptions["onConfirm"]) => {
@@ -157,22 +172,24 @@ function useConfirmationMachine(options: ConfirmationOptions) {
         result = run()
       } catch (error) {
         enter("idle")
-        throw error
+        return fail(error)
       }
       if (isPromise(result)) {
         enter("pending")
         ;(async () => {
           try {
             await result
-          } finally {
             setState("idle")
+          } catch (error) {
+            setState("idle")
+            fail(error)
           }
         })()
       } else {
         enter("idle")
       }
     },
-    [clearTimer, enter]
+    [clearTimer, enter, fail]
   )
 
   const confirm = React.useCallback(() => {
@@ -183,16 +200,22 @@ function useConfirmationMachine(options: ConfirmationOptions) {
       duration: undo,
       onExpire: () => commit(onConfirm),
       onPauseChange: setPaused,
+      within: () => triggerRef.current,
     })
     undoRef.current = { window: undoWindow, pausable: new Set() }
-    enter("undo", {
-      from: 1,
-      to: 0,
-      duration: undoWindow.duration,
-      startedAt: performance.now(),
-    })
+    enter(
+      "undo",
+      undoWindow.manual
+        ? null
+        : {
+            from: 1,
+            to: 0,
+            duration: undoWindow.duration,
+            startedAt: performance.now(),
+          }
+    )
     setPaused(undoWindow.paused())
-  }, [commit, clearTimer, enter])
+  }, [commit, clearTimer, enter, triggerRef])
 
   const pauseUndo = React.useCallback((reason: PauseReason) => {
     const { pauseUndoOnHover = true, pauseUndoOnFocus = true } =
@@ -270,6 +293,7 @@ function useConfirmationMachine(options: ConfirmationOptions) {
     state,
     fill,
     paused,
+    failed,
     arm,
     hold,
     release,
@@ -289,13 +313,16 @@ function useConfirmation<T extends Element = HTMLElement>({
   cancelOnBlur = true,
   cancelHoldOnLeave = true,
   holdFallback = "click-again",
+  armDelay = 0,
   disabled = false,
   ...options
 }: ConfirmationOptions & GestureOptions) {
+  const triggerRef = React.useRef<T | null>(null)
   const {
     state,
     fill,
     paused,
+    failed,
     arm,
     hold,
     release,
@@ -304,14 +331,42 @@ function useConfirmation<T extends Element = HTMLElement>({
     pauseUndo,
     resumeUndo,
     reset,
-  } = useConfirmationMachine(options)
+  } = useConfirmationMachine(options, triggerRef)
   const fillRef = React.useRef<HTMLSpanElement>(null)
   useFill(fillRef, fill, paused)
+  const armDelayRef = React.useRef(armDelay)
+  const quietRef = React.useRef(false)
+  const quietTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
   const repeatRef = React.useRef(false)
   const undoPressRef = React.useRef(false)
   const pressRef = React.useRef<"none" | "pointer" | "virtual" | "key">("none")
   const fallbackRef = React.useRef(false)
   const selectedRef = React.useRef(false)
+
+  React.useEffect(() => {
+    armDelayRef.current = armDelay
+  })
+
+  const quiet = React.useCallback(() => {
+    const ms = toMs(armDelayRef.current, 0, 0)
+    if (quietTimerRef.current !== null) clearTimeout(quietTimerRef.current)
+    quietTimerRef.current = null
+    quietRef.current = ms > 0
+    if (ms <= 0) return
+    quietTimerRef.current = setTimeout(() => {
+      quietTimerRef.current = null
+      quietRef.current = false
+    }, ms)
+  }, [])
+
+  React.useEffect(() => {
+    quiet()
+    return () => {
+      if (quietTimerRef.current !== null) clearTimeout(quietTimerRef.current)
+      quietTimerRef.current = null
+      quietRef.current = false
+    }
+  }, [quiet])
 
   React.useEffect(() => {
     if (state !== "armed") fallbackRef.current = false
@@ -334,9 +389,14 @@ function useConfirmation<T extends Element = HTMLElement>({
     cancel()
   }
 
+  function armNow() {
+    arm()
+    quiet()
+  }
+
   function armFallback() {
     fallbackRef.current = true
-    arm()
+    armNow()
   }
 
   function holdClick() {
@@ -354,12 +414,13 @@ function useConfirmation<T extends Element = HTMLElement>({
 
   const handlers: Required<Omit<TriggerProps<T>, "disabled">> = {
     onClick() {
+      if (quietRef.current) return
       if (isHold) return holdClick()
       if (repeatRef.current) return
       if (state === "undo") cancel()
       else if (state === "armed") confirm()
       else if (state === "idle" && gesture === "click") confirm()
-      else if (state === "idle") arm()
+      else if (state === "idle") armNow()
     },
     onBlur() {
       resumeUndo("focus")
@@ -378,7 +439,7 @@ function useConfirmation<T extends Element = HTMLElement>({
     },
     onPointerDown(event) {
       selectedRef.current = hasSelection()
-      if (!isHold || event.button !== 0) return
+      if (!isHold || event.button !== 0 || quietRef.current) return
       pressRef.current = isVirtualPress(event) ? "virtual" : "pointer"
       undoPressRef.current = state === "undo"
       if (state !== "idle") return
@@ -411,7 +472,7 @@ function useConfirmation<T extends Element = HTMLElement>({
       if (event.key === "Escape" && fallbackArmed) return cancel()
       if (!isPressKey(event)) return
       event.preventDefault()
-      if (event.repeat) return
+      if (event.repeat || quietRef.current) return
       pressRef.current = "key"
       undoPressRef.current = state === "undo"
       if (state === "idle") hold(duration, confirmOnRelease)
@@ -442,8 +503,12 @@ function useConfirmation<T extends Element = HTMLElement>({
   function getTriggerProps<P extends TriggerProps<T>>(props: P) {
     const composed = { ...props }
     for (const name of Object.keys(handlers) as (keyof typeof handlers)[]) {
-      const ours = handlers[name] as (event: unknown) => void
+      const handler = handlers[name] as (event: unknown) => void
       const theirs = props[name] as ((event: unknown) => void) | undefined
+      const ours = (event: { currentTarget: T }) => {
+        triggerRef.current = event.currentTarget
+        handler(event)
+      }
       Object.assign(composed, { [name]: composeHandlers(theirs, ours) })
     }
     return {
@@ -452,7 +517,7 @@ function useConfirmation<T extends Element = HTMLElement>({
     }
   }
 
-  return { state, fillRef, getTriggerProps }
+  return { state, failed, fillRef, getTriggerProps }
 }
 
 export {

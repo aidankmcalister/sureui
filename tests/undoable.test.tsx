@@ -1,3 +1,4 @@
+import * as React from "react"
 import { act, fireEvent, render, screen } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -395,5 +396,253 @@ describe("Undoable", () => {
     )
     expect(host(container).tagName).toBe("DIV")
     expect(host(container).textContent).toBe("report.pdf")
+  })
+})
+
+describe("Undoable focus after removal", () => {
+  function Files({
+    names,
+    ...props
+  }: Partial<UndoableProps> & { names: string[] }) {
+    const [items, setItems] = React.useState(names)
+    return (
+      <ul aria-label="Files">
+        {items.map((name) => (
+          <Undoable
+            key={name}
+            render={<li />}
+            label={`Deleted ${name}`}
+            {...props}
+            onConfirm={() =>
+              setItems((current) => current.filter((item) => item !== name))
+            }
+          >
+            {({ remove }) => (
+              <>
+                <span>{name}</span>
+                <Button variant="ghost">Rename {name}</Button>
+                <Button onClick={remove}>Delete {name}</Button>
+              </>
+            )}
+          </Undoable>
+        ))}
+      </ul>
+    )
+  }
+
+  async function removeWithUndo(name: string) {
+    const button = screen.getByRole("button", { name: `Delete ${name}` })
+    act(() => button.focus())
+    await click(button)
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Undo" })
+    )
+    advance(5000)
+  }
+
+  it("moves focus to the same button in the next row", async () => {
+    render(<Files names={["a.pdf", "b.pdf", "c.pdf"]} />)
+    await removeWithUndo("b.pdf")
+    expect(screen.queryByText("b.pdf")).toBeNull()
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Delete c.pdf" })
+    )
+  })
+
+  it("moves focus to the previous row when the last row goes", async () => {
+    render(<Files names={["a.pdf", "b.pdf"]} />)
+    await removeWithUndo("b.pdf")
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Delete a.pdf" })
+    )
+  })
+
+  it("skips rows that are collapsed", async () => {
+    render(<Files names={["a.pdf", "b.pdf", "c.pdf"]} />)
+    const button = screen.getByRole("button", { name: "Delete a.pdf" })
+    act(() => button.focus())
+    await click(button)
+    advance(1000)
+    await click(screen.getByRole("button", { name: "Delete b.pdf" }))
+    advance(4000)
+    expect(screen.queryByText("a.pdf")).toBeNull()
+    expect(screen.getByText("Deleted b.pdf")).toBeTruthy()
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Delete c.pdf" })
+    )
+  })
+
+  it("moves focus to the list when the only row goes", async () => {
+    render(<Files names={["a.pdf"]} />)
+    await removeWithUndo("a.pdf")
+    const list = screen.getByRole("list", { name: "Files" })
+    expect(document.activeElement).toBe(list)
+    expect(list.getAttribute("tabindex")).toBe("-1")
+  })
+
+  it("moves focus without an undo window", async () => {
+    render(<Files names={["a.pdf", "b.pdf"]} undo={false} />)
+    const button = screen.getByRole("button", { name: "Delete a.pdf" })
+    act(() => button.focus())
+    await click(button)
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Delete b.pdf" })
+    )
+  })
+
+  it("waits for a pending onConfirm before moving focus", async () => {
+    let resolve!: () => void
+    render(
+      <ul>
+        <Undoable
+          render={<li />}
+          onConfirm={() => new Promise<void>((res) => (resolve = res))}
+        >
+          {({ remove }) => <Button onClick={remove}>Delete</Button>}
+        </Undoable>
+        <li>
+          <Button>Next</Button>
+        </li>
+      </ul>
+    )
+    const button = screen.getByRole("button", { name: "Delete" })
+    act(() => button.focus())
+    await click(button)
+    advance(5000)
+    const undo = screen.getByRole("button", { name: "Undo" })
+    expect(document.activeElement).toBe(undo)
+    await act(async () => resolve())
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Next" })
+    )
+  })
+
+  it("focusAfterRemove picks the target", async () => {
+    const focusAfterRemove = vi.fn(() =>
+      screen.getByRole("button", { name: "Add file" })
+    )
+    render(
+      <>
+        <Button>Add file</Button>
+        <Files names={["a.pdf", "b.pdf"]} focusAfterRemove={focusAfterRemove} />
+      </>
+    )
+    await removeWithUndo("a.pdf")
+    expect(focusAfterRemove).toHaveBeenCalledOnce()
+    expect(focusAfterRemove.mock.calls[0]).toHaveLength(1)
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Add file" })
+    )
+  })
+
+  it("leaves focus alone when it wasn't in the row", async () => {
+    render(
+      <>
+        <Button>Elsewhere</Button>
+        <Files names={["a.pdf", "b.pdf"]} />
+      </>
+    )
+    await click(screen.getByRole("button", { name: "Delete a.pdf" }))
+    const elsewhere = screen.getByRole("button", { name: "Elsewhere" })
+    act(() => elsewhere.focus())
+    advance(5000)
+    expect(document.activeElement).toBe(elsewhere)
+  })
+})
+
+describe("Undoable failures", () => {
+  it("onConfirmError gets a thrown error and the row comes back", async () => {
+    const error = new Error("nope")
+    const onConfirmError = vi.fn()
+    const { container } = render(
+      <ListItem
+        onConfirmError={onConfirmError}
+        onConfirm={() => {
+          throw error
+        }}
+      />
+    )
+    await click(screen.getByRole("button", { name: "Delete" }))
+    advance(5000)
+    await act(async () => {})
+    expect(onConfirmError).toHaveBeenCalledWith(error)
+    expect(host(container).getAttribute("data-state")).toBe("idle")
+  })
+
+  it("onConfirmError gets a rejection without an unhandled rejection", async () => {
+    let reject!: (error: Error) => void
+    const onConfirmError = vi.fn()
+    const onRejection = vi.fn()
+    process.on("unhandledRejection", onRejection)
+    try {
+      const { container } = render(
+        <ListItem
+          onConfirmError={onConfirmError}
+          onConfirm={() =>
+            new Promise<void>((_, rej) => {
+              reject = rej
+            })
+          }
+        />
+      )
+      await click(screen.getByRole("button", { name: "Delete" }))
+      advance(5000)
+      await act(async () => reject(new Error("offline")))
+      vi.useRealTimers()
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 0))
+      })
+      expect(onConfirmError.mock.calls[0][0]).toHaveProperty(
+        "message",
+        "offline"
+      )
+      expect(onRejection).not.toHaveBeenCalled()
+      expect(host(container).getAttribute("data-state")).toBe("idle")
+    } finally {
+      process.off("unhandledRejection", onRejection)
+    }
+  })
+})
+
+describe("Undoable manual undo", () => {
+  it("keeps Undo until a press outside the row", async () => {
+    const onConfirm = vi.fn()
+    const { container } = render(
+      <>
+        <ListItem undo="manual" onConfirm={onConfirm} />
+        <Button>Elsewhere</Button>
+      </>
+    )
+    await click(screen.getByRole("button", { name: "Delete" }))
+    advance(600000)
+    expect(host(container).getAttribute("data-state")).toBe("undo")
+    fireEvent.pointerDown(screen.getByRole("button", { name: "Undo" }))
+    expect(onConfirm).not.toHaveBeenCalled()
+    act(() => {
+      fireEvent.pointerDown(screen.getByRole("button", { name: "Elsewhere" }))
+    })
+    expect(onConfirm).toHaveBeenCalledOnce()
+    expect(host(container).getAttribute("data-state")).toBe("removed")
+  })
+
+  it("commits when focus leaves the row and Undo still cancels", async () => {
+    const onConfirm = vi.fn()
+    const onCancel = vi.fn()
+    render(
+      <>
+        <ListItem undo="manual" onConfirm={onConfirm} onCancel={onCancel} />
+        <Button>Elsewhere</Button>
+      </>
+    )
+    const remove = screen.getByRole("button", { name: "Delete" })
+    act(() => remove.focus())
+    await click(remove)
+    await click(screen.getByRole("button", { name: "Undo" }))
+    expect(onCancel).toHaveBeenCalledOnce()
+    const again = screen.getByRole("button", { name: "Delete" })
+    act(() => again.focus())
+    await click(again)
+    act(() => screen.getByRole("button", { name: "Elsewhere" }).focus())
+    expect(onConfirm).toHaveBeenCalledOnce()
   })
 })

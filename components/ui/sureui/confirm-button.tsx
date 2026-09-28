@@ -16,18 +16,21 @@ type ConfirmButtonProps = React.ComponentProps<typeof Button> &
     confirmLabel?: React.ReactNode
     releaseLabel?: React.ReactNode
     undoLabel?: React.ReactNode
+    errorLabel?: React.ReactNode
     announcements?: {
       hold?: string
       ready?: string
       armed?: string
       fallback?: string
       undo?: string
+      error?: string
     }
   }
 
 function ConfirmButton({
   onConfirm,
   onCancel,
+  onConfirmError,
   undo,
   pauseUndoOnHover,
   pauseUndoOnFocus,
@@ -38,20 +41,23 @@ function ConfirmButton({
   cancelOnBlur,
   cancelHoldOnLeave,
   holdFallback = "click-again",
+  armDelay,
   disabled,
   confirmLabel,
   releaseLabel,
   undoLabel = "Undo",
+  errorLabel,
   announcements,
   className,
   children,
   "aria-describedby": describedBy,
   ...props
 }: ConfirmButtonProps) {
-  const { state, fillRef, getTriggerProps } =
+  const { state, failed, fillRef, getTriggerProps } =
     useConfirmation<HTMLButtonElement>({
       onConfirm,
       onCancel,
+      onConfirmError,
       undo,
       pauseUndoOnHover,
       pauseUndoOnFocus,
@@ -62,17 +68,21 @@ function ConfirmButton({
       cancelOnBlur,
       cancelHoldOnLeave,
       holdFallback,
+      armDelay,
       disabled,
     })
   const hintId = React.useId()
 
   const hasReleaseLabel = gesture === "hold" && releaseLabel != null
+  const showError = failed && state === "idle" && errorLabel != null
   const shown =
     state === "armed" ||
     state === "undo" ||
     (state === "ready" && hasReleaseLabel)
       ? state
-      : "idle"
+      : showError
+        ? "error"
+        : "idle"
   const labels = [
     { state: "idle", node: children },
     ...(gesture === "click-again" ||
@@ -88,6 +98,7 @@ function ConfirmButton({
       : []),
     ...(hasReleaseLabel ? [{ state: "ready", node: releaseLabel }] : []),
     ...(undo ? [{ state: "undo", node: undoLabel }] : []),
+    ...(errorLabel != null ? [{ state: "error", node: errorLabel }] : []),
   ]
 
   const holdDescribedBy =
@@ -100,14 +111,19 @@ function ConfirmButton({
       <Button
         {...getTriggerProps(props)}
         aria-label={
-          state === "undo" &&
-          typeof undoLabel === "string" &&
-          props["aria-label"]
+          props["aria-label"] &&
+          shown === "undo" &&
+          typeof undoLabel === "string"
             ? undoLabel
-            : props["aria-label"]
+            : props["aria-label"] &&
+                shown === "error" &&
+                typeof errorLabel === "string"
+              ? errorLabel
+              : props["aria-label"]
         }
         aria-describedby={holdDescribedBy}
         data-state={state}
+        data-error={failed || undefined}
         className={cn(
           "relative overflow-hidden transition-[color,background-color,border-color,box-shadow] active:not-aria-[haspopup]:translate-y-0 aria-disabled:opacity-50 motion-safe:data-[state=pending]:animate-pulse motion-safe:aria-disabled:data-[state=pending]:opacity-100",
           gesture === "hold" ? "touch-none" : "touch-manipulation",
@@ -157,7 +173,12 @@ function ConfirmButton({
                   : "Click again to confirm"))
               : state === "undo"
                 ? (announcements?.undo ?? "Done. Undo is available.")
-                : ""}
+                : showError
+                  ? (announcements?.error ??
+                    (typeof errorLabel === "string"
+                      ? errorLabel
+                      : "Failed. Activate again to retry."))
+                  : ""}
       </span>
     </>
   )

@@ -287,3 +287,80 @@ describe("ConfirmMenuItem", () => {
     expect(closed(onOpenChange)).toBe(true)
   })
 })
+
+describe("ConfirmMenuItem options", () => {
+  it("errorLabel shows a handled failure and the next click retries", async () => {
+    const onConfirmError = vi.fn()
+    let fail = true
+    const onConfirm = vi.fn(() => {
+      if (fail) throw new Error("offline")
+    })
+    const { item, onOpenChange } = renderMenu({
+      gesture: "click",
+      errorLabel: "Couldn't delete",
+      onConfirm,
+      onConfirmError,
+    })
+    await click(item)
+    expect(onConfirmError).toHaveBeenCalledOnce()
+    expect(item.getAttribute("data-state")).toBe("idle")
+    expect(item).toBe(screen.getByRole("menuitem", { name: "Couldn't delete" }))
+    expect(closed(onOpenChange)).toBe(false)
+    fail = false
+    await click(item)
+    await flush()
+    expect(onConfirm).toHaveBeenCalledTimes(2)
+    expect(closed(onOpenChange)).toBe(true)
+  })
+
+  it("undo=manual: keeps Undo until another item is pressed, then commits once", async () => {
+    const { item, onConfirm } = renderMenu({ gesture: "click", undo: "manual" })
+    await click(item)
+    await act(async () => vi.advanceTimersByTime(600000))
+    expect(item.getAttribute("data-state")).toBe("undo")
+    expect(onConfirm).not.toHaveBeenCalled()
+    await act(async () =>
+      fireEvent.pointerDown(screen.getByRole("menuitem", { name: "Rename" }))
+    )
+    await act(async () => fireEvent.keyDown(item, { key: "Escape" }))
+    await act(async () => vi.advanceTimersByTime(1000))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("commitUndoOnClose passes a rejection to onConfirmError", async () => {
+    const onConfirmError = vi.fn()
+    const onRejection = vi.fn()
+    process.on("unhandledRejection", onRejection)
+    try {
+      const { item } = renderMenu({
+        gesture: "click",
+        undo: true,
+        onConfirmError,
+        onConfirm: () => Promise.reject(new Error("offline")),
+      })
+      await click(item)
+      await act(async () => fireEvent.keyDown(item, { key: "Escape" }))
+      await act(async () => vi.advanceTimersByTime(1000))
+      vi.useRealTimers()
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 0))
+      })
+      expect(onConfirmError.mock.calls[0]?.[0]).toHaveProperty(
+        "message",
+        "offline"
+      )
+      expect(onRejection).not.toHaveBeenCalled()
+    } finally {
+      process.off("unhandledRejection", onRejection)
+    }
+  })
+
+  it("armDelay ignores clicks right after the menu opens", async () => {
+    const { item, onConfirm } = renderMenu({ gesture: "click", armDelay: 300 })
+    await click(item)
+    expect(onConfirm).not.toHaveBeenCalled()
+    await act(async () => vi.advanceTimersByTime(300))
+    await click(item)
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+})

@@ -1,0 +1,138 @@
+---
+title: Unsaved Changes
+description: A hook that asks before leaving a form with unsaved changes, in a dialog for in-app navigation and the browser's prompt for reloads and closed tabs.
+---
+
+<Example name="unsaved-changes/demo" />
+
+## Installation
+
+<Install args="add @sureui/unsaved-changes" />
+
+## Usage
+
+```tsx
+import { useUnsavedChanges } from "@/components/ui/sureui/unsaved-changes"
+
+const { confirmLeave, dialog } = useUnsavedChanges({ when: dirty })
+
+async function openBilling() {
+  if (await confirmLeave()) navigate("/settings/billing")
+}
+
+return (
+  <>
+    <form>...</form>
+    {dialog}
+  </>
+)
+```
+
+While `when` is true, reloading or closing the tab shows the browser's own prompt, and `confirmLeave()` opens a dialog with Keep editing and Discard changes. It resolves `true` when it's fine to leave. While `when` is false it resolves `true` right away.
+
+The hook doesn't know your router. Call `confirmLeave()` before any navigation you start, or hand it to your router's blocker.
+
+### React Router
+
+`useBlocker` needs a data router, such as `createBrowserRouter`. It stops links, `navigate()` and back and forward inside the app.
+
+```tsx
+import { useBlocker } from "react-router"
+
+const { confirmLeave, dialog } = useUnsavedChanges({ when: dirty })
+const blocker = useBlocker(dirty)
+
+React.useEffect(() => {
+  if (blocker.state !== "blocked") return
+  confirmLeave().then((leave) => (leave ? blocker.proceed() : blocker.reset()))
+}, [blocker, confirmLeave])
+```
+
+### TanStack Router
+
+`shouldBlockFn` can return a promise. It stops links, `navigate()` and back and forward inside the app. Turn off TanStack's own unload prompt, since the hook already adds one.
+
+```tsx
+import { useBlocker } from "@tanstack/react-router"
+
+const { confirmLeave, dialog } = useUnsavedChanges({ when: dirty })
+
+useBlocker({
+  shouldBlockFn: async () => !(await confirmLeave()),
+  enableBeforeUnload: false,
+})
+```
+
+### Next.js App Router
+
+The App Router has no navigation blocker. `Link` calls `onNavigate` before a client-side navigation, and calling `preventDefault()` there cancels it:
+
+```tsx
+"use client"
+
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+
+const router = useRouter()
+const { confirmLeave, dialog } = useUnsavedChanges({ when: dirty })
+
+<Link
+  href="/settings/billing"
+  onNavigate={(event) => {
+    if (!dirty) return
+    event.preventDefault()
+    confirmLeave().then((leave) => leave && router.push("/settings/billing"))
+  }}
+>
+  Billing
+</Link>
+```
+
+Wrap your own calls the same way: `if (await confirmLeave()) router.push(href)`.
+
+This covers the `Link`s you add `onNavigate` to, the `router` calls you wrap, and reloads, closed tabs and links to other sites through the browser's prompt. It doesn't cover:
+
+- The browser's back and forward buttons. The App Router can't cancel them.
+- `Link`s without `onNavigate` and `router` calls you haven't wrapped, such as a shared header or another library.
+- `redirect()` from a Server Action or a Server Component.
+
+With `cacheComponents`, Next.js hides the page you leave instead of unmounting it. The hook stops guarding while the page is hidden, and the draft is still there when you come back.
+
+## Examples
+
+### Save from the dialog
+
+With `onSave`, the dialog offers Save and stays open until it settles. Discard changes then asks once more before the edits are thrown away. `onDiscard` runs once they are.
+
+<Example name="unsaved-changes/save" />
+
+## API reference
+
+### useUnsavedChanges(options)
+
+| Prop | Type | Default |
+| --- | --- | --- |
+| `when` | `boolean` | required |
+| `onSave` | `() => void \| Promise<unknown>` | — |
+| `onDiscard` | `() => void` | — |
+| `beforeUnload` | `boolean` | `true` |
+| `title` | `string` | `"Discard unsaved changes?"` |
+| `saveTitle` | `string` | `"Save changes before leaving?"` |
+| `description` | `ReactNode` | `"Your changes haven't been saved."` |
+| `keepLabel` | `string` | `"Keep editing"` |
+| `discardLabel` | `string` | `"Discard changes"` |
+| `saveLabel` | `string` | `"Save"` |
+
+`beforeUnload={false}` leaves reloads and closed tabs alone, for when your router already prompts.
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `confirmLeave` | `() => Promise<boolean>` | Opens the dialog while `when` is true. Resolves `true` once the changes are saved or discarded, and `false` on Keep editing, Escape or unmount. Called again while the dialog is open, it returns the same promise. |
+| `dialog` | `ReactElement` | The dialog. Render it once. |
+
+## Accessibility
+
+- The dialog is a [Confirm Dialog](/docs/confirm-dialog#accessibility): it has the `alertdialog` role, named by the title and described by the description.
+- Without `onSave`, Keep editing has focus when the dialog opens, so Enter doesn't throw anything away.
+- With `onSave`, focus starts on Discard changes, which only moves to the discard step. While Save is pending, Keep editing and Escape do nothing.
+- Browsers show their own text in the unload prompt, and only after someone has interacted with the page.

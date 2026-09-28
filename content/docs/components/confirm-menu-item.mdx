@@ -36,7 +36,13 @@ The first click arms the item and the second confirms. The menu stays open until
 
 With `undo`, the item turns into Undo. Closing the menu during the window commits the action unless `commitUndoOnClose={false}`.
 
+With `undo="manual"`, Undo stays until people move to another item, press outside it or close the menu.
+
 <Example name="confirm-menu-item/undo" />
+
+### Errors
+
+`onConfirmError`, `errorLabel` and `armDelay` work as on [Confirm Button](/docs/confirm-button#errors). A failed item keeps the menu open and shows `errorLabel`, so the next activation tries again.
 
 ### Context menu
 
@@ -55,31 +61,39 @@ Extends the shadcn [`DropdownMenuItem`](https://ui.shadcn.com/docs/components/ba
 | `...menuItemProps` | [`DropdownMenuItem`](https://ui.shadcn.com/docs/components/base/dropdown-menu) props | — |
 | `onConfirm` | `() => void \| Promise<unknown>` | required |
 | `onCancel` | `() => void` | — |
+| `onConfirmError` | `(error: unknown) => void` | — |
 | `gesture` | `"click" \| "click-again" \| "hold"` | `"click-again"` |
 | `menu` | `"dropdown" \| "context"` | `"dropdown"` |
 | `closeOnConfirm` | `boolean` | `true` |
 | `closeOnUndo` | `boolean` | `true` |
 | `commitUndoOnClose` | `boolean` | `true` |
-| `undo` | `boolean \| number` | — |
+| `undo` | `boolean \| number \| "manual"` | — |
 | `pauseUndoOnHover` | `boolean` | `true` |
 | `pauseUndoOnFocus` | `boolean` | `true` |
 | `confirmLabel` | `ReactNode` | `"Click again to confirm"`, or `"Confirm"` for a hold |
 | `releaseLabel` | `ReactNode` | — |
 | `undoLabel` | `ReactNode` | `"Undo"` |
+| `errorLabel` | `ReactNode` | — |
+| `armDelay` | `number` | `0` |
 | `timeout` | `number` | `3000` |
 | `cancelOnBlur` | `boolean` | `true` |
 | `duration` | `number` | `1200` |
 | `confirmOnRelease` | `boolean` | `false` |
 | `cancelHoldOnLeave` | `boolean` | `true` |
 | `holdFallback` | `"click-again" \| "none"` | `"click-again"` |
-| `announcements` | `{ armed?, hold?, fallback?, ready?, undo? }` | — |
+| `announcements` | `{ armed?, hold?, fallback?, ready?, undo?, error? }` | — |
 
 ### Data attributes
 
-The item sets the same `data-state` values as [Confirm Button](/docs/confirm-button#data-attributes).
+The item sets the same `data-state` values and `data-error` as [Confirm Button](/docs/confirm-button#data-attributes).
 
 ## Accessibility
 
 - Moving the highlight to another item disarms it, unless `cancelOnBlur={false}`.
 - Key repeat is ignored, so holding Enter can't arm and confirm at once.
 - Each state change is announced in a polite live region. Change the text with `announcements`.
+
+### WCAG
+
+- 2.2.1 Timing Adjustable: `undo="manual"` meets it, since Undo has no time limit.
+- 2.5.2 Pointer Cancellation: `gesture="hold"` meets it, because releasing early or moving off the item cancels.

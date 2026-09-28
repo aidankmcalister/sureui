@@ -23,6 +23,7 @@ type ConfirmMenuItemProps = Omit<
     confirmLabel?: React.ReactNode
     releaseLabel?: React.ReactNode
     undoLabel?: React.ReactNode
+    errorLabel?: React.ReactNode
     closeOnConfirm?: boolean
     closeOnUndo?: boolean
     commitUndoOnClose?: boolean
@@ -32,12 +33,14 @@ type ConfirmMenuItemProps = Omit<
       armed?: string
       fallback?: string
       undo?: string
+      error?: string
     }
   }
 
 function ConfirmMenuItem({
   onConfirm,
   onCancel,
+  onConfirmError,
   undo,
   pauseUndoOnHover,
   pauseUndoOnFocus,
@@ -48,11 +51,13 @@ function ConfirmMenuItem({
   cancelOnBlur,
   cancelHoldOnLeave,
   holdFallback = "click-again",
+  armDelay,
   disabled,
   menu = "dropdown",
   confirmLabel,
   releaseLabel,
   undoLabel = "Undo",
+  errorLabel,
   closeOnConfirm = true,
   closeOnUndo = true,
   commitUndoOnClose = true,
@@ -65,9 +70,14 @@ function ConfirmMenuItem({
   const [closing, setClosing] = React.useState(false)
   const closingRef = React.useRef(false)
   const stateRef = React.useRef<ConfirmationState>("idle")
-  const latestRef = React.useRef({ onConfirm, commitUndoOnClose })
+  const latestRef = React.useRef({
+    onConfirm,
+    onConfirmError,
+    commitUndoOnClose,
+  })
 
   function handleConfirm() {
+    stateRef.current = "pending"
     const result = onConfirm()
     if (!closeOnConfirm) return result
     if (isPromise(result)) {
@@ -87,27 +97,30 @@ function ConfirmMenuItem({
     if (fromUndo && closeOnUndo) setClosing(true)
   }
 
-  const { state, fillRef, getTriggerProps } = useConfirmation<HTMLDivElement>({
-    onConfirm: handleConfirm,
-    onCancel: handleCancel,
-    undo,
-    pauseUndoOnHover,
-    pauseUndoOnFocus,
-    gesture,
-    timeout,
-    duration,
-    confirmOnRelease,
-    cancelOnBlur,
-    cancelHoldOnLeave,
-    holdFallback,
-    disabled,
-  })
+  const { state, failed, fillRef, getTriggerProps } =
+    useConfirmation<HTMLDivElement>({
+      onConfirm: handleConfirm,
+      onCancel: handleCancel,
+      onConfirmError,
+      undo,
+      pauseUndoOnHover,
+      pauseUndoOnFocus,
+      gesture,
+      timeout,
+      duration,
+      confirmOnRelease,
+      cancelOnBlur,
+      cancelHoldOnLeave,
+      holdFallback,
+      armDelay,
+      disabled,
+    })
   const labelId = React.useId()
   const hintId = React.useId()
 
   React.useEffect(() => {
     stateRef.current = state
-    latestRef.current = { onConfirm, commitUndoOnClose }
+    latestRef.current = { onConfirm, onConfirmError, commitUndoOnClose }
   })
 
   React.useEffect(() => {
@@ -120,8 +133,13 @@ function ConfirmMenuItem({
   React.useEffect(
     () => () => {
       const latest = latestRef.current
-      if (stateRef.current === "undo" && latest.commitUndoOnClose) {
-        latest.onConfirm()
+      if (stateRef.current !== "undo" || !latest.commitUndoOnClose) return
+      if (!latest.onConfirmError) return void latest.onConfirm()
+      try {
+        const result = latest.onConfirm()
+        if (isPromise(result)) result.then(undefined, latest.onConfirmError)
+      } catch (error) {
+        latest.onConfirmError(error)
       }
     },
     []
@@ -131,12 +149,15 @@ function ConfirmMenuItem({
   const Item = menu === "context" ? ContextMenuItem : DropdownMenuItem
 
   const hasReleaseLabel = gesture === "hold" && releaseLabel != null
+  const showError = failed && state === "idle" && errorLabel != null
   const shown =
     state === "armed" ||
     state === "undo" ||
     (state === "ready" && hasReleaseLabel)
       ? state
-      : "idle"
+      : showError
+        ? "error"
+        : "idle"
   const labels = [
     { state: "idle", node: children },
     ...(gesture === "click-again" ||
@@ -152,6 +173,7 @@ function ConfirmMenuItem({
       : []),
     ...(hasReleaseLabel ? [{ state: "ready", node: releaseLabel }] : []),
     ...(undo ? [{ state: "undo", node: undoLabel }] : []),
+    ...(errorLabel != null ? [{ state: "error", node: errorLabel }] : []),
   ]
 
   const holdDescribedBy =
@@ -172,13 +194,18 @@ function ConfirmMenuItem({
       }}
       closeOnClick={closing}
       aria-label={
-        state === "undo" && typeof undoLabel === "string" && props["aria-label"]
+        props["aria-label"] && shown === "undo" && typeof undoLabel === "string"
           ? undoLabel
-          : props["aria-label"]
+          : props["aria-label"] &&
+              shown === "error" &&
+              typeof errorLabel === "string"
+            ? errorLabel
+            : props["aria-label"]
       }
       aria-labelledby={named ? props["aria-labelledby"] : labelId}
       aria-describedby={holdDescribedBy}
       data-state={state}
+      data-error={failed || undefined}
       className={cn(
         "overflow-hidden motion-safe:data-[state=pending]:animate-pulse motion-safe:data-disabled:data-[state=pending]:opacity-100",
         gesture === "hold" ? "touch-none" : "touch-manipulation",
@@ -224,7 +251,12 @@ function ConfirmMenuItem({
                   : "Click again to confirm"))
               : state === "undo"
                 ? (announcements?.undo ?? "Done. Undo is available.")
-                : ""}
+                : showError
+                  ? (announcements?.error ??
+                    (typeof errorLabel === "string"
+                      ? errorLabel
+                      : "Failed. Activate again to retry."))
+                  : ""}
       </span>
     </Item>
   )

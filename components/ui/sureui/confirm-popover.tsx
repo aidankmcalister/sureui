@@ -23,14 +23,19 @@ import {
 
 type PopoverContentProps = React.ComponentProps<typeof PopoverContent>
 
-type ConfirmPopoverProps = Pick<ConfirmationOptions, "onConfirm" | "onCancel"> &
+type ConfirmPopoverProps = Pick<
+  ConfirmationOptions,
+  "onConfirm" | "onCancel" | "onConfirmError"
+> &
   Omit<GestureOptions, "disabled"> & {
     children: React.ReactElement
     description: React.ReactNode
     title?: string
     confirmLabel?: string
+    errorLabel?: string
     cancelLabel?: string
     showCancel?: boolean
+    initialFocus?: "confirm" | "cancel" | "none"
     variant?: ConfirmButtonProps["variant"]
     side?: PopoverContentProps["side"]
     align?: PopoverContentProps["align"]
@@ -41,6 +46,7 @@ type ConfirmPopoverProps = Pick<ConfirmationOptions, "onConfirm" | "onCancel"> &
       ready?: string
       armed?: string
       fallback?: string
+      error?: string
     }
   }
 
@@ -49,8 +55,10 @@ function ConfirmPopover({
   description,
   title,
   confirmLabel = "Confirm",
+  errorLabel,
   cancelLabel = "Cancel",
   showCancel = true,
+  initialFocus = "confirm",
   variant = "default",
   side = "bottom",
   align = "center",
@@ -58,11 +66,14 @@ function ConfirmPopover({
   onOpenChange,
   onConfirm,
   onCancel,
+  onConfirmError,
   announcements,
   ...gestureOptions
 }: ConfirmPopoverProps) {
   const [uncontrolledOpen, setUncontrolledOpen] = React.useState(false)
   const [pending, setPending] = React.useState(false)
+  const popupRef = React.useRef<HTMLDivElement>(null)
+  const cancelRef = React.useRef<HTMLButtonElement>(null)
   const confirmRef = React.useRef<HTMLButtonElement>(null)
   const open = openProp ?? uncontrolledOpen
 
@@ -99,7 +110,18 @@ function ConfirmPopover({
   return (
     <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger render={children} />
-      <PopoverContent side={side} align={align} initialFocus={confirmRef}>
+      <PopoverContent
+        ref={popupRef}
+        side={side}
+        align={align}
+        initialFocus={
+          initialFocus === "none"
+            ? popupRef
+            : initialFocus === "cancel" && showCancel
+              ? cancelRef
+              : confirmRef
+        }
+      >
         <PopoverHeader>
           {title ? (
             <>
@@ -115,6 +137,7 @@ function ConfirmPopover({
         <div className="flex justify-end gap-2">
           {showCancel && (
             <Button
+              ref={cancelRef}
               type="button"
               variant="outline"
               size="sm"
@@ -131,7 +154,9 @@ function ConfirmPopover({
             size="sm"
             variant={variant}
             announcements={announcements}
+            errorLabel={errorLabel}
             onConfirm={run}
+            onConfirmError={onConfirmError}
           >
             {confirmLabel}
           </ConfirmButton>

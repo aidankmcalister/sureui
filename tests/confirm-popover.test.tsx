@@ -150,6 +150,31 @@ describe("ConfirmPopover", () => {
     await waitFor(() => expect(document.activeElement).toBe(trigger))
   })
 
+  it("initialFocus: cancel focuses Cancel", async () => {
+    const { trigger } = renderPopover({ initialFocus: "cancel" })
+    await open(trigger)
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        screen.getByRole("button", { name: "Cancel" })
+      )
+    )
+  })
+
+  it("initialFocus: none focuses the popover itself", async () => {
+    const { trigger } = renderPopover({ initialFocus: "none" })
+    const popup = await open(trigger)
+    await waitFor(() => expect(document.activeElement).toBe(popup))
+  })
+
+  it("initialFocus: cancel without showCancel falls back to confirm", async () => {
+    const { trigger } = renderPopover({
+      initialFocus: "cancel",
+      showCancel: false,
+    })
+    await open(trigger)
+    await waitFor(() => expect(document.activeElement).toBe(confirmButton()))
+  })
+
   it("returns focus to the trigger after confirming", async () => {
     const { trigger } = renderPopover()
     trigger.focus()
@@ -344,5 +369,54 @@ describe("ConfirmPopover", () => {
     await act(async () => {})
     expect(onConfirm).not.toHaveBeenCalled()
     expect(onCancel).not.toHaveBeenCalled()
+  })
+})
+
+describe("ConfirmPopover options", () => {
+  it("armDelay ignores a click that lands right after opening", async () => {
+    const { trigger, onConfirm } = renderPopover({ armDelay: 5000 })
+    await open(trigger)
+    await act(async () => fireEvent.click(confirmButton()))
+    expect(onConfirm).not.toHaveBeenCalled()
+    expect(screen.getByRole("dialog")).toBeTruthy()
+    await act(async () => vi.advanceTimersByTime(5000))
+    await act(async () => fireEvent.click(confirmButton()))
+    expect(onConfirm).toHaveBeenCalledOnce()
+    await closed()
+  })
+
+  it("onConfirmError keeps it open with errorLabel and retries", async () => {
+    let attempt = 0
+    const onConfirm = vi.fn(() => {
+      attempt += 1
+      return attempt === 1 ? Promise.reject(new Error("offline")) : undefined
+    })
+    const onConfirmError = vi.fn()
+    const onRejection = vi.fn()
+    process.on("unhandledRejection", onRejection)
+    try {
+      const { trigger } = renderPopover({
+        onConfirm,
+        onConfirmError,
+        errorLabel: "Retry",
+      })
+      await open(trigger)
+      await act(async () => fireEvent.click(confirmButton()))
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 0))
+      })
+      expect(onConfirmError.mock.calls[0]?.[0]).toHaveProperty(
+        "message",
+        "offline"
+      )
+      expect(screen.getByRole("dialog")).toBeTruthy()
+      const retry = screen.getByRole("button", { name: "Retry" })
+      await act(async () => fireEvent.click(retry))
+      expect(onConfirm).toHaveBeenCalledTimes(2)
+      await closed()
+      expect(onRejection).not.toHaveBeenCalled()
+    } finally {
+      process.off("unhandledRejection", onRejection)
+    }
   })
 })

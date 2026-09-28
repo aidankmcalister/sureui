@@ -184,3 +184,32 @@ describe("undoToast pausing", () => {
     expect(state.value).toBe(false)
   })
 })
+
+describe("undoToast manual duration", () => {
+  it("stays until dismissed and shows a close button", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "performance"] })
+    render(<Toaster />)
+    let result!: Promise<boolean>
+    act(() => {
+      result = undoToast("Deleted", { duration: "manual" })
+    })
+    const state: { value?: boolean } = {}
+    result.then((value) => (state.value = value))
+    await act(async () => vi.advanceTimersByTime(600000))
+    expect(state.value).toBeUndefined()
+    expect(screen.getByRole("button", { name: "Undo" })).toBeTruthy()
+    fireEvent.click(screen.getByRole("button", { name: "Close toast" }))
+    await act(async () => vi.advanceTimersByTime(1000))
+    expect(state.value).toBe(true)
+  })
+
+  it("resolves false on Undo", async () => {
+    render(<Toaster />)
+    let result!: Promise<boolean>
+    act(() => {
+      result = undoToast("Deleted", { duration: "manual" })
+    })
+    fireEvent.click(await screen.findByRole("button", { name: "Undo" }))
+    await expect(result).resolves.toBe(false)
+  })
+})

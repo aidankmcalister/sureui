@@ -1,0 +1,81 @@
+---
+title: Confirm Close
+description: Asks "Discard changes?" before a dialog with unsaved edits closes.
+---
+
+<Example name="confirm-close/demo" />
+
+## Installation
+
+<Install args="add @sureui/confirm-close" />
+
+## Usage
+
+```tsx
+import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog"
+import { useConfirmClose } from "@/components/ui/sureui/confirm-close"
+
+const { rootProps, question, close } = useConfirmClose(dirty, {
+  onDiscard: resetForm,
+})
+
+<Dialog {...rootProps}>
+  <DialogContent>
+    <ProfileForm onSaved={close} />
+    <DialogFooter>{question ?? <FormButtons />}</DialogFooter>
+  </DialogContent>
+</Dialog>
+```
+
+Spread `rootProps` on the root of a Base UI Dialog, Sheet or Drawer. While `dirty` is `true`, Escape, a click outside or a close button keeps it open and sets `question`: two buttons, Keep editing and Discard changes. Render it in place of your footer buttons, so the dialog keeps its size. Discard changes closes, Keep editing goes back to the form. While `dirty` is `false`, it closes straight away and `question` is `null`.
+
+`close()` closes without asking. Call it after saving.
+
+For leaving a page rather than closing a dialog, use [Unsaved Changes](/docs/unsaved-changes).
+
+`rootProps` makes the root controlled. To control `open` yourself, pass `open` and `onOpenChange` to the hook instead of the root.
+
+## Examples
+
+### Wording
+
+`confirmLabel` and `cancelLabel` change the buttons, and `title` changes what screen readers announce.
+
+<Example name="confirm-close/wording" />
+
+## API reference
+
+### useConfirmClose(dirty, options)
+
+Returns `{ rootProps, question, close }`: props for the dialog root, the buttons to render while asking (otherwise `null`), and a function that closes without asking. Discard changes is a [Confirm Button](/docs/confirm-button), so it takes the gesture options too.
+
+| Prop | Type | Default |
+| --- | --- | --- |
+| `dirty` | `boolean` | required |
+| `onDiscard` | `() => void \| Promise<unknown>` | — |
+| `onConfirmError` | `(error: unknown) => void` | — |
+| `open` | `boolean` | — |
+| `defaultOpen` | `boolean` | `false` |
+| `onOpenChange` | `(open: boolean) => void` | — |
+| `title` | `string` | `"Discard changes?"` |
+| `confirmLabel` | `ReactNode` | `"Discard changes"` |
+| `cancelLabel` | `ReactNode` | `"Keep editing"` |
+| `errorLabel` | `ReactNode` | — |
+| `variant` | [`Button`](https://ui.shadcn.com/docs/components/base/button) `variant` | `"destructive"` |
+| `gesture` | `"click" \| "click-again" \| "hold"` | `"click"` |
+| `timeout` | `number` | `3000` |
+| `cancelOnBlur` | `boolean` | `true` |
+| `duration` | `number` | `1200` |
+| `confirmOnRelease` | `boolean` | `false` |
+| `cancelHoldOnLeave` | `boolean` | `true` |
+| `holdFallback` | `"click-again" \| "none"` | `"click-again"` |
+| `armDelay` | `number` | `0` |
+| `announcements` | `{ armed?, hold?, fallback?, ready?, undo?, error? }` | — |
+
+If `onDiscard` returns a promise, Discard changes stays pending until it settles, and the dialog closes only if it succeeds. If it fails, the buttons stay and the error goes to `onConfirmError`, as on [Confirm Button](/docs/confirm-button).
+
+## Accessibility
+
+- When asking starts, `title` is announced in a polite live region and focus moves to Keep editing, the choice that loses nothing.
+- Keep editing returns focus to where it was before the close was attempted.
+- While asking, Escape and outside clicks do nothing more, so the dialog can't close by accident.

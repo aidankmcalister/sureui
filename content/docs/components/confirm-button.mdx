@@ -29,7 +29,9 @@ The button turns into Undo right away, and `onConfirm` waits until the window cl
 
 <Example name="confirm-button/undo" />
 
-The window lasts 5 seconds, or the milliseconds you pass to `undo`, and pauses while the pointer or focus is on the button. Unmounting during the window drops the action without calling either handler.
+The window lasts 5 seconds, or the milliseconds you pass to `undo` between 4 and 60 seconds, and pauses while the pointer or focus is on the button. Unmounting during the window drops the action without calling either handler.
+
+With `undo="manual"`, Undo stays until people move on: a press outside the button or focus moving elsewhere runs `onConfirm`. There is no fill, since nothing is counting down.
 
 ### Click again
 
@@ -53,6 +55,18 @@ Return a promise from `onConfirm` and the button pulses until it settles. If it 
 
 <Example name="confirm-button/pending" />
 
+### Errors
+
+By default, when `onConfirm` throws or rejects, the button goes back to idle and the error reaches your app unchanged. Pass `onConfirmError` to receive it instead, and `errorLabel` to show the failure on the button until the next activation, which tries again.
+
+<Example name="confirm-button/errors" />
+
+The error label is announced in the polite live region. Change the text with `announcements.error`.
+
+### Arm delay
+
+`armDelay` ignores activation for that many milliseconds after the button mounts or arms, so the second click of a double click can't pass through. It helps most inside a dialog or popover, where the button appears under the pointer.
+
 ### Labels
 
 `confirmLabel` shows while armed and `undoLabel` during the undo window. With `confirmOnRelease`, `releaseLabel` shows while a finished hold waits for release.
@@ -70,24 +84,27 @@ Extends the shadcn [`Button`](https://ui.shadcn.com/docs/components/base/button)
 | `...buttonProps` | [`Button`](https://ui.shadcn.com/docs/components/base/button) props | — |
 | `onConfirm` | `() => void \| Promise<unknown>` | required |
 | `onCancel` | `() => void` | — |
+| `onConfirmError` | `(error: unknown) => void` | — |
 | `gesture` | `"click" \| "click-again" \| "hold"` | `"click"` |
-| `undo` | `boolean \| number` | — |
+| `undo` | `boolean \| number \| "manual"` | — |
 | `pauseUndoOnHover` | `boolean` | `true` |
 | `pauseUndoOnFocus` | `boolean` | `true` |
 | `confirmLabel` | `ReactNode` | `"Click again to confirm"`, or `"Confirm"` for a hold |
 | `releaseLabel` | `ReactNode` | — |
 | `undoLabel` | `ReactNode` | `"Undo"` |
+| `errorLabel` | `ReactNode` | — |
+| `armDelay` | `number` | `0` |
 | `timeout` | `number` | `3000` |
 | `cancelOnBlur` | `boolean` | `true` |
 | `duration` | `number` | `1200` |
 | `confirmOnRelease` | `boolean` | `false` |
 | `cancelHoldOnLeave` | `boolean` | `true` |
 | `holdFallback` | `"click-again" \| "none"` | `"click-again"` |
-| `announcements` | `{ armed?, hold?, fallback?, ready?, undo? }` | — |
+| `announcements` | `{ armed?, hold?, fallback?, ready?, undo?, error? }` | — |
 
 ### Data attributes
 
-The button sets `data-state`, so you can style around it.
+The button sets `data-state`, so you can style around it. After `onConfirm` fails, it also sets `data-error` until the next activation.
 
 | Value | When |
 | --- | --- |
@@ -104,3 +121,8 @@ The button sets `data-state`, so you can style around it.
 - Each state change is announced in a polite live region. Replace the English text with `announcements`.
 - Screen reader and keyboard users can confirm a hold with two activations. Set `holdFallback="none"` to turn this off.
 - With `prefers-reduced-motion`, fills jump to their end state instead of moving, and a pending button dims instead of pulsing.
+
+### WCAG
+
+- 2.2.1 Timing Adjustable: `undo="manual"` meets it, since Undo has no time limit. A numeric `undo` stops at 60 seconds.
+- 2.5.2 Pointer Cancellation: `gesture="hold"` meets it, because releasing early or moving off the button cancels. `click` and `click-again` run on the up event.

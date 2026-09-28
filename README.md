@@ -4,17 +4,19 @@ Confirmation components for [shadcn/ui](https://ui.shadcn.com), built on [Base U
 
 When every action opens an "Are you sure?" dialog, people stop reading and confirm on reflex. SureUI has other ways to ask: undo, a second click, a press and hold, a typed name, or a dialog when you want one. The components install into your app with the shadcn CLI and look like stock shadcn, so they fit whatever your app already looks like.
 
-| Component         | What it does                                                                |
-| ----------------- | --------------------------------------------------------------------------- |
-| `ConfirmButton`   | Confirms on a click, a second click or a press and hold, with optional undo |
-| `ConfirmMenuItem` | The same gestures in dropdown and context menus                             |
-| `TypeToConfirm`   | Unlocks only after the exact phrase is typed                                |
-| `ConfirmDialog`   | An optional alert dialog, with an awaitable `useConfirm`                    |
-| `ConfirmPopover`  | A one-line confirmation anchored to its trigger                             |
-| `Consequences`    | Lists what a confirmation will remove, with counts and names                |
-| `undoToast`       | A toast with Undo that resolves once nobody undoes                          |
-| `Undoable`        | Collapses a removed row in place to a label and an Undo button              |
-| `ToolApproval`    | Approves or denies an AI SDK tool call with a gesture that matches its risk |
+| Component           | What it does                                                                |
+| ------------------- | --------------------------------------------------------------------------- |
+| `ConfirmButton`     | Confirms on a click, a second click or a press and hold, with optional undo |
+| `ConfirmMenuItem`   | The same gestures in dropdown and context menus                             |
+| `TypeToConfirm`     | Unlocks only after the exact phrase is typed                                |
+| `ConfirmDialog`     | An optional alert dialog, with an awaitable `useConfirm`                    |
+| `ConfirmPopover`    | A one-line confirmation anchored to its trigger                             |
+| `Consequences`      | Lists what a confirmation will remove, with counts and names                |
+| `undoToast`         | A toast with Undo that resolves once nobody undoes                          |
+| `Undoable`          | Collapses a removed row in place to a label and an Undo button              |
+| `useUnsavedChanges` | Asks before someone leaves unsaved changes, with any router                 |
+| `useConfirmClose`   | Asks before a dialog with unsaved edits closes                              |
+| `ToolApproval`      | Approves or denies an AI SDK tool call with a gesture that matches its risk |
 
 The [blocks](https://sureui.com/blocks) are full screens built from these components, installed as app code you edit.
 
@@ -90,6 +92,19 @@ Pass `onConfirm` to keep the dialog open and pending until the work finishes. `c
 
 ```tsx
 await confirm({ title: "Leave the team?", onConfirm: leaveTeam })
+```
+
+To ask before a Dialog, Sheet or Drawer with unsaved edits closes, use `useConfirmClose`:
+
+```tsx
+const { rootProps, dialog, close } = useConfirmClose(dirty)
+
+<Dialog {...rootProps}>
+  <DialogContent>
+    <ProfileForm onSaved={close} />
+    {dialog}
+  </DialogContent>
+</Dialog>
 ```
 
 ## Development

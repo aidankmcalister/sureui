@@ -29,6 +29,18 @@ Each sentence in `acknowledgements` adds a checkbox. The button unlocks once the
 
 <Example name="type-to-confirm/acknowledgements" />
 
+### Several phrases
+
+Pass `phrase` an array to ask for more than one field, such as the project name and a fixed sentence. The button unlocks once every field matches. With an array of phrases, `label` can be an array too, one label per field.
+
+<Example name="type-to-confirm/several-phrases" />
+
+### Choices
+
+Each item in `choices` adds a checkbox that doesn't block confirming. `onConfirm` receives their values by `name`, as they were when the person confirmed, and they reset to `defaultChecked` afterwards.
+
+<Example name="type-to-confirm/choices" />
+
 ### Consequences
 
 Pass a [Consequences](/docs/consequences) list to show what the action removes, above the input.
@@ -55,26 +67,34 @@ Renders a `form`.
 
 | Prop | Type | Default |
 | --- | --- | --- |
-| `phrase` | `string` | required |
-| `onConfirm` | `() => void \| Promise<unknown>` | required |
+| `phrase` | `string \| string[]` | required |
+| `onConfirm` | `(choices: Record<string, boolean>) => void \| Promise<unknown>` | required |
 | `onCancel` | `() => void` | — |
+| `onConfirmError` | `(error: unknown) => void` | — |
 | `caseSensitive` | `boolean` | `true` |
 | `trim` | `boolean` | `false` |
 | `acknowledgements` | `string[]` | `[]` |
+| `choices` | `{ name: string, label: ReactNode, defaultChecked?: boolean }[]` | `[]` |
 | `consequences` | `ReactNode` | — |
-| `label` | `ReactNode` | `"Type {phrase} to confirm"` |
+| `label` | `ReactNode \| ReactNode[]` | `"Type {phrase} to confirm"` |
 | `confirmLabel` | `string` | `"Confirm"` |
 | `undoLabel` | `string` | `"Undo"` |
+| `errorLabel` | `string` | — |
 | `variant` | [`Button`](https://ui.shadcn.com/docs/components/base/button) `variant` | `"destructive"` |
-| `undo` | `boolean \| number` | — |
+| `undo` | `boolean \| number \| "manual"` | — |
 | `pauseUndoOnHover` | `boolean` | `true` |
 | `pauseUndoOnFocus` | `boolean` | `true` |
 | `renderActions` | `(confirmButton: ReactElement) => ReactNode` | — |
 | `className` | `string` | — |
-| `announcements` | `{ match?, undo? }` | — |
+| `announcements` | `{ match?, undo?, error? }` | — |
 
 ## Accessibility
 
-- A matching phrase is announced in a polite live region. Change the text with `announcements`.
+- A matching phrase is announced in a polite live region. Change the text with `announcements`. With several phrases, each field has its own label and announces its own match.
 - While `onConfirm` is pending, the input is read-only and the button keeps focus.
-- The input and checkboxes clear after confirming, so an undone form isn't one click from running again.
+- The inputs and checkboxes clear after confirming, so an undone form isn't one click from running again.
+- `onConfirmError` and `errorLabel` work as on [Confirm Button](/docs/confirm-button#errors). The form still clears, so a retry means typing the phrase again.
+
+### WCAG
+
+- 2.2.1 Timing Adjustable: `undo="manual"` meets it, since Undo has no time limit.

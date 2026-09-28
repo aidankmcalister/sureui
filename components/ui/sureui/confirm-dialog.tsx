@@ -12,6 +12,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
 import {
   ConfirmButton,
   type ConfirmButtonProps,
@@ -20,29 +21,45 @@ import {
   type ConfirmationOptions,
   type GestureOptions,
 } from "@/components/ui/sureui/confirmation"
-import { TypeToConfirm } from "@/components/ui/sureui/type-to-confirm"
+import {
+  ConfirmChoiceList,
+  TypeToConfirm,
+  type ConfirmChoice,
+  type ConfirmChoices,
+} from "@/components/ui/sureui/type-to-confirm"
+
+type ConfirmDialogAlternative = {
+  label: React.ReactNode
+  onSelect: () => void | Promise<unknown>
+}
 
 type ConfirmDialogOptions = Pick<
   ConfirmationOptions,
-  "onConfirm" | "onCancel"
+  "onCancel" | "onConfirmError"
 > &
   Omit<GestureOptions, "disabled"> & {
+    onConfirm: (choices: ConfirmChoices) => void | Promise<unknown>
     title: string
     description?: React.ReactNode
     consequences?: React.ReactNode
     cancelLabel?: string
     confirmLabel?: string
+    errorLabel?: string
     variant?: ConfirmButtonProps["variant"]
-    phrase?: string
+    initialFocus?: "cancel" | "confirm" | "none"
+    alternative?: ConfirmDialogAlternative
+    phrase?: string | string[]
     caseSensitive?: boolean
     trim?: boolean
     acknowledgements?: string[]
+    choices?: ConfirmChoice[]
     announcements?: {
       hold?: string
       ready?: string
       armed?: string
       fallback?: string
       match?: string
+      error?: string
     }
   }
 
@@ -53,9 +70,11 @@ type ConfirmDialogProps = ConfirmDialogOptions & {
 type ConfirmOptions = Omit<ConfirmDialogOptions, "onConfirm" | "onCancel"> &
   Partial<Pick<ConfirmDialogOptions, "onConfirm">>
 
+type Pending = "confirm" | "alternative" | null
+
 function useConfirmDialog() {
   const [open, setOpen] = React.useState(false)
-  const [pending, setPending] = React.useState(false)
+  const [pending, setPending] = React.useState<Pending>(null)
   const [request, setRequest] = React.useState<ConfirmOptions | null>(null)
   const resolver = React.useRef<((value: boolean) => void) | null>(null)
 
@@ -76,14 +95,18 @@ function useConfirmDialog() {
 
   React.useEffect(() => () => resolver.current?.(false), [])
 
-  async function run(onConfirm: ConfirmOptions["onConfirm"]) {
-    if (!onConfirm) return settle(true)
-    setPending(true)
+  async function run(
+    action: Exclude<Pending, null>,
+    work: (() => unknown) | undefined,
+    value: boolean
+  ) {
+    if (!work) return settle(value)
+    setPending(action)
     try {
-      await onConfirm()
-      settle(true)
+      await work()
+      settle(value)
     } finally {
-      setPending(false)
+      setPending(null)
     }
   }
 
@@ -109,7 +132,16 @@ function useConfirmDialog() {
           <ConfirmContent
             {...current}
             pending={pending}
-            onConfirm={() => run(current.onConfirm)}
+            onConfirm={(choices) =>
+              run(
+                "confirm",
+                current.onConfirm && (() => current.onConfirm?.(choices)),
+                true
+              )
+            }
+            onAlternative={() =>
+              run("alternative", current.alternative?.onSelect, false)
+            }
           />
         )}
       </AlertDialog>
@@ -129,31 +161,89 @@ function useConfirm() {
   return { confirm, dialog: render(request) }
 }
 
-function ConfirmContent({
+type ConfirmContentProps = Omit<ConfirmOptions, "onConfirm"> & {
+  pending: Pending
+  onConfirm: (choices: ConfirmChoices) => Promise<unknown>
+  onAlternative: () => Promise<unknown>
+}
+
+function ConfirmContent({ initialFocus, ...props }: ConfirmContentProps) {
+  const popupRef = React.useRef<HTMLDivElement>(null)
+  const cancelRef = React.useRef<HTMLButtonElement>(null)
+  const confirmRef = React.useRef<HTMLButtonElement>(null)
+  const focus = initialFocus ?? (props.phrase ? "confirm" : "cancel")
+
+  return (
+    <AlertDialogContent
+      ref={popupRef}
+      initialFocus={
+        focus === "none"
+          ? popupRef
+          : focus === "cancel"
+            ? cancelRef
+            : props.phrase
+              ? true
+              : confirmRef
+      }
+    >
+      <ConfirmBody {...props} cancelRef={cancelRef} confirmRef={confirmRef} />
+    </AlertDialogContent>
+  )
+}
+
+function ConfirmBody({
   title,
   description,
   consequences,
   cancelLabel = "Cancel",
   confirmLabel = "Confirm",
+  errorLabel,
   variant = "default",
+  alternative,
   phrase,
   caseSensitive,
   trim,
   acknowledgements,
+  choices = [],
   announcements,
   pending,
   onConfirm,
+  onConfirmError,
+  onAlternative,
+  cancelRef,
+  confirmRef,
   ...gestureOptions
-}: ConfirmOptions & {
-  pending: boolean
-  onConfirm: () => Promise<unknown>
+}: Omit<ConfirmContentProps, "initialFocus"> & {
+  cancelRef: React.Ref<HTMLButtonElement>
+  confirmRef: React.Ref<HTMLButtonElement>
 }) {
-  const cancel = (
-    <AlertDialogCancel disabled={pending}>{cancelLabel}</AlertDialogCancel>
+  const [picked, setPicked] = React.useState<ConfirmChoices>(() =>
+    Object.fromEntries(
+      choices.map((choice) => [choice.name, choice.defaultChecked ?? false])
+    )
   )
 
+  const cancel = (
+    <AlertDialogCancel ref={cancelRef} disabled={!!pending}>
+      {cancelLabel}
+    </AlertDialogCancel>
+  )
+  const other = alternative && (
+    <Button
+      type="button"
+      variant="secondary"
+      data-state={pending === "alternative" ? "pending" : "idle"}
+      disabled={!!pending}
+      focusableWhenDisabled={pending === "alternative"}
+      onClick={onAlternative}
+    >
+      {alternative.label}
+    </Button>
+  )
+  const blocked = pending === "alternative"
+
   return (
-    <AlertDialogContent>
+    <>
       <AlertDialogHeader>
         <AlertDialogTitle>{title}</AlertDialogTitle>
         {description && (
@@ -168,37 +258,67 @@ function ConfirmContent({
           caseSensitive={caseSensitive}
           trim={trim}
           acknowledgements={acknowledgements}
-          announcements={{ match: announcements?.match }}
+          choices={choices}
+          announcements={{
+            match: announcements?.match,
+            error: announcements?.error,
+          }}
           confirmLabel={confirmLabel}
+          errorLabel={errorLabel}
+          onConfirmError={onConfirmError}
           variant={variant}
           onConfirm={onConfirm}
           renderActions={(confirmButton) => (
             <AlertDialogFooter>
               {cancel}
-              {confirmButton}
+              {other}
+              {blocked
+                ? React.cloneElement(
+                    confirmButton as React.ReactElement<{ disabled?: boolean }>,
+                    { disabled: true }
+                  )
+                : confirmButton}
             </AlertDialogFooter>
           )}
         />
       ) : (
-        <AlertDialogFooter>
-          {cancel}
-          <ConfirmButton
-            {...gestureOptions}
-            announcements={announcements}
-            variant={variant}
-            onConfirm={onConfirm}
-          >
-            {confirmLabel}
-          </ConfirmButton>
-        </AlertDialogFooter>
+        <>
+          {choices.length > 0 && (
+            <div className="grid gap-4">
+              <ConfirmChoiceList
+                choices={choices}
+                value={picked}
+                disabled={!!pending}
+                onChange={setPicked}
+              />
+            </div>
+          )}
+          <AlertDialogFooter>
+            {cancel}
+            {other}
+            <ConfirmButton
+              {...gestureOptions}
+              ref={confirmRef}
+              announcements={announcements}
+              errorLabel={errorLabel}
+              variant={variant}
+              disabled={blocked}
+              onConfirm={() => onConfirm(picked)}
+              onConfirmError={onConfirmError}
+            >
+              {confirmLabel}
+            </ConfirmButton>
+          </AlertDialogFooter>
+        </>
       )}
-    </AlertDialogContent>
+    </>
   )
 }
 
 export {
   ConfirmDialog,
   useConfirm,
+  type ConfirmDialogAlternative,
   type ConfirmDialogProps,
   type ConfirmDialogOptions,
   type ConfirmOptions,

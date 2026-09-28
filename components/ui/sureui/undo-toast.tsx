@@ -9,7 +9,7 @@ import { startUndoWindow } from "@/components/ui/sureui/undo-window"
 
 type UndoToastOptions = {
   description?: React.ReactNode
-  duration?: number
+  duration?: number | "manual"
   undoLabel?: string
   pauseOnHover?: boolean
   pauseOnFocus?: boolean
@@ -119,6 +119,7 @@ function undoToast(
     const id = toast(message, {
       description,
       duration: Infinity,
+      closeButton: countdown.manual || undefined,
       action: (
         <Button
           size="sm"
@@ -128,7 +129,7 @@ function undoToast(
             toast.dismiss(id)
           }}
         >
-          <Countdown track={track} />
+          {!countdown.manual && <Countdown track={track} />}
           {undoLabel}
         </Button>
       ),

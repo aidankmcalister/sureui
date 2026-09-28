@@ -333,6 +333,249 @@ describe("ConfirmDialog", () => {
     await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
     expect(onCancel).not.toHaveBeenCalled()
   })
+
+  it("initialFocus: focuses the confirm button or the dialog itself", async () => {
+    const view = render(
+      <ConfirmDialog
+        title="Publish?"
+        initialFocus="confirm"
+        onConfirm={vi.fn()}
+      >
+        <Button>Publish</Button>
+      </ConfirmDialog>
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Publish" }))
+    const confirmButton = await screen.findByRole("button", { name: "Confirm" })
+    await waitFor(() => expect(document.activeElement).toBe(confirmButton))
+    view.unmount()
+
+    render(
+      <ConfirmDialog title="Publish?" initialFocus="none" onConfirm={vi.fn()}>
+        <Button>Publish</Button>
+      </ConfirmDialog>
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Publish" }))
+    const dialog = await screen.findByRole("alertdialog")
+    await waitFor(() => expect(document.activeElement).toBe(dialog))
+  })
+
+  it("initialFocus: a phrase starts in the field unless it says cancel", async () => {
+    const view = render(
+      <ConfirmDialog title="Delete?" phrase="acme" onConfirm={vi.fn()}>
+        <Button>Delete</Button>
+      </ConfirmDialog>
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Delete" }))
+    const input = await screen.findByRole("textbox")
+    await waitFor(() => expect(document.activeElement).toBe(input))
+    view.unmount()
+
+    render(
+      <ConfirmDialog
+        title="Delete?"
+        phrase="acme"
+        initialFocus="cancel"
+        onConfirm={vi.fn()}
+      >
+        <Button>Delete</Button>
+      </ConfirmDialog>
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Delete" }))
+    const cancel = await screen.findByRole("button", { name: "Cancel" })
+    await waitFor(() => expect(document.activeElement).toBe(cancel))
+  })
+
+  it("initialFocus: cancel by default even with choices before it", async () => {
+    render(
+      <ConfirmDialog
+        title="Delete?"
+        choices={[{ name: "snapshot", label: "Take a final snapshot" }]}
+        onConfirm={vi.fn()}
+      >
+        <Button>Delete</Button>
+      </ConfirmDialog>
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Delete" }))
+    const cancel = await screen.findByRole("button", { name: "Cancel" })
+    await waitFor(() => expect(document.activeElement).toBe(cancel))
+  })
+
+  it("variant styles the confirm button, not the trigger", async () => {
+    render(
+      <ConfirmDialog title="Delete?" variant="destructive" onConfirm={vi.fn()}>
+        <Button variant="outline">Delete</Button>
+      </ConfirmDialog>
+    )
+    const trigger = screen.getByRole("button", { name: "Delete" })
+    fireEvent.click(trigger)
+    const confirmButton = await screen.findByRole("button", { name: "Confirm" })
+    expect(confirmButton.className).toContain("text-destructive")
+    expect(trigger.className).not.toContain("text-destructive")
+  })
+
+  it("phrase: several phrases must all match", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmDialog
+        title="Delete project?"
+        phrase={["acme", "delete my project"]}
+        onConfirm={onConfirm}
+      >
+        <Button>Delete project</Button>
+      </ConfirmDialog>
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Delete project" }))
+    await screen.findByRole("alertdialog")
+    const [name, sentence] = screen.getAllByRole("textbox")
+    const confirmButton = screen.getByRole("button", { name: "Confirm" })
+    fireEvent.change(name, { target: { value: "acme" } })
+    expect(confirmButton).toHaveProperty("disabled", true)
+    fireEvent.change(sentence, { target: { value: "delete my project" } })
+    fireEvent.click(confirmButton)
+    await waitFor(() => expect(onConfirm).toHaveBeenCalledOnce())
+  })
+
+  it("choices: passes their values to onConfirm", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmDialog
+        title="Delete database?"
+        choices={[
+          {
+            name: "snapshot",
+            label: "Take a final snapshot",
+            defaultChecked: true,
+          },
+          { name: "notify", label: "Email the owners" },
+        ]}
+        onConfirm={onConfirm}
+      >
+        <Button>Delete database</Button>
+      </ConfirmDialog>
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Delete database" }))
+    fireEvent.click(
+      await screen.findByRole("checkbox", { name: "Take a final snapshot" })
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Confirm" }))
+    await waitFor(() =>
+      expect(onConfirm).toHaveBeenCalledWith({ snapshot: false, notify: false })
+    )
+  })
+
+  it("choices: start from their defaults each time it opens", async () => {
+    render(
+      <ConfirmDialog
+        title="Delete database?"
+        choices={[{ name: "snapshot", label: "Take a final snapshot" }]}
+        onConfirm={vi.fn()}
+      >
+        <Button>Delete database</Button>
+      </ConfirmDialog>
+    )
+    const trigger = screen.getByRole("button", { name: "Delete database" })
+    fireEvent.click(trigger)
+    const box = await screen.findByRole("checkbox")
+    fireEvent.click(box)
+    expect(box.getAttribute("aria-checked")).toBe("true")
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }))
+    await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
+    fireEvent.click(trigger)
+    expect(
+      (await screen.findByRole("checkbox")).getAttribute("aria-checked")
+    ).toBe("false")
+  })
+
+  it("phrase: choices reach onConfirm", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmDialog
+        title="Delete project?"
+        phrase="acme"
+        choices={[{ name: "snapshot", label: "Take a final snapshot" }]}
+        onConfirm={onConfirm}
+      >
+        <Button>Delete project</Button>
+      </ConfirmDialog>
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Delete project" }))
+    fireEvent.change(await screen.findByRole("textbox"), {
+      target: { value: "acme" },
+    })
+    fireEvent.click(screen.getByRole("checkbox"))
+    fireEvent.click(screen.getByRole("button", { name: "Confirm" }))
+    await waitFor(() =>
+      expect(onConfirm).toHaveBeenCalledWith({ snapshot: true })
+    )
+  })
+
+  it("alternative: runs onSelect and closes without either handler", async () => {
+    const onConfirm = vi.fn()
+    const onCancel = vi.fn()
+    const onSelect = vi.fn()
+    render(
+      <ConfirmDialog
+        title="Delete project?"
+        phrase="acme"
+        alternative={{ label: "Archive instead", onSelect }}
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+      >
+        <Button>Delete project</Button>
+      </ConfirmDialog>
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Delete project" }))
+    const archive = await screen.findByRole("button", {
+      name: "Archive instead",
+    })
+    expect(archive.parentElement?.getAttribute("data-slot")).toBe(
+      "alert-dialog-footer"
+    )
+    fireEvent.click(archive)
+    await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
+    expect(onSelect).toHaveBeenCalledOnce()
+    expect(onConfirm).not.toHaveBeenCalled()
+    expect(onCancel).not.toHaveBeenCalled()
+  })
+
+  it("alternative: stays open while onSelect is pending and blocks the rest", async () => {
+    let resolve!: () => void
+    const onSelect = vi.fn(() => new Promise<void>((res) => (resolve = res)))
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmDialog
+        title="Delete project?"
+        alternative={{ label: "Archive instead", onSelect }}
+        onConfirm={onConfirm}
+      >
+        <Button>Delete project</Button>
+      </ConfirmDialog>
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Delete project" }))
+    const archive = await screen.findByRole("button", {
+      name: "Archive instead",
+    })
+    fireEvent.click(archive)
+    await waitFor(() =>
+      expect(archive.getAttribute("data-state")).toBe("pending")
+    )
+    const cancel = screen.getByRole("button", { name: "Cancel" })
+    const confirmButton = screen.getByRole("button", { name: "Confirm" })
+    expect(cancel).toHaveProperty("disabled", true)
+    expect(confirmButton).toHaveProperty("disabled", true)
+    fireEvent.keyDown(document.activeElement ?? document.body, {
+      key: "Escape",
+    })
+    await act(async () => {})
+    expect(screen.getByRole("alertdialog")).toBeTruthy()
+    await act(async () => {
+      resolve()
+      await Promise.resolve()
+      await Promise.resolve()
+    })
+    await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
+    expect(onConfirm).not.toHaveBeenCalled()
+  })
 })
 
 type Confirm = ReturnType<typeof useConfirm>["confirm"]
@@ -412,9 +655,100 @@ describe("useConfirm", () => {
     await expect(result).resolves.toBe(false)
   })
 
+  it("resolves false after the alternative", async () => {
+    const onSelect = vi.fn()
+    const { result } = renderHook({
+      title: "Delete project?",
+      alternative: { label: "Archive instead", onSelect },
+    })
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Archive instead" })
+    )
+    await expect(result).resolves.toBe(false)
+    expect(onSelect).toHaveBeenCalledOnce()
+  })
+
   it("resolves false on unmount", async () => {
     const { result, view } = renderHook()
     view.unmount()
     await expect(result).resolves.toBe(false)
+  })
+})
+
+describe("ConfirmDialog options", () => {
+  it("armDelay ignores a click that lands right after opening", async () => {
+    vi.useFakeTimers({
+      toFake: ["setTimeout", "clearTimeout", "performance"],
+      shouldAdvanceTime: true,
+    })
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmDialog title="Delete?" armDelay={5000} onConfirm={onConfirm}>
+        <Button>Delete</Button>
+      </ConfirmDialog>
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Delete" }))
+    const confirm = await screen.findByRole("button", { name: "Confirm" })
+    fireEvent.click(confirm)
+    expect(onConfirm).not.toHaveBeenCalled()
+    await act(async () => vi.advanceTimersByTime(5000))
+    fireEvent.click(confirm)
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("onConfirmError keeps it open and shows errorLabel", async () => {
+    const onConfirmError = vi.fn()
+    render(
+      <ConfirmDialog
+        title="Delete?"
+        errorLabel="Try again"
+        onConfirmError={onConfirmError}
+        onConfirm={() => Promise.reject(new Error("offline"))}
+      >
+        <Button>Delete</Button>
+      </ConfirmDialog>
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Delete" }))
+    fireEvent.click(await screen.findByRole("button", { name: "Confirm" }))
+    await waitFor(() =>
+      expect(onConfirmError.mock.calls[0]?.[0]).toHaveProperty(
+        "message",
+        "offline"
+      )
+    )
+    expect(screen.getByRole("alertdialog")).toBeTruthy()
+    expect(
+      await screen.findByRole("button", { name: "Try again" })
+    ).toBeTruthy()
+  })
+
+  it("phrase: a failed confirm with choices keeps it open and announces the error", async () => {
+    const onConfirmError = vi.fn()
+    const onConfirm = vi.fn(() => Promise.reject(new Error("offline")))
+    render(
+      <ConfirmDialog
+        title="Delete project?"
+        phrase={["acme", "delete my project"]}
+        choices={[{ name: "snapshot", label: "Take a final snapshot" }]}
+        errorLabel="Try again"
+        announcements={{ error: "No se pudo borrar" }}
+        onConfirmError={onConfirmError}
+        onConfirm={onConfirm}
+      >
+        <Button>Delete project</Button>
+      </ConfirmDialog>
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Delete project" }))
+    await screen.findByRole("alertdialog")
+    const [name, sentence] = screen.getAllByRole("textbox")
+    fireEvent.change(name, { target: { value: "acme" } })
+    fireEvent.change(sentence, { target: { value: "delete my project" } })
+    fireEvent.click(screen.getByRole("checkbox"))
+    fireEvent.click(screen.getByRole("button", { name: "Confirm" }))
+    await waitFor(() => expect(onConfirmError).toHaveBeenCalledOnce())
+    expect(onConfirm).toHaveBeenCalledWith({ snapshot: true })
+    expect(screen.getByRole("alertdialog")).toBeTruthy()
+    expect(await screen.findByText("No se pudo borrar")).toBeTruthy()
+    expect(screen.getByRole("button", { name: "Try again" })).toBeTruthy()
   })
 })

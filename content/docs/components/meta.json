@@ -9,6 +9,8 @@
     "consequences",
     "undo-toast",
     "undoable",
+    "unsaved-changes",
+    "confirm-close",
     "tool-approval"
   ]
 }

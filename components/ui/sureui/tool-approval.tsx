@@ -39,7 +39,7 @@ type ToolApprovalOptions = {
   denyLabel?: string
   approvedLabel?: React.ReactNode
   deniedLabel?: React.ReactNode
-  undo?: boolean | number
+  undo?: boolean | number | "manual"
   timeout?: number
   duration?: number
   scopes?: ToolApprovalScope[]
@@ -67,7 +67,7 @@ type ApprovalActionsProps = {
   phrase: string
   approveLabel: string
   denyLabel: string
-  undo: boolean | number
+  undo: boolean | number | "manual"
   timeout?: number
   duration?: number
   scopes?: ToolApprovalScope[]

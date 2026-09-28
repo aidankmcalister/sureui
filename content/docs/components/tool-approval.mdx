@@ -224,7 +224,7 @@ Pass `scopes` to let people choose how long an answer holds: once, this session 
 | `denyLabel` | `string` | `"Deny"` |
 | `approvedLabel` | `ReactNode` | `"Approved"` |
 | `deniedLabel` | `ReactNode` | `"Denied"` |
-| `undo` | `boolean \| number` | `true` |
+| `undo` | `boolean \| number \| "manual"` | `true` |
 | `timeout` | `number` | `3000` |
 | `duration` | `number` | `1200` |
 | `scopes` | `("once" \| "session" \| "always")[]` | — |
@@ -247,7 +247,7 @@ Takes the same props as `ToolApproval`, with `parts` in place of `part`.
 | `denyLabel` | `string` | `"Deny all"` |
 | `approvedLabel` | `ReactNode` | `"Approved"` |
 | `deniedLabel` | `ReactNode` | `"Denied"` |
-| `undo` | `boolean \| number` | `true` |
+| `undo` | `boolean \| number \| "manual"` | `true` |
 | `timeout` | `number` | `3000` |
 | `duration` | `number` | `1200` |
 | `scopes` | `("once" \| "session" \| "always")[]` | — |
@@ -271,3 +271,8 @@ The root sets `data-slot="tool-approval"` (or `"tool-approval-batch"`) and `data
 - Approve uses the same announcements as [Confirm Button](/docs/confirm-button#accessibility) and [Type to Confirm](/docs/type-to-confirm#accessibility), including the second-click fallback for a hold.
 - Only one response is ever sent per call. Deny is disabled during a low-risk undo window and while a response is pending, and both buttons come back if the response fails. In a batch, only the calls whose response failed come back.
 - The scope choice is a radio group named by `scopeLabels.group`, so arrow keys move between options.
+
+### WCAG
+
+- 2.2.1 Timing Adjustable: `undo="manual"` meets it for `"low"`, since Undo has no time limit.
+- 2.5.2 Pointer Cancellation: `"high"` meets it, because releasing early or moving off Approve cancels the hold.

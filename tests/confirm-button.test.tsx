@@ -1257,3 +1257,246 @@ describe("ConfirmButton", () => {
     expect(document.activeElement).toBe(button)
   })
 })
+
+describe("ConfirmButton failures", () => {
+  function liveText() {
+    return document.querySelector('[aria-live="polite"]')?.textContent
+  }
+
+  it("rethrows without onConfirmError, even with errorLabel", async () => {
+    render(
+      <ConfirmButton
+        undo
+        errorLabel="Couldn't delete"
+        onConfirm={() => {
+          throw new Error("boom")
+        }}
+      >
+        Delete
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await click(button)
+    expect(() => vi.advanceTimersByTime(5000)).toThrow("boom")
+    await act(async () => {})
+    expect(button).toBe(screen.getByRole("button", { name: "Couldn't delete" }))
+    expect(button.hasAttribute("data-error")).toBe(true)
+  })
+
+  it("passes a thrown error to onConfirmError and shows errorLabel until the retry", async () => {
+    const onConfirmError = vi.fn()
+    let fail = true
+    const onConfirm = vi.fn(() => {
+      if (fail) throw new Error("boom")
+    })
+    render(
+      <ConfirmButton
+        errorLabel="Couldn't delete. Try again"
+        onConfirm={onConfirm}
+        onConfirmError={onConfirmError}
+      >
+        Delete
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await click(button)
+    expect(onConfirmError).toHaveBeenCalledOnce()
+    expect(onConfirmError.mock.calls[0][0]).toHaveProperty("message", "boom")
+    expect(button.getAttribute("data-state")).toBe("idle")
+    expect(button.hasAttribute("data-error")).toBe(true)
+    expect(button).toBe(
+      screen.getByRole("button", { name: "Couldn't delete. Try again" })
+    )
+    expect(liveText()).toBe("Couldn't delete. Try again")
+    fail = false
+    await click(button)
+    expect(onConfirm).toHaveBeenCalledTimes(2)
+    expect(onConfirmError).toHaveBeenCalledOnce()
+    expect(button.hasAttribute("data-error")).toBe(false)
+    expect(button).toBe(screen.getByRole("button", { name: "Delete" }))
+    expect(liveText()).toBe("")
+  })
+
+  it("handles a rejection without an unhandled rejection", async () => {
+    let reject!: (error: Error) => void
+    const onConfirmError = vi.fn()
+    const onRejection = vi.fn()
+    process.on("unhandledRejection", onRejection)
+    try {
+      render(
+        <ConfirmButton
+          errorLabel="Failed"
+          announcements={{ error: "Deleting failed. Activate to retry." }}
+          onConfirmError={onConfirmError}
+          onConfirm={() =>
+            new Promise<void>((_, rej) => {
+              reject = rej
+            })
+          }
+        >
+          Delete
+        </ConfirmButton>
+      )
+      const button = screen.getByRole("button")
+      await click(button)
+      expect(button.getAttribute("data-state")).toBe("pending")
+      await act(async () => {
+        reject(new Error("offline"))
+      })
+      vi.useRealTimers()
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 0))
+      })
+      expect(onConfirmError.mock.calls[0][0]).toHaveProperty(
+        "message",
+        "offline"
+      )
+      expect(onRejection).not.toHaveBeenCalled()
+      expect(button.getAttribute("data-state")).toBe("idle")
+      expect(button).toBe(screen.getByRole("button", { name: "Failed" }))
+      expect(liveText()).toBe("Deleting failed. Activate to retry.")
+    } finally {
+      process.off("unhandledRejection", onRejection)
+    }
+  })
+
+  it("keeps the idle label when errorLabel isn't set", async () => {
+    const onConfirmError = vi.fn()
+    render(
+      <ConfirmButton
+        undo
+        onConfirmError={onConfirmError}
+        onConfirm={() => {
+          throw new Error("boom")
+        }}
+      >
+        Delete
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await click(button)
+    await act(async () => vi.advanceTimersByTime(5000))
+    expect(onConfirmError).toHaveBeenCalledOnce()
+    expect(button).toBe(screen.getByRole("button", { name: "Delete" }))
+    expect(liveText()).toBe("")
+  })
+})
+
+describe("ConfirmButton manual undo", () => {
+  function renderManual() {
+    const onConfirm = vi.fn()
+    const onCancel = vi.fn()
+    render(
+      <>
+        <ConfirmButton undo="manual" onConfirm={onConfirm} onCancel={onCancel}>
+          Archive
+        </ConfirmButton>
+        <button>Elsewhere</button>
+      </>
+    )
+    const button = screen.getByRole("button", { name: "Archive" })
+    return { button, onConfirm, onCancel }
+  }
+
+  it("keeps Undo open with no time limit", async () => {
+    const { button, onConfirm } = renderManual()
+    await click(button)
+    expect(button.getAttribute("data-state")).toBe("undo")
+    await act(async () => vi.advanceTimersByTime(600000))
+    expect(button.getAttribute("data-state")).toBe("undo")
+    expect(onConfirm).not.toHaveBeenCalled()
+  })
+
+  it("commits on a press outside the button", async () => {
+    const { button, onConfirm } = renderManual()
+    await click(button)
+    fireEvent.pointerDown(button, { button: 0 })
+    expect(onConfirm).not.toHaveBeenCalled()
+    await act(async () =>
+      fireEvent.pointerDown(screen.getByRole("button", { name: "Elsewhere" }))
+    )
+    expect(onConfirm).toHaveBeenCalledOnce()
+    expect(button.getAttribute("data-state")).toBe("idle")
+  })
+
+  it("commits when focus moves elsewhere", async () => {
+    const { button, onConfirm } = renderManual()
+    act(() => button.focus())
+    await click(button)
+    await act(async () =>
+      screen.getByRole("button", { name: "Elsewhere" }).focus()
+    )
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("undo cancels and stops listening", async () => {
+    const { button, onConfirm, onCancel } = renderManual()
+    await click(button)
+    await click(button)
+    expect(onCancel).toHaveBeenCalledOnce()
+    fireEvent.pointerDown(document.body)
+    expect(onConfirm).not.toHaveBeenCalled()
+  })
+
+  it("unmounting discards the action", async () => {
+    const onConfirm = vi.fn()
+    const { unmount } = render(
+      <ConfirmButton undo="manual" onConfirm={onConfirm}>
+        Archive
+      </ConfirmButton>
+    )
+    await click(screen.getByRole("button"))
+    unmount()
+    fireEvent.pointerDown(document.body)
+    expect(onConfirm).not.toHaveBeenCalled()
+  })
+})
+
+describe("ConfirmButton armDelay", () => {
+  it("ignores clicks for armDelay after mounting", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmButton armDelay={400} onConfirm={onConfirm}>
+        Delete
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await click(button)
+    expect(onConfirm).not.toHaveBeenCalled()
+    await act(async () => vi.advanceTimersByTime(400))
+    await click(button)
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("click-again: ignores the second click for armDelay after arming", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmButton gesture="click-again" armDelay={300} onConfirm={onConfirm}>
+        Archive
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await act(async () => vi.advanceTimersByTime(300))
+    await click(button)
+    await click(button)
+    expect(button.getAttribute("data-state")).toBe("armed")
+    expect(onConfirm).not.toHaveBeenCalled()
+    await act(async () => vi.advanceTimersByTime(300))
+    await click(button)
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("hold: ignores a press for armDelay after mounting", async () => {
+    render(
+      <ConfirmButton gesture="hold" armDelay={300} onConfirm={vi.fn()}>
+        Hold to delete
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    fireEvent.pointerDown(button, { button: 0 })
+    expect(button.getAttribute("data-state")).toBe("idle")
+    await act(async () => vi.advanceTimersByTime(300))
+    fireEvent.pointerDown(button, { button: 0 })
+    expect(button.getAttribute("data-state")).toBe("holding")
+  })
+})

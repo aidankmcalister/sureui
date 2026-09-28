@@ -27,6 +27,8 @@ import { ConfirmPopover } from "@/components/ui/sureui/confirm-popover"
 
 Cancel, Escape, a click outside or tabbing out close it and call `onCancel`.
 
+`variant` styles only the confirm button. The trigger is your own element, so an outline trigger can open a destructive confirm step, as above.
+
 ## Examples
 
 ### Hold
@@ -47,6 +49,22 @@ Add a `title` to show a heading above the description.
 
 <Example name="confirm-popover/placement" />
 
+### Arm delay
+
+`armDelay` ignores the confirm button for that many milliseconds after the popover opens, so a double click on the trigger can't pass through to it.
+
+<Example name="confirm-popover/arm-delay" />
+
+### Errors
+
+With `onConfirmError`, a failed `onConfirm` keeps the popover open and the error goes to your handler. `errorLabel` replaces the confirm label until the next activation, which tries again.
+
+### Initial focus
+
+Focus starts on the confirm button, so a keyboard user can confirm a quick action with one more key. `initialFocus="cancel"` starts on Cancel instead, and `"none"` focuses the popover itself. For an action that deletes data or can't be undone, the WAI-ARIA [dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) advises focusing the least destructive action. Without `showCancel`, `"cancel"` falls back to the confirm button.
+
+<Example name="confirm-popover/initial-focus" />
+
 ## API reference
 
 ### ConfirmPopover
@@ -59,26 +77,35 @@ It has no `undo`, since it closes when the action commits. Use [Undo Toast](/doc
 | `children` | `ReactElement` | required |
 | `onConfirm` | `() => void \| Promise<unknown>` | required |
 | `onCancel` | `() => void` | — |
+| `onConfirmError` | `(error: unknown) => void` | — |
 | `title` | `string` | — |
 | `confirmLabel` | `string` | `"Confirm"` |
+| `errorLabel` | `string` | — |
 | `cancelLabel` | `string` | `"Cancel"` |
 | `showCancel` | `boolean` | `true` |
+| `initialFocus` | `"confirm" \| "cancel" \| "none"` | `"confirm"` |
 | `variant` | [`Button`](https://ui.shadcn.com/docs/components/base/button) `variant` | `"default"` |
 | `side` | `"top" \| "bottom" \| "left" \| "right" \| "inline-start" \| "inline-end"` | `"bottom"` |
 | `align` | `"start" \| "center" \| "end"` | `"center"` |
 | `open` | `boolean` | — |
 | `onOpenChange` | `(open: boolean) => void` | — |
 | `gesture` | `"click" \| "click-again" \| "hold"` | `"click"` |
+| `armDelay` | `number` | `0` |
 | `timeout` | `number` | `3000` |
 | `cancelOnBlur` | `boolean` | `true` |
 | `duration` | `number` | `1200` |
 | `confirmOnRelease` | `boolean` | `false` |
 | `cancelHoldOnLeave` | `boolean` | `true` |
 | `holdFallback` | `"click-again" \| "none"` | `"click-again"` |
-| `announcements` | `{ armed?, hold?, fallback?, ready? }` | — |
+| `announcements` | `{ armed?, hold?, fallback?, ready?, error? }` | — |
 
 ## Accessibility
 
 - The popover is named by `title`, or by `description` when there's no title.
-- Focus moves to the confirm button when it opens and back to the trigger when it closes.
+- Focus moves to the confirm button when it opens, or where `initialFocus` says, and back to the trigger when it closes.
 - While `onConfirm` is pending, the popover stays open and the confirm button keeps focus.
+
+### WCAG
+
+- 2.2.1 Timing Adjustable: the popover has no time limit. `timeout` only disarms `click-again`, and never runs or drops the action.
+- 2.5.2 Pointer Cancellation: `gesture="hold"` meets it, because releasing early or moving off the button cancels.

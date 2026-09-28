@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest"
 import type { Button } from "@/components/ui/button"
 import type { DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import type { ConfirmButtonProps } from "@/components/ui/sureui/confirm-button"
+import type { ConfirmCloseOptions } from "@/components/ui/sureui/confirm-close"
 import type { ConfirmDialogProps } from "@/components/ui/sureui/confirm-dialog"
 import type { ConfirmPopoverProps } from "@/components/ui/sureui/confirm-popover"
 import type { ConfirmMenuItemProps } from "@/components/ui/sureui/confirm-menu-item"
@@ -18,6 +19,7 @@ import type {
 import type { TypeToConfirmProps } from "@/components/ui/sureui/type-to-confirm"
 import type { UndoToastOptions } from "@/components/ui/sureui/undo-toast"
 import type { UndoableProps } from "@/components/ui/sureui/undoable"
+import type { UnsavedChangesOptions } from "@/components/ui/sureui/unsaved-changes"
 import { docsSource, pages } from "@/lib/site/docs"
 import { exampleFile, exampleNames } from "@/lib/site/examples"
 
@@ -39,6 +41,9 @@ const confirmButton = {
   confirmOnRelease: true,
   cancelOnBlur: true,
   cancelHoldOnLeave: true,
+  armDelay: true,
+  onConfirmError: true,
+  errorLabel: true,
   holdFallback: true,
 } satisfies Record<OwnProps<ConfirmButtonProps>, true>
 
@@ -62,6 +67,9 @@ const confirmMenuItem = {
   holdFallback: true,
   closeOnConfirm: true,
   closeOnUndo: true,
+  armDelay: true,
+  onConfirmError: true,
+  errorLabel: true,
   commitUndoOnClose: true,
 } satisfies Record<
   Exclude<
@@ -87,7 +95,10 @@ const typeToConfirm = {
   undoLabel: true,
   variant: true,
   acknowledgements: true,
+  choices: true,
   renderActions: true,
+  onConfirmError: true,
+  errorLabel: true,
   className: true,
 } satisfies Record<keyof TypeToConfirmProps, true>
 
@@ -100,9 +111,12 @@ const confirmDialog = {
   cancelLabel: true,
   confirmLabel: true,
   variant: true,
+  initialFocus: true,
+  alternative: true,
   gesture: true,
   phrase: true,
   acknowledgements: true,
+  choices: true,
   children: true,
   timeout: true,
   cancelOnBlur: true,
@@ -112,6 +126,9 @@ const confirmDialog = {
   holdFallback: true,
   caseSensitive: true,
   trim: true,
+  armDelay: true,
+  onConfirmError: true,
+  errorLabel: true,
   announcements: true,
 } satisfies Record<keyof ConfirmDialogProps, true>
 
@@ -123,6 +140,7 @@ const confirmPopover = {
   confirmLabel: true,
   cancelLabel: true,
   showCancel: true,
+  initialFocus: true,
   variant: true,
   gesture: true,
   children: true,
@@ -136,8 +154,34 @@ const confirmPopover = {
   side: true,
   align: true,
   open: true,
+  armDelay: true,
+  onConfirmError: true,
+  errorLabel: true,
   onOpenChange: true,
 } satisfies Record<keyof ConfirmPopoverProps, true>
+const confirmClose = {
+  dirty: true,
+  title: true,
+  confirmLabel: true,
+  cancelLabel: true,
+  variant: true,
+  open: true,
+  defaultOpen: true,
+  onOpenChange: true,
+  onDiscard: true,
+  onConfirmError: true,
+  errorLabel: true,
+  armDelay: true,
+  gesture: true,
+  timeout: true,
+  cancelOnBlur: true,
+  duration: true,
+  confirmOnRelease: true,
+  cancelHoldOnLeave: true,
+  holdFallback: true,
+  announcements: true,
+} satisfies Record<keyof ConfirmCloseOptions | "dirty", true>
+
 const consequences = {
   subject: true,
   subjectDescription: true,
@@ -191,6 +235,8 @@ const undoable = {
   render: true,
   label: true,
   undoLabel: true,
+  onConfirmError: true,
+  focusAfterRemove: true,
   announcements: true,
 } satisfies Record<
   Exclude<
@@ -199,6 +245,19 @@ const undoable = {
   >,
   true
 >
+
+const unsavedChanges = {
+  when: true,
+  onSave: true,
+  onDiscard: true,
+  beforeUnload: true,
+  title: true,
+  saveTitle: true,
+  description: true,
+  keepLabel: true,
+  discardLabel: true,
+  saveLabel: true,
+} satisfies Record<keyof UnsavedChangesOptions, true>
 
 const toolApproval = {
   part: true,
@@ -240,10 +299,12 @@ const documented = {
   TypeToConfirm: typeToConfirm,
   ConfirmDialog: confirmDialog,
   ConfirmPopover: confirmPopover,
+  "useConfirmClose(dirty, options)": confirmClose,
   Consequences: consequences,
   ConsequencesItem: consequencesItem,
   "undoToast(message, options)": undoToast,
   Undoable: undoable,
+  "useUnsavedChanges(options)": unsavedChanges,
   ToolApproval: toolApproval,
   ToolApprovalBatch: toolApprovalBatch,
 }

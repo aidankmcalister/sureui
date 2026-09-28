@@ -367,4 +367,110 @@ describe("TypeToConfirm", () => {
     fireEvent.click(undoButton)
     expect(screen.getByRole("button", { name: "Confirm" })).toBeTruthy()
   })
+
+  it("several phrases: every field must match", () => {
+    const onConfirm = vi.fn()
+    render(
+      <TypeToConfirm
+        phrase={["acme-prod", "delete my project"]}
+        onConfirm={onConfirm}
+      />
+    )
+    const [name, sentence] = screen.getAllByRole("textbox")
+    const confirm = screen.getByRole("button", { name: "Confirm" })
+    fireEvent.change(name, { target: { value: "acme-prod" } })
+    expect(confirm).toHaveProperty("disabled", true)
+    expect(screen.getAllByText("Phrase matches")).toHaveLength(1)
+    fireEvent.change(sentence, { target: { value: "delete my project" } })
+    expect(screen.getAllByText("Phrase matches")).toHaveLength(2)
+    fireEvent.click(confirm)
+    expect(onConfirm).toHaveBeenCalledOnce()
+    expect(name).toHaveProperty("value", "")
+    expect(sentence).toHaveProperty("value", "")
+  })
+
+  it("several phrases: each field has its own label", () => {
+    render(
+      <TypeToConfirm
+        phrase={["acme-prod", "delete my project"]}
+        label={["Project name", "Confirmation"]}
+        onConfirm={vi.fn()}
+      />
+    )
+    expect(screen.getByRole("textbox", { name: "Project name" })).toBeTruthy()
+    expect(screen.getByRole("textbox", { name: "Confirmation" })).toBeTruthy()
+  })
+
+  it("several phrases: fields without a label use the default", () => {
+    render(
+      <TypeToConfirm
+        phrase={["acme-prod", "delete my project"]}
+        label={["Project name"]}
+        onConfirm={vi.fn()}
+      />
+    )
+    expect(
+      screen.getByRole("textbox", { name: "Type delete my project to confirm" })
+    ).toBeTruthy()
+  })
+
+  it("choices: passes their values to onConfirm and resets them", () => {
+    const onConfirm = vi.fn()
+    render(
+      <TypeToConfirm
+        phrase="acme"
+        choices={[
+          {
+            name: "snapshot",
+            label: "Take a final snapshot",
+            defaultChecked: true,
+          },
+          { name: "notify", label: "Email the owners" },
+        ]}
+        onConfirm={onConfirm}
+      />
+    )
+    const confirm = screen.getByRole("button", { name: "Confirm" })
+    const notify = screen.getByRole("checkbox", { name: "Email the owners" })
+    type("acme")
+    expect(confirm).toHaveProperty("disabled", false)
+    fireEvent.click(notify)
+    fireEvent.click(confirm)
+    expect(onConfirm).toHaveBeenCalledWith({ snapshot: true, notify: true })
+    expect(notify.getAttribute("aria-checked")).toBe("false")
+    expect(
+      screen
+        .getByRole("checkbox", { name: "Take a final snapshot" })
+        .getAttribute("aria-checked")
+    ).toBe("true")
+  })
+
+  it("choices: undo passes the values chosen when confirming", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <TypeToConfirm
+        phrase="acme"
+        undo
+        choices={[{ name: "snapshot", label: "Take a final snapshot" }]}
+        onConfirm={onConfirm}
+      />
+    )
+    type("acme")
+    fireEvent.click(
+      screen.getByRole("checkbox", { name: "Take a final snapshot" })
+    )
+    await act(async () =>
+      fireEvent.submit(screen.getByRole("textbox").closest("form")!)
+    )
+    await act(async () => vi.advanceTimersByTime(5000))
+    expect(onConfirm).toHaveBeenCalledWith({ snapshot: true })
+  })
+
+  it("choices: without any, onConfirm gets an empty object", () => {
+    const onConfirm = vi.fn()
+    render(<TypeToConfirm phrase="acme" onConfirm={onConfirm} />)
+    type("acme")
+    fireEvent.click(screen.getByRole("button", { name: "Confirm" }))
+    expect(onConfirm).toHaveBeenCalledWith({})
+  })
 })

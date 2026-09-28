@@ -31,6 +31,7 @@ type UndoableProps = Omit<
       React.ReactNode | ((props: UndoableRenderProps) => React.ReactNode)
     label?: React.ReactNode
     undoLabel?: React.ReactNode
+    focusAfterRemove?: (row: HTMLElement) => HTMLElement | null
     announcements?: {
       undo?: string
     }
@@ -73,6 +74,46 @@ function follow(root: Element, path: number[] | null) {
     : null
 }
 
+function targetIn(row: Element, path: number[] | null) {
+  if (
+    row.getAttribute("data-slot") === "undoable" &&
+    row.getAttribute("data-state") !== "idle"
+  ) {
+    return null
+  }
+  return (
+    follow(row, path) ??
+    (row instanceof HTMLElement && row.matches(focusable)
+      ? row
+      : row.querySelector<HTMLElement>(focusable))
+  )
+}
+
+function nextFocus(row: HTMLElement, path: number[] | null) {
+  for (
+    let next = row.nextElementSibling;
+    next;
+    next = next.nextElementSibling
+  ) {
+    const target = targetIn(next, path)
+    if (target) return target
+  }
+  for (
+    let previous = row.previousElementSibling;
+    previous;
+    previous = previous.previousElementSibling
+  ) {
+    const target = targetIn(previous, path)
+    if (target) return target
+  }
+  const list = row.parentElement
+  if (!list || list === document.body) return null
+  if (!list.matches(focusable) && !list.hasAttribute("tabindex")) {
+    list.tabIndex = -1
+  }
+  return list
+}
+
 function measure(host: HTMLElement): Collapsed {
   return {
     height: host.getBoundingClientRect().height,
@@ -101,11 +142,14 @@ function announcer() {
 function useUndoable({
   onConfirm,
   onCancel,
+  onConfirmError,
   undo = true,
   pauseUndoOnHover = true,
   pauseUndoOnFocus = true,
+  focusAfterRemove,
   announcement,
-}: ConfirmationOptions & { announcement?: string }) {
+}: ConfirmationOptions &
+  Pick<UndoableProps, "focusAfterRemove"> & { announcement?: string }) {
   const [state, setState] = React.useState<UndoableState>("idle")
   const [collapsed, setCollapsed] = React.useState<Collapsed | null>(null)
   const [fill, setFill] = React.useState<Fill | null>(null)
@@ -125,9 +169,11 @@ function useUndoable({
   const optionsRef = React.useRef({
     onConfirm,
     onCancel,
+    onConfirmError,
     undo,
     pauseUndoOnHover,
     pauseUndoOnFocus,
+    focusAfterRemove,
   })
 
   useFill(fillRef, fill, paused)
@@ -136,9 +182,11 @@ function useUndoable({
     optionsRef.current = {
       onConfirm,
       onCancel,
+      onConfirmError,
       undo,
       pauseUndoOnHover,
       pauseUndoOnFocus,
+      focusAfterRemove,
     }
   })
 
@@ -170,6 +218,29 @@ function useUndoable({
     setState("idle")
   }, [])
 
+  const fail = React.useCallback(
+    (error: unknown) => {
+      restore()
+      const { onConfirmError } = optionsRef.current
+      if (!onConfirmError) throw error
+      onConfirmError(error)
+    },
+    [restore]
+  )
+
+  const removed = React.useCallback(() => {
+    const host = hostRef.current
+    const active = document.activeElement
+    if (host && active instanceof Element && host.contains(active)) {
+      const { focusAfterRemove } = optionsRef.current
+      const target = focusAfterRemove
+        ? focusAfterRemove(host)
+        : nextFocus(host, triggerPathRef.current)
+      target?.focus()
+    }
+    setState("removed")
+  }, [])
+
   const commit = React.useCallback(
     (run: ConfirmationOptions["onConfirm"]) => {
       windowRef.current = null
@@ -179,25 +250,20 @@ function useUndoable({
       try {
         result = run()
       } catch (error) {
-        restore()
-        throw error
+        return fail(error)
       }
-      if (!isPromise(result)) {
-        setState("removed")
-        return
-      }
+      if (!isPromise(result)) return removed()
       setState("pending")
       ;(async () => {
         try {
           await result
-          setState("removed")
         } catch (error) {
-          restore()
-          throw error
+          return fail(error)
         }
+        removed()
       })()
     },
-    [restore]
+    [fail, removed]
   )
 
   const remove = React.useCallback(() => {
@@ -219,14 +285,19 @@ function useUndoable({
       duration,
       onExpire: () => commit(run),
       onPauseChange: setPaused,
+      within: () => hostRef.current,
     })
     windowRef.current = undoWindow
-    setFill({
-      from: 1,
-      to: 0,
-      duration: undoWindow.duration,
-      startedAt: performance.now(),
-    })
+    setFill(
+      undoWindow.manual
+        ? null
+        : {
+            from: 1,
+            to: 0,
+            duration: undoWindow.duration,
+            startedAt: performance.now(),
+          }
+    )
     setPaused(undoWindow.paused())
     setState("undo")
   }, [commit])
@@ -322,11 +393,13 @@ function useUndoable({
 function Undoable({
   onConfirm,
   onCancel,
+  onConfirmError,
   undo,
   pauseUndoOnHover,
   pauseUndoOnFocus,
   label = "Deleted",
   undoLabel = "Undo",
+  focusAfterRemove,
   announcements,
   render,
   ref,
@@ -346,9 +419,11 @@ function Undoable({
   } = useUndoable({
     onConfirm,
     onCancel,
+    onConfirmError,
     undo,
     pauseUndoOnHover,
     pauseUndoOnFocus,
+    focusAfterRemove,
     announcement: announcements?.undo,
   })
   const labelId = React.useId()

@@ -2,14 +2,18 @@
 
 type UndoPauseReason = "hover" | "focus" | "hidden"
 
+type UndoDuration = boolean | number | "manual"
+
 type UndoWindowOptions = {
-  duration?: boolean | number
+  duration?: UndoDuration
   onExpire: () => void
   onPauseChange?: (paused: boolean) => void
+  within?: () => Element | null
 }
 
 type UndoWindow = {
   duration: number
+  manual: boolean
   elapsed: () => number
   paused: () => boolean
   pause: (reason: UndoPauseReason) => void
@@ -17,16 +21,51 @@ type UndoWindow = {
   cancel: () => void
 }
 
-function undoDuration(value: boolean | number | undefined) {
+function undoDuration(value: UndoDuration | undefined) {
   if (typeof value !== "number" || !Number.isFinite(value)) return 5000
   return Math.min(Math.max(value, 4000), 60000)
 }
 
-function startUndoWindow({
-  duration,
+function startManualWindow({
   onExpire,
-  onPauseChange,
+  within,
 }: UndoWindowOptions): UndoWindow {
+  let open = true
+
+  function stop() {
+    open = false
+    document.removeEventListener("pointerdown", onOutside, true)
+    document.removeEventListener("focusin", onOutside, true)
+  }
+
+  function onOutside(event: Event) {
+    const container = within?.()
+    const target = event.target
+    if (!open || !container || !(target instanceof Node)) return
+    if (container.contains(target)) return
+    stop()
+    onExpire()
+  }
+
+  if (within) {
+    document.addEventListener("pointerdown", onOutside, true)
+    document.addEventListener("focusin", onOutside, true)
+  }
+
+  return {
+    duration: Infinity,
+    manual: true,
+    elapsed: () => 0,
+    paused: () => false,
+    pause: () => {},
+    resume: () => {},
+    cancel: stop,
+  }
+}
+
+function startUndoWindow(options: UndoWindowOptions): UndoWindow {
+  const { duration, onExpire, onPauseChange } = options
+  if (duration === "manual") return startManualWindow(options)
   const total = undoDuration(duration)
   const pausedBy = new Set<UndoPauseReason>()
   let open = true
@@ -71,6 +110,7 @@ function startUndoWindow({
 
   return {
     duration: total,
+    manual: false,
     elapsed: () =>
       total -
       remaining +
@@ -84,6 +124,7 @@ function startUndoWindow({
 
 export {
   startUndoWindow,
+  type UndoDuration,
   type UndoWindow,
   type UndoWindowOptions,
   type UndoPauseReason,
