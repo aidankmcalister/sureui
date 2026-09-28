@@ -23,6 +23,31 @@ describe("TypeToConfirm", () => {
     expect(onConfirm).toHaveBeenCalledOnce()
   })
 
+  it("matches exactly by default: case and spaces count", () => {
+    render(<TypeToConfirm phrase="Acme" onConfirm={vi.fn()} />)
+    const confirm = screen.getByRole("button", { name: "Confirm" })
+    type("acme")
+    expect(confirm).toHaveProperty("disabled", true)
+    type("Acme ")
+    expect(confirm).toHaveProperty("disabled", true)
+  })
+
+  it("caseSensitive={false} and trim relax the match", () => {
+    const onConfirm = vi.fn()
+    render(
+      <TypeToConfirm
+        phrase="Acme"
+        caseSensitive={false}
+        trim
+        onConfirm={onConfirm}
+      />
+    )
+    const confirm = screen.getByRole("button", { name: "Confirm" })
+    type("  acme ")
+    fireEvent.click(confirm)
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
   it("requires every acknowledgement", () => {
     const onConfirm = vi.fn()
     render(

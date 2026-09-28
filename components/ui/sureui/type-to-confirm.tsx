@@ -14,6 +14,8 @@ import {
 
 type TypeToConfirmProps = ConfirmationOptions & {
   phrase: string
+  caseSensitive?: boolean
+  trim?: boolean
   label?: React.ReactNode
   announcements?: {
     match?: string
@@ -34,6 +36,8 @@ function TypeToConfirm({
   pauseUndoOnHover,
   pauseUndoOnFocus,
   phrase,
+  caseSensitive = true,
+  trim = false,
   label,
   announcements,
   confirmLabel = "Confirm",
@@ -55,7 +59,11 @@ function TypeToConfirm({
   const [checked, setChecked] = React.useState<number[]>([])
   const inputId = React.useId()
 
-  const matches = value === phrase
+  const normalize = (text: string) => {
+    const trimmed = trim ? text.trim() : text
+    return caseSensitive ? trimmed : trimmed.toLocaleLowerCase()
+  }
+  const matches = normalize(value) === normalize(phrase)
   const ready = matches && checked.length === acknowledgements.length
 
   const confirmButton = (

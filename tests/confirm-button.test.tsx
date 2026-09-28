@@ -781,6 +781,22 @@ describe("ConfirmButton", () => {
     return { button: screen.getByRole("button"), onConfirm, onCancel }
   }
 
+  it("click-again: cancelOnBlur={false} stays armed when focus leaves", async () => {
+    render(
+      <ConfirmButton
+        gesture="click-again"
+        cancelOnBlur={false}
+        onConfirm={vi.fn()}
+      >
+        Archive
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await click(button)
+    fireEvent.blur(button)
+    expect(button.getAttribute("data-state")).toBe("armed")
+  })
+
   it("hold: Space keyUp before the duration cancels", async () => {
     const { button, onConfirm, onCancel } = renderHold()
     fireEvent.keyDown(button, { key: " " })
