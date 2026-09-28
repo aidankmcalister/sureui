@@ -10,14 +10,14 @@ import { SiteMenu } from "@/components/site/layout/site-menu"
 import { ThemeToggle } from "@/components/site/layout/theme-toggle"
 import { siteButton } from "@/components/site/ui/button"
 
-const firstComponent = pages.find((page) => page.group === "Components")
+const firstComponent = pages.find((page) => page.section === "components")
 
 const sections: Record<string, string[]> = {
   Docs: pages
-    .filter((page) => page.group !== "Components")
+    .filter((page) => page.section !== "components")
     .map((page) => page.href),
   Components: pages
-    .filter((page) => page.group === "Components")
+    .filter((page) => page.section === "components")
     .map((page) => page.href),
 }
 

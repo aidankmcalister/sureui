@@ -1,0 +1,14 @@
+{
+  "title": "Components",
+  "pages": [
+    "confirm-button",
+    "confirm-menu-item",
+    "type-to-confirm",
+    "confirm-dialog",
+    "confirm-popover",
+    "consequences",
+    "undo-toast",
+    "undoable",
+    "tool-approval"
+  ]
+}

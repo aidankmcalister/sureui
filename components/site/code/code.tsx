@@ -7,7 +7,9 @@ import { ChevronRightIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { CopyButton } from "@/components/site/code/copy-button"
+import { ControlText } from "@/components/site/docs/controls"
 import { Label } from "@/components/site/layout/frame"
+import { controlSlotName } from "@/lib/site/controls"
 
 const sureui = new Set([
   "ConfirmButton",
@@ -126,6 +128,18 @@ export function Code({
             {line.map((token, offset) => {
               const [, before, word, after] =
                 /^(\s*)(.*?)(\s*)$/.exec(token.content) ?? []
+              const control = controlSlotName(word)
+              if (control) {
+                return (
+                  <span key={offset}>
+                    {before}
+                    <span style={{ color: "var(--code-number)" }}>
+                      <ControlText name={control} />
+                    </span>
+                    {after}
+                  </span>
+                )
+              }
               return sureui.has(word) ? (
                 <span key={offset}>
                   {before}

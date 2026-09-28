@@ -1,0 +1,117 @@
+---
+title: Tool Approval
+description: Approve or deny an AI SDK tool call with a gesture that matches its risk.
+---
+
+<Example name="tool-approval/demo" />
+
+## Installation
+
+<Install args="add @sureui/tool-approval" />
+
+## Usage
+
+Mark a tool as needing approval on the server:
+
+```tsx
+import { ToolLoopAgent } from "ai"
+
+const agent = new ToolLoopAgent({
+  model,
+  tools: { deleteProject },
+  toolApproval: { deleteProject: "user-approval" },
+})
+```
+
+Render `ToolApproval` for its tool part and pass `addToolApprovalResponse` from `useChat`:
+
+```tsx
+import { useChat } from "@ai-sdk/react"
+import { lastAssistantMessageIsCompleteWithApprovalResponses } from "ai"
+
+import { ToolApproval } from "@/components/ui/sureui/tool-approval"
+
+const { messages, addToolApprovalResponse } = useChat({
+  sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses,
+})
+
+{message.parts.map((part) =>
+  part.type === "tool-deleteProject" ? (
+    <ToolApproval
+      key={part.toolCallId}
+      part={part}
+      risk="critical"
+      phrase={part.input.name}
+      onRespond={addToolApprovalResponse}
+    />
+  ) : null
+)}
+```
+
+It shows Approve and Deny while the part is `approval-requested`, and the outcome once it's answered. `sendAutomaticallyWhen` continues the conversation after you respond.
+
+## Examples
+
+### Low risk
+
+Approve runs after an undo window, so a misclick can be taken back before the agent hears about it.
+
+<Example name="tool-approval/low" />
+
+### Medium risk
+
+The default. Approve arms on the first click and responds on the second.
+
+<Example name="tool-approval/medium" />
+
+### High risk
+
+Approve responds once the hold completes. Letting go early cancels.
+
+<Example name="tool-approval/high" />
+
+### Critical risk
+
+Approve unlocks once `phrase` is typed, like a project or repository name.
+
+<Example name="tool-approval/critical" />
+
+Deny is one click at every level.
+
+## API reference
+
+### ToolApproval
+
+`onRespond` takes the same argument as `addToolApprovalResponse`, and `part` takes any AI SDK tool part.
+
+| Prop | Type | Default |
+| --- | --- | --- |
+| `part` | `{ state, approval?: { id, approved?, reason? } }` | required |
+| `onRespond` | `({ id, approved, reason? }) => void \| PromiseLike<unknown>` | required |
+| `risk` | `"low" \| "medium" \| "high" \| "critical"` | `"medium"` |
+| `phrase` | `string` | required with `"critical"` |
+| `approveLabel` | `string` | `"Approve"`, or `"Hold to approve"` for `"high"` |
+| `denyLabel` | `string` | `"Deny"` |
+| `approvedLabel` | `ReactNode` | `"Approved"` |
+| `deniedLabel` | `ReactNode` | `"Denied"` |
+| `undo` | `boolean \| number` | `true` |
+| `timeout` | `number` | `3000` |
+| `duration` | `number` | `1200` |
+| `className` | `string` | — |
+
+`undo` applies to `"low"`, `timeout` to `"medium"` and `duration` to `"high"`.
+
+### Data attributes
+
+The root sets `data-slot="tool-approval"` and `data-state`.
+
+| Value | When |
+| --- | --- |
+| `requested` | Waiting for Approve or Deny. |
+| `approved` | The part was approved. |
+| `denied` | The part was denied. |
+
+## Accessibility
+
+- Approve uses the same announcements as [Confirm Button](/docs/confirm-button#accessibility) and [Type to Confirm](/docs/type-to-confirm#accessibility), including the second-click fallback for a hold.
+- Only one response is ever sent. Deny is disabled during a low-risk undo window and while a response is pending, and both buttons come back if the response fails.

@@ -9,6 +9,7 @@ import {
 import { toast, Toaster } from "sonner"
 import { describe, expect, it, vi } from "vitest"
 
+import { AgentApproval } from "@/components/blocks/agent-approval-01/agent-approval"
 import { ApiKeys } from "@/components/blocks/api-keys-01/api-keys"
 import { DangerZone } from "@/components/blocks/danger-zone-01/danger-zone"
 import { DeleteAccount } from "@/components/blocks/delete-account-01/delete-account"
@@ -340,5 +341,30 @@ describe("inbox-01", () => {
       settled
     )
     expect(screen.queryByText("Re: Q3 numbers")).toBeNull()
+  })
+})
+
+describe("agent-approval-01", () => {
+  it("approves a call, runs it and shows its result", async () => {
+    render(<AgentApproval />)
+    const approve = within(
+      screen
+        .getByText("Archive 12 branches merged more than 30 days ago")
+        .closest("li")!
+    ).getByRole("button", { name: "Approve" })
+    await act(async () => fireEvent.click(approve))
+    await act(async () => fireEvent.click(approve))
+    expect(await screen.findByText("Archived 12 branches")).toBeTruthy()
+  })
+
+  it("denies a call in one click", async () => {
+    render(<AgentApproval />)
+    const call = screen
+      .getByText("Rotate the staging database password")
+      .closest("li")!
+    await act(async () =>
+      fireEvent.click(within(call).getByRole("button", { name: "Deny" }))
+    )
+    expect(within(call).getByText("Denied")).toBeTruthy()
   })
 })

@@ -3,7 +3,9 @@
 import * as React from "react"
 import { CheckIcon, CopyIcon } from "lucide-react"
 
+import { useControlValues } from "@/components/site/docs/controls"
 import { SiteButton } from "@/components/site/ui/button"
+import { fillControlSlots } from "@/lib/site/controls"
 
 export function CopyButton({
   value,
@@ -13,6 +15,7 @@ export function CopyButton({
   className?: string
 }) {
   const [copied, setCopied] = React.useState(false)
+  const values = useControlValues()
 
   React.useEffect(() => {
     if (!copied) return
@@ -27,7 +30,7 @@ export function CopyButton({
       aria-label={copied ? "Copied" : "Copy"}
       className={className}
       onClick={async () => {
-        await navigator.clipboard.writeText(value)
+        await navigator.clipboard.writeText(fillControlSlots(value, values))
         setCopied(true)
       }}
     >

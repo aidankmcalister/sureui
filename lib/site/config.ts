@@ -11,6 +11,7 @@ export const items = [
   "consequences",
   "undo-toast",
   "undoable",
+  "tool-approval",
 ]
 
 export function addArgs(names: string[]) {

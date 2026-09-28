@@ -6,7 +6,27 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # SureUI
 
-A shadcn/ui registry of confirmation controls. Read `CONTEXT.md` for the vocabulary (confirmation, gesture, style, surface, undo window, pending, confirmation core). Work is tracked in Linear (team SureUI, `SUI-*`).
+A shadcn/ui registry of confirmation controls. Work is tracked in Linear (team SureUI, `SUI-*`).
+
+## Vocabulary
+
+These terms are the shared vocabulary for code, docs and plans.
+
+**Confirmation**: one attempt to get intent for an action. It starts idle and ends by committing (`onConfirm`) or cancelling (`onCancel`). If `onConfirm` throws or rejects, the control returns to idle and the error reaches your app unchanged, so handle failures inside `onConfirm`.
+
+**Gesture**: how a person proves intent. `click` (one click), `click-again` (arm, then click again within a timeout), `hold` (press and hold for a duration), `type` (type a phrase, handled by TypeToConfirm).
+
+**Style**: a named way to confirm: undo, click again, hold, type to confirm, a dialog or a popover. Components combine them, and each component's docs page shows its styles as examples.
+
+**Surface**: where a confirmation appears. Inline is the default. A dialog is an optional surface that wraps an inline control, never the default.
+
+**Undo window**: an optional delay after confirming, before `onConfirm` runs. The control shows "Undo" while it drains. Undoing cancels. Leaving the control and coming back to it, by pointer or focus, pauses the window until you leave again, and a hidden tab pauses it until the tab is visible. Unmounting during the window, including closing the tab, discards the confirmation without calling either handler.
+
+**Pending**: the state while an async `onConfirm` is running. The control is disabled until it settles.
+
+**Confirmation core**: the module every control is built on (`components/ui/sureui/confirmation.ts`). It owns the state machine, the gesture rules (which pointer, key and focus events arm, hold, confirm, cancel or undo), timing and handler composition. `useConfirmation` returns the state, a fill ref and `getTriggerProps`, which a control spreads on its trigger. Controls are thin adapters over it: labels, announcements and styling.
+
+**Undo toast**: `undoToast()`, an optional Sonner-based undo for actions whose control disappears. It is separate from the core on purpose: its lifecycle belongs to Sonner. It shares the undo window's timing with the core (`components/ui/sureui/undo-window.ts`), but pauses as soon as the toast is hovered or focused, since a toast appears away from the control that was clicked.
 
 ## Commands
 
@@ -21,8 +41,8 @@ A shadcn/ui registry of confirmation controls. Read `CONTEXT.md` for the vocabul
 - `components/ui/*.tsx` outside `sureui/` are stock shadcn components from the CLI. Never edit them.
 - `app/`, `components/site/`, `lib/site/` and `content/docs/` are the docs site:
   - `components/site/layout/` header, footer and page frame; `docs/` docs page pieces, the MDX element styles (`mdx.tsx`) and the live examples; `code/` code blocks and install commands; `home/` the home page and its examples; `og/` the Open Graph card.
-  - `content/docs/<slug>.mdx` holds every docs page, one per registry item plus Introduction and Installation. Frontmatter has `title` and `description`. Pages use Markdown plus two tags: `<Example name="<slug>/<name>" />` and `<Install args="add @sureui/<item>" />`.
-  - `components/site/docs/examples/<slug>/<name>.tsx` are the live examples. The Code tab shows the file itself (without `"use client"` and the `useLog` lines, with `log(` shown as `console.log(`), so keep them short, realistic and uncommented.
+  - `content/docs/<section>/<slug>.mdx` holds every docs page, one per registry item plus Introduction and Installation. Each section folder has a `meta.json` with its `title` and `pages` in nav order, and `content/docs/meta.json` lists the section folders in order. Frontmatter has `title` and `description`. Pages use Markdown plus two tags: `<Example name="<slug>/<name>" />` and `<Install args="add @sureui/<item>" />`.
+  - `components/site/docs/examples/<slug>/<name>.tsx` are the live examples. The Code tab shows the file itself (without `"use client"` and the `useLog` lines, with `log(` shown as `console.log(`), so keep them short, realistic and uncommented. For a value worth changing (a timing or a toggle that is the point of the figure), write `control("name", default)` with `const control = useControl()`. The Preview header shows a number field (milliseconds) or a true/false toggle, and the Code tab shows the chosen value.
   - `lib/site/docs.ts` lists the pages in nav order and reads the MDX and example files. `lib/site/llms.ts` builds `llms.txt` and the markdown pages from the same MDX, so the HTML pages and `llms.txt` never disagree. `lib/site/config.ts` has URLs and registry items.
   - Each component page follows the same order: main example, Installation, Usage, Examples (one `###` per option), API reference (a `| Prop | Type | Default |` table per component, headed by its exact name), Accessibility. `tests/docs.test.tsx` checks every props table against the component's types.
   - The site has its own look, separate from the product. SureUI's controls are built on stock shadcn, so site chrome must never use stock `components/ui/*`: use `components/site/ui/` (site button, tabs, drawer, built on Base UI) and the frame pieces in `components/site/layout/frame.tsx`. Only the docs examples and the home examples render stock shadcn, because they show the product.

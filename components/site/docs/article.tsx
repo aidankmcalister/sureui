@@ -3,7 +3,9 @@ import { DocsToc } from "@/components/site/docs/toc"
 import { headings, type Page } from "@/lib/site/docs"
 
 export async function DocsArticle({ page }: { page: Page }) {
-  const { default: Content } = await import(`@/content/docs/${page.slug}.mdx`)
+  const { default: Content } = await import(
+    `@/content/docs/${page.section}/${page.slug}.mdx`
+  )
 
   return (
     <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_220px]">

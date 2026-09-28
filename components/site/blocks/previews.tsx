@@ -1,5 +1,6 @@
 "use client"
 
+import { AgentApproval } from "@/components/blocks/agent-approval-01/agent-approval"
 import { ApiKeys } from "@/components/blocks/api-keys-01/api-keys"
 import { DangerZone } from "@/components/blocks/danger-zone-01/danger-zone"
 import { DeleteAccount } from "@/components/blocks/delete-account-01/delete-account"
@@ -14,6 +15,7 @@ const previews: Record<string, React.ComponentType> = {
   "team-members-01": TeamMembers,
   "file-manager-01": FileManager,
   "inbox-01": Inbox,
+  "agent-approval-01": AgentApproval,
 }
 
 export const blockPreviewNames = Object.keys(previews)

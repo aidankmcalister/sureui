@@ -17,13 +17,13 @@ const columns = [
   {
     title: "Docs",
     links: pages
-      .filter((page) => page.group !== "Components")
+      .filter((page) => page.section !== "components")
       .map((page) => ({ href: page.href, label: page.title })),
   },
   {
     title: "Components",
     links: pages
-      .filter((page) => page.group === "Components")
+      .filter((page) => page.section === "components")
       .map((page) => ({ href: page.href, label: page.title })),
   },
   {

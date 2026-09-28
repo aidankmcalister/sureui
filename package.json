@@ -14,8 +14,8 @@
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx}\"",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
+    "test": "vitest run --config tests/vitest.config.ts",
+    "test:coverage": "vitest run --config tests/vitest.config.ts --coverage",
     "check": "pnpm lint && pnpm typecheck && pnpm test",
     "registry:build": "shadcn build",
     "smoke:install": "./scripts/smoke-install.sh",
@@ -52,6 +52,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitest/coverage-v8": "^5.0.2",
+    "ai": "^7.0.120",
     "eslint": "^9.39.5",
     "eslint-config-next": "16.3.6",
     "jsdom": "^30.1.1",
@@ -60,5 +61,28 @@
     "tailwindcss": "^4.3.3",
     "typescript": "^5",
     "vitest": "^5.0.2"
+  },
+  "prettier": {
+    "endOfLine": "lf",
+    "semi": false,
+    "singleQuote": false,
+    "tabWidth": 2,
+    "trailingComma": "es5",
+    "printWidth": 80,
+    "plugins": [
+      "prettier-plugin-tailwindcss"
+    ],
+    "tailwindStylesheet": "app/globals.css",
+    "tailwindFunctions": [
+      "cn",
+      "cva"
+    ]
+  },
+  "pnpm": {
+    "allowBuilds": {
+      "sharp": true,
+      "unrs-resolver": true,
+      "msw": false
+    }
   }
 }

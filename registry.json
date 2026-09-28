@@ -299,6 +299,54 @@
       ]
     },
     {
+      "name": "tool-approval",
+      "type": "registry:ui",
+      "title": "Tool Approval",
+      "description": "Approve or deny an AI SDK tool call with a gesture that matches its risk: undo for low, click again for medium, hold for high and a typed phrase for critical. Pass addToolApprovalResponse from useChat as onRespond.",
+      "registryDependencies": [
+        "button",
+        "checkbox",
+        "input",
+        "label"
+      ],
+      "files": [
+        {
+          "path": "components/ui/sureui/fill.ts",
+          "type": "registry:lib",
+          "target": "@ui/sureui/fill.ts"
+        },
+        {
+          "path": "components/ui/sureui/undo-window.ts",
+          "type": "registry:lib",
+          "target": "@ui/sureui/undo-window.ts"
+        },
+        {
+          "path": "components/ui/sureui/confirmation.ts",
+          "type": "registry:lib",
+          "target": "@ui/sureui/confirmation.ts"
+        },
+        {
+          "path": "components/ui/sureui/confirm-button.tsx",
+          "type": "registry:ui",
+          "target": "@ui/sureui/confirm-button.tsx"
+        },
+        {
+          "path": "components/ui/sureui/type-to-confirm.tsx",
+          "type": "registry:ui",
+          "target": "@ui/sureui/type-to-confirm.tsx"
+        },
+        {
+          "path": "components/ui/sureui/tool-approval.tsx",
+          "type": "registry:ui",
+          "target": "@ui/sureui/tool-approval.tsx"
+        }
+      ],
+      "categories": [
+        "confirmation",
+        "ai"
+      ]
+    },
+    {
       "name": "danger-zone-01",
       "type": "registry:block",
       "title": "Danger Zone",
@@ -455,6 +503,28 @@
       "categories": [
         "block",
         "mail"
+      ]
+    },
+    {
+      "name": "agent-approval-01",
+      "type": "registry:block",
+      "title": "Agent Approval",
+      "description": "An agent turn with four tool calls waiting for approval, from a low-risk message that approves with undo to a critical delete that asks for the project name. Each call shows its tool, risk and arguments, then its result once it runs.",
+      "registryDependencies": [
+        "@sureui/tool-approval",
+        "badge",
+        "card"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/agent-approval-01/agent-approval.tsx",
+          "type": "registry:component",
+          "target": "@components/agent-approval.tsx"
+        }
+      ],
+      "categories": [
+        "block",
+        "ai"
       ]
     }
   ]
