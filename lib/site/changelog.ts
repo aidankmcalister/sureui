@@ -7,6 +7,35 @@ export type Release = {
 
 export const releases: Release[] = [
   {
+    version: "0.1.1",
+    date: "2026-09-28",
+    summary:
+      "A redesigned Consequences, a pulse while controls are pending, and new docs. ConfirmSwitch is removed for now.",
+    sections: [
+      {
+        label: "Changes",
+        items: [
+          "`Consequences` is now a ledger: one row per item with the count on the right and names underneath. Labels read as row headings, so pass them capitalized, like `Deployments`.",
+          '`Consequences` counts the names when you don\'t pass `count`, and `variant="destructive"` tints the whole list.',
+          "Controls pulse while an async `onConfirm` is pending, instead of dimming. With `prefers-reduced-motion` they dim as before.",
+        ],
+      },
+      {
+        label: "Removed",
+        items: [
+          "`ConfirmSwitch` is out of the registry while it's reworked. Installed copies keep working.",
+        ],
+      },
+      {
+        label: "Docs",
+        items: [
+          "One page per component, each with live examples, a props table and a table of contents.",
+          "Old style pages like `/docs/undo` and `/docs/hold` redirect to their component page.",
+        ],
+      },
+    ],
+  },
+  {
     version: "0.1.0",
     date: "2026-09-28",
     summary:
