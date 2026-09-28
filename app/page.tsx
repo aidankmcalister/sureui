@@ -70,7 +70,7 @@ export default function Home() {
           <Cell
             figure={2}
             gesture="Hold"
-            href="/docs/hold"
+            href="/docs/confirm-button#hold"
             title="Revoking an API key"
             description="Press and hold. Letting go early cancels."
           >
@@ -88,7 +88,7 @@ export default function Home() {
           <Cell
             figure={4}
             gesture="Dialog"
-            href="/docs/dialogs"
+            href="/docs/confirm-dialog"
             title="Leaving a shared workspace"
             description="A dialog, because leaving affects everyone else in the workspace."
           >
@@ -97,7 +97,7 @@ export default function Home() {
           <Cell
             figure={5}
             gesture="Hold"
-            href="/docs/hold"
+            href="/docs/confirm-button#hold"
             title="Resetting preferences"
             description="A longer hold for a bigger reset."
           >
@@ -110,7 +110,7 @@ export default function Home() {
           <Cell
             figure={6}
             gesture="Undo"
-            href="/docs/undo"
+            href="/docs/confirm-button#undo"
             title="Clearing out shared files"
             description="Moves to trash right away, with five seconds to undo."
             className="md:col-span-2 lg:col-span-1"
@@ -120,7 +120,7 @@ export default function Home() {
           <Cell
             figure={7}
             gesture="Click again"
-            href="/docs/click-again"
+            href="/docs/confirm-button#click-again"
             title="Removing a teammate"
             description="Each row asks for a second click before it removes anyone."
           >
@@ -129,7 +129,7 @@ export default function Home() {
           <Cell
             figure={8}
             gesture="Hold · Click again"
-            href="/docs/hold"
+            href="/docs/confirm-button#hold"
             title="Tidying a message"
             description="Icon buttons: click again to archive, hold to delete."
           >

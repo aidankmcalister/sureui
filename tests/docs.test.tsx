@@ -16,8 +16,7 @@ import type {
 import type { TypeToConfirmProps } from "@/components/ui/sureui/type-to-confirm"
 import type { UndoToastOptions } from "@/components/ui/sureui/undo-toast"
 import type { UndoableProps } from "@/components/ui/sureui/undoable"
-import { demoSlugs } from "@/components/site/docs/demos"
-import { styles } from "@/lib/site/styles"
+import { docsSource, exampleFile, exampleNames, pages } from "@/lib/site/docs"
 
 type OwnProps<T> = Exclude<keyof T, keyof React.ComponentProps<typeof Button>>
 
@@ -238,24 +237,53 @@ const documented = {
   Undoable: undoable,
 }
 
+function tableAfter(heading: string) {
+  for (const page of pages) {
+    const source = docsSource(page.slug)
+    const lines = source
+      .slice(Math.max(0, source.indexOf("## API reference")))
+      .split("\n")
+    const start = lines.indexOf(`### ${heading}`)
+    if (start === -1) continue
+    const first = lines.findIndex(
+      (line, index) => index > start && line.startsWith("|")
+    )
+    const end = lines.findIndex(
+      (line, index) => index > first && !line.startsWith("|")
+    )
+    return lines.slice(first + 2, end === -1 ? undefined : end)
+  }
+  return []
+}
+
 function rowsFor(name: string) {
   return new Set(
-    styles
-      .flatMap((style) => style.api)
-      .filter((api) => api.name === name)
-      .flatMap((api) => api.rows.map(([prop]) => prop))
+    tableAfter(name)
+      .map((row) => row.split(" | ")[0].replace(/^\| /, "").replace(/`/g, ""))
       .filter((prop) => !prop.startsWith("...") && !prop.startsWith("data-"))
       .map((prop) => prop.split(/[ .]/)[0])
   )
 }
 
 describe("docs", () => {
-  it("every style has a demo", () => {
-    expect(demoSlugs.sort()).toEqual(styles.map((style) => style.slug).sort())
+  it("every example on a page lives in that page's folder", () => {
+    for (const page of pages) {
+      for (const name of exampleNames(page.slug)) {
+        expect(name.startsWith(`${page.slug}/`)).toBe(true)
+        expect(exampleFile(name)).toContain("export default function")
+      }
+    }
+  })
+
+  it("every page has a title and description", () => {
+    for (const page of pages) {
+      expect(page.title).toBeTruthy()
+      expect(page.description).toBeTruthy()
+    }
   })
 
   it.each(Object.entries(documented))(
-    "the %s props tables match its props",
+    "the %s props table matches its props",
     (name, props) => {
       expect([...rowsFor(name)].sort()).toEqual(Object.keys(props).sort())
     }

@@ -1,0 +1,105 @@
+---
+title: Confirm Button
+description: A button that runs its action on a click, a second click or a press and hold, with optional undo.
+---
+
+<Example name="confirm-button/demo" />
+
+## Installation
+
+<Install args="add @sureui/confirm-button" />
+
+## Usage
+
+```tsx
+import { ConfirmButton } from "@/components/ui/sureui/confirm-button"
+
+<ConfirmButton gesture="click-again" onConfirm={deleteProject}>
+  Delete project
+</ConfirmButton>
+```
+
+`gesture` picks how people confirm, and `undo` adds a few seconds to take it back.
+
+## Examples
+
+### Undo
+
+The button turns into Undo right away, and `onConfirm` waits until the window closes. Undo calls `onCancel` instead.
+
+<Example name="confirm-button/undo" />
+
+The window lasts 5 seconds, or the milliseconds you pass to `undo`, and pauses while the pointer or focus is on the button. Unmounting during the window drops the action without calling either handler.
+
+### Click again
+
+The first click arms the button and shows `confirmLabel`. The second click confirms.
+
+<Example name="confirm-button/click-again" />
+
+The button disarms after `timeout` or when it loses focus.
+
+### Hold
+
+Press and hold until the fill completes, then let go to confirm. Letting go early cancels.
+
+<Example name="confirm-button/hold" />
+
+Moving off the button or losing focus also cancels, even after the fill. Set `confirmOnRelease={false}` to confirm as soon as the fill completes.
+
+### Pending
+
+Return a promise from `onConfirm` and the button stays pending until it settles. If it rejects, the button goes back to idle.
+
+<Example name="confirm-button/pending" />
+
+### Labels
+
+`confirmLabel` shows while armed and `undoLabel` during the undo window. `releaseLabel` does the same for a finished hold.
+
+<Example name="confirm-button/labels" />
+
+## API reference
+
+### ConfirmButton
+
+Takes every prop of the shadcn `Button`.
+
+| Prop | Type | Default |
+| --- | --- | --- |
+| `onConfirm` | `() => void \| Promise<unknown>` | required |
+| `onCancel` | `() => void` | — |
+| `gesture` | `"click" \| "click-again" \| "hold"` | `"click"` |
+| `undo` | `boolean \| number` | — |
+| `pauseUndoOnHover` | `boolean` | `true` |
+| `pauseUndoOnFocus` | `boolean` | `true` |
+| `confirmLabel` | `ReactNode` | `"Click again to confirm"` |
+| `releaseLabel` | `ReactNode` | — |
+| `undoLabel` | `ReactNode` | `"Undo"` |
+| `timeout` | `number` | `3000` |
+| `cancelOnBlur` | `boolean` | `true` |
+| `duration` | `number` | `1200` |
+| `confirmOnRelease` | `boolean` | `true` |
+| `cancelHoldOnLeave` | `boolean` | `true` |
+| `holdFallback` | `"click-again" \| "none"` | `"click-again"` |
+| `announcements` | `{ armed?, hold?, fallback?, ready?, undo? }` | — |
+
+### Data attributes
+
+The button sets `data-state`, so you can style around it.
+
+| Value | When |
+| --- | --- |
+| `idle` | Waiting for input. |
+| `armed` | Clicked once with `click-again`, or a hold that fell back to a second activation. |
+| `holding` | Being held with `gesture="hold"`. |
+| `ready` | The hold fill is complete and letting go confirms. |
+| `undo` | The undo window is open. |
+| `pending` | `onConfirm` returned a promise that hasn't settled. |
+
+## Accessibility
+
+- Key repeat is ignored, so holding Enter can't arm and confirm at once.
+- Each state change is announced in a polite live region. Replace the English text with `announcements`.
+- Screen reader and keyboard users can confirm a hold with two activations. Set `holdFallback="none"` to turn this off.
+- With `prefers-reduced-motion`, fills jump to their end state instead of moving.

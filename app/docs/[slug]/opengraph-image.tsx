@@ -1,14 +1,16 @@
 import { card, ogSize } from "@/components/site/og/card"
-import { getStyle, styles } from "@/lib/site/styles"
+import { getPage, pages } from "@/lib/site/docs"
 
-export const alt = "A SureUI confirmation component for shadcn/ui."
+export const alt = "A SureUI docs page."
 export const size = ogSize
 export const contentType = "image/png"
 export const dynamic = "force-static"
 export const dynamicParams = false
 
 export function generateStaticParams() {
-  return styles.map((style) => ({ slug: style.slug }))
+  return pages
+    .filter((page) => page.slug !== "introduction")
+    .map((page) => ({ slug: page.slug }))
 }
 
 export default async function Image({
@@ -16,10 +18,10 @@ export default async function Image({
 }: {
   params: Promise<{ slug: string }>
 }) {
-  const style = getStyle((await params).slug)
+  const page = getPage((await params).slug)
 
   return card({
-    lead: style?.name ?? "SureUI",
-    detail: style?.lead ?? "Confirmation components for shadcn/ui.",
+    lead: page?.title ?? "SureUI",
+    detail: page?.description ?? "Confirmation components for shadcn/ui.",
   })
 }

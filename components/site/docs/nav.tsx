@@ -13,12 +13,17 @@ import {
   SiteDrawerContent,
   SiteDrawerTrigger,
 } from "@/components/site/ui/drawer"
-import { getPage, pages, type Page } from "@/lib/site/pages"
+import type { Page } from "@/lib/site/docs"
 
-const groups = [...new Set(pages.map((page) => page.group))]
-
-function DocsNav({ onNavigate }: { onNavigate?: () => void }) {
+function DocsNav({
+  pages,
+  onNavigate,
+}: {
+  pages: Page[]
+  onNavigate?: () => void
+}) {
   const pathname = usePathname()
+  const groups = [...new Set(pages.map((page) => page.group))]
 
   return (
     <nav className="grid gap-7">
@@ -59,19 +64,20 @@ function DocsNav({ onNavigate }: { onNavigate?: () => void }) {
   )
 }
 
-export function DocsSidebar() {
+export function DocsSidebar({ pages }: { pages: Page[] }) {
   return (
     <aside className="hidden border-r border-(--rule) lg:block">
       <div className="sticky top-0 max-h-svh overflow-y-auto px-4 py-6">
-        <DocsNav />
+        <DocsNav pages={pages} />
       </div>
     </aside>
   )
 }
 
-export function DocsBar() {
+export function DocsBar({ pages }: { pages: Page[] }) {
   const [open, setOpen] = React.useState(false)
-  const page = getPage(usePathname())
+  const pathname = usePathname()
+  const page = pages.find((item) => item.href === pathname)
 
   return (
     <div className="flex h-14 items-center justify-between gap-4 px-3 sm:px-6">
@@ -86,7 +92,7 @@ export function DocsBar() {
         </SiteDrawerTrigger>
         <SiteDrawerContent title="Contents">
           <div className="overflow-y-auto px-3 py-6">
-            <DocsNav onNavigate={() => setOpen(false)} />
+            <DocsNav pages={pages} onNavigate={() => setOpen(false)} />
           </div>
         </SiteDrawerContent>
       </SiteDrawer>
@@ -94,7 +100,7 @@ export function DocsBar() {
   )
 }
 
-export function DocsPager() {
+export function DocsPager({ pages }: { pages: Page[] }) {
   const pathname = usePathname()
   const index = pages.findIndex((page) => page.href === pathname)
   const previous = pages[index - 1]

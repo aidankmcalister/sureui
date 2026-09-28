@@ -6,7 +6,7 @@ SureUI is a shadcn/ui registry of confirmation controls. These terms are the sha
 
 **Gesture**: how a person proves intent. `click` (one click), `click-again` (arm, then click again within a timeout), `hold` (press and hold for a duration), `type` (type a phrase, handled by TypeToConfirm).
 
-**Style**: a named way to confirm, as the docs present it: Undo, Click again, Hold, Dialogs, Type to confirm. Each answers one question about the action, such as "Can it be taken back?" or "Is it permanent and large?".
+**Style**: a named way to confirm: undo, click again, hold, type to confirm, a dialog or a popover. Components combine them, and each component's docs page shows its styles as examples.
 
 **Surface**: where a confirmation appears. Inline is the default. A dialog is an optional surface that wraps an inline control, never the default.
 

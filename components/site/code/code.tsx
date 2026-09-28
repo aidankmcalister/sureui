@@ -1,5 +1,6 @@
 import { createHighlighterCoreSync, type ThemeRegistration } from "shiki/core"
 import { createJavaScriptRegexEngine } from "shiki/engine/javascript"
+import json from "shiki/langs/json.mjs"
 import tsx from "shiki/langs/tsx.mjs"
 
 import { cn } from "@/lib/utils"
@@ -8,9 +9,15 @@ import { Label } from "@/components/site/layout/frame"
 
 const sureui = new Set([
   "ConfirmButton",
+  "ConfirmMenuItem",
+  "ConfirmSwitch",
   "TypeToConfirm",
   "ConfirmDialog",
+  "ConfirmPopover",
+  "Consequences",
+  "ConsequencesItem",
   "undoToast",
+  "Undoable",
   "useConfirm",
 ])
 
@@ -64,17 +71,19 @@ const theme: ThemeRegistration = {
 
 const highlighter = createHighlighterCoreSync({
   themes: [theme],
-  langs: [tsx],
+  langs: [tsx, json],
   engine: createJavaScriptRegexEngine(),
 })
 
 export function Code({
-  label = "tsx",
+  lang = "tsx",
+  label = lang,
   highlight = [],
   framed = true,
   bodyClassName,
   children,
 }: {
+  lang?: "tsx" | "json"
   label?: string
   highlight?: number[]
   framed?: boolean
@@ -82,7 +91,7 @@ export function Code({
   children: string
 }) {
   const { tokens } = highlighter.codeToTokens(children, {
-    lang: "tsx",
+    lang,
     theme: "sureui",
   })
 

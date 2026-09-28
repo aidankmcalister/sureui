@@ -2,15 +2,72 @@
   "headers": [
     {
       "source": "/opengraph-image",
-      "headers": [{ "key": "Content-Type", "value": "image/png" }]
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "image/png"
+        }
+      ]
     },
     {
       "source": "/docs/:slug/opengraph-image",
-      "headers": [{ "key": "Content-Type", "value": "image/png" }]
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "image/png"
+        }
+      ]
     },
     {
       "source": "/apple-icon",
-      "headers": [{ "key": "Content-Type", "value": "image/png" }]
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "image/png"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/docs/undo",
+      "destination": "/docs/confirm-button#undo",
+      "permanent": true
+    },
+    {
+      "source": "/docs/click-again",
+      "destination": "/docs/confirm-button#click-again",
+      "permanent": true
+    },
+    {
+      "source": "/docs/hold",
+      "destination": "/docs/confirm-button#hold",
+      "permanent": true
+    },
+    {
+      "source": "/docs/dialogs",
+      "destination": "/docs/confirm-dialog",
+      "permanent": true
+    },
+    {
+      "source": "/llms/undo.md",
+      "destination": "/llms/confirm-button.md",
+      "permanent": true
+    },
+    {
+      "source": "/llms/click-again.md",
+      "destination": "/llms/confirm-button.md",
+      "permanent": true
+    },
+    {
+      "source": "/llms/hold.md",
+      "destination": "/llms/confirm-button.md",
+      "permanent": true
+    },
+    {
+      "source": "/llms/dialogs.md",
+      "destination": "/llms/confirm-dialog.md",
+      "permanent": true
     }
   ]
 }

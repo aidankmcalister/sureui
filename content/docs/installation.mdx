@@ -1,0 +1,49 @@
+---
+title: Installation
+description: Add SureUI to a shadcn/ui project with the shadcn CLI.
+---
+
+## Set up shadcn/ui
+
+SureUI installs into a shadcn/ui project on Base UI, the shadcn default. If your project doesn't use shadcn yet, run:
+
+<Install args="init" />
+
+## Add the registry
+
+Add `@sureui` to the registries in your `components.json`:
+
+```json
+{
+  "registries": {
+    "@sureui": "https://sureui.com/r/{name}.json"
+  }
+}
+```
+
+## Add components
+
+Each item includes the confirmation core, so install only the ones you use:
+
+<Install args="add @sureui/confirm-button" />
+
+The items are `confirm-button`, `confirm-menu-item`, `confirm-switch`, `type-to-confirm`, `confirm-dialog`, `confirm-popover`, `consequences`, `undo-toast` and `undoable`. Each component page lists its own command.
+
+## Mount the Toaster
+
+`undoToast` shows a shadcn toast, so it needs the `Toaster` in your root layout. Nothing else needs setup.
+
+```tsx
+import { Toaster } from "@/components/ui/sonner"
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>
+        {children}
+        <Toaster />
+      </body>
+    </html>
+  )
+}
+```

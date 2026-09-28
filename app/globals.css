@@ -167,3 +167,51 @@
   --code-comment: #858b96;
   --code-punctuation: #858b96;
 }
+
+@layer components {
+  :where(.docs-body > *) {
+    margin-inline: 0.75rem;
+    margin-top: 1.25rem;
+    max-width: 53.125rem;
+  }
+  :where(.docs-body > :first-child) {
+    margin-top: 0;
+  }
+  :where(.docs-body > h3) {
+    margin-top: 3rem;
+  }
+  :where(.docs-body > h3 + *) {
+    margin-top: 0.5rem;
+  }
+  :where(.docs-body > h3 + p + *) {
+    margin-top: 1.25rem;
+  }
+  :where(.docs-body > .docs-rule) {
+    margin-inline: 0;
+    margin-top: 2.5rem;
+    max-width: none;
+    padding: 2.5rem 0.75rem 0;
+  }
+  :where(.docs-body > .docs-rule + h3) {
+    margin-top: 1.5rem;
+  }
+  @media (width >= 40rem) {
+    :where(.docs-body > *) {
+      margin-inline: 1.5rem;
+    }
+    :where(.docs-body > .docs-rule) {
+      margin-inline: 0;
+      padding-inline: 1.5rem;
+    }
+  }
+  @media (width >= 64rem) {
+    :where(.docs-body > *) {
+      margin-inline: 3.5rem;
+    }
+    :where(.docs-body > .docs-rule) {
+      margin-inline: 0;
+      margin-top: 3rem;
+      padding: 3rem 3.5rem 0;
+    }
+  }
+}

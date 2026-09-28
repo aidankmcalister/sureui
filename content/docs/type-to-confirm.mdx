@@ -1,0 +1,80 @@
+---
+title: Type to Confirm
+description: An inline form that unlocks its confirm button only after the exact phrase is typed.
+---
+
+<Example name="type-to-confirm/demo" />
+
+## Installation
+
+<Install args="add @sureui/type-to-confirm" />
+
+## Usage
+
+```tsx
+import { TypeToConfirm } from "@/components/ui/sureui/type-to-confirm"
+
+<TypeToConfirm
+  phrase="acme-prod"
+  confirmLabel="Delete project"
+  onConfirm={deleteProject}
+/>
+```
+
+## Examples
+
+### Acknowledgements
+
+Each sentence in `acknowledgements` adds a checkbox. The button unlocks once the phrase matches and every box is checked.
+
+<Example name="type-to-confirm/acknowledgements" />
+
+### Consequences
+
+Pass a [Consequences](/docs/consequences) list to show what the action removes, above the input.
+
+<Example name="type-to-confirm/consequences" />
+
+### Case and spaces
+
+The phrase must match exactly. `caseSensitive={false}` ignores case, and `trim` ignores spaces at either end.
+
+<Example name="type-to-confirm/case-and-spaces" />
+
+### Labels and actions
+
+`label` replaces the text above the input. `renderActions` wraps the confirm button, for example to add Cancel next to it.
+
+<Example name="type-to-confirm/labels-and-actions" />
+
+## API reference
+
+### TypeToConfirm
+
+Renders a `form`.
+
+| Prop | Type | Default |
+| --- | --- | --- |
+| `phrase` | `string` | required |
+| `onConfirm` | `() => void \| Promise<unknown>` | required |
+| `onCancel` | `() => void` | — |
+| `caseSensitive` | `boolean` | `true` |
+| `trim` | `boolean` | `false` |
+| `acknowledgements` | `string[]` | `[]` |
+| `consequences` | `ReactNode` | — |
+| `label` | `ReactNode` | `"Type {phrase} to confirm"` |
+| `confirmLabel` | `string` | `"Confirm"` |
+| `undoLabel` | `string` | `"Undo"` |
+| `variant` | `"default" \| "outline" \| "secondary" \| "ghost" \| "destructive" \| "link"` | `"destructive"` |
+| `undo` | `boolean \| number` | — |
+| `pauseUndoOnHover` | `boolean` | `true` |
+| `pauseUndoOnFocus` | `boolean` | `true` |
+| `renderActions` | `(confirmButton: ReactElement) => ReactNode` | — |
+| `className` | `string` | — |
+| `announcements` | `{ match?, undo? }` | — |
+
+## Accessibility
+
+- A matching phrase is announced in a polite live region. Change the text with `announcements`.
+- While `onConfirm` is pending, the input is read-only and the button keeps focus.
+- The input and checkboxes clear after confirming, so an undone form isn't one click from running again.

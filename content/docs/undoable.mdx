@@ -1,0 +1,82 @@
+---
+title: Undoable
+description: A list item or table row that collapses in place to a label and Undo when it's removed.
+---
+
+<Example name="undoable/demo" />
+
+## Installation
+
+<Install args="add @sureui/undoable" />
+
+## Usage
+
+```tsx
+import { Button } from "@/components/ui/button"
+import { Undoable } from "@/components/ui/sureui/undoable"
+
+<Undoable
+  render={<li />}
+  label={`Deleted ${file.name}`}
+  onConfirm={() => deleteFile(file.id)}
+>
+  {({ remove }) => (
+    <>
+      {file.name}
+      <Button onClick={remove}>Delete</Button>
+    </>
+  )}
+</Undoable>
+```
+
+`remove` collapses the row to `label` and Undo, and `onConfirm` runs when the window ends.
+
+## Examples
+
+### Table rows
+
+Pass `render={<TableRow />}` to wrap a table row. The label and Undo go in one cell that spans every column.
+
+<Example name="undoable/table" />
+
+### Undo duration
+
+The window lasts 5 seconds, or the milliseconds you pass to `undo`.
+
+<Example name="undoable/undo-duration" />
+
+## API reference
+
+### Undoable
+
+Takes every prop of the element it renders.
+
+| Prop | Type | Default |
+| --- | --- | --- |
+| `onConfirm` | `() => void \| Promise<unknown>` | required |
+| `onCancel` | `() => void` | — |
+| `children` | `ReactNode \| (({ remove, state }) => ReactNode)` | — |
+| `render` | `ReactElement` | `<div />` |
+| `label` | `ReactNode` | `"Deleted"` |
+| `undoLabel` | `ReactNode` | `"Undo"` |
+| `undo` | `boolean \| number` | `true` |
+| `pauseUndoOnHover` | `boolean` | `true` |
+| `pauseUndoOnFocus` | `boolean` | `true` |
+| `announcements` | `{ undo? }` | — |
+
+### Data attributes
+
+The rendered element sets `data-state`. Drop the item from your data once it's `removed`.
+
+| Value | When |
+| --- | --- |
+| `idle` | Showing its children. |
+| `undo` | Collapsed, with the undo window open. |
+| `pending` | `onConfirm` returned a promise that hasn't settled. |
+| `removed` | `onConfirm` has run. |
+
+## Accessibility
+
+- If focus was in the row, it moves to Undo, and back to the button that removed the row after Undo.
+- The label and "Undo is available." are announced in a polite live region. Change the text with `announcements`.
+- With `prefers-reduced-motion`, the fill on Undo doesn't move.

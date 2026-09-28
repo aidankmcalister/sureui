@@ -10,14 +10,14 @@ import {
 } from "@/components/site/ui/tabs"
 import { Label } from "@/components/site/layout/frame"
 
-type Report = (call: string, note?: string) => void
+type Log = (message: string) => void
 
-type Line = { id: number; call: string; note?: string }
+type Line = { id: number; message: string }
 
-const ReportContext = React.createContext<Report>(() => {})
+const LogContext = React.createContext<Log>(() => {})
 
-export function useReport() {
-  return React.useContext(ReportContext)
+export function useLog() {
+  return React.useContext(LogContext)
 }
 
 export function Preview({
@@ -31,12 +31,11 @@ export function Preview({
   log?: boolean
   children: React.ReactNode
 }) {
-  const [lines, setLines] = React.useState<Line[]>([])
+  const [line, setLine] = React.useState<Line | null>(null)
   const nextId = React.useRef(0)
 
-  const report = React.useCallback<Report>((call, note) => {
-    const id = nextId.current++
-    setLines((current) => [...current, { id, call, note }].slice(-3))
+  const push = React.useCallback<Log>((message) => {
+    setLine({ id: nextId.current++, message })
   }, [])
 
   return (
@@ -50,43 +49,32 @@ export function Preview({
           <Label>Fig. {figure}</Label>
         </div>
         <SiteTabPanel value="preview">
-          <ReportContext value={report}>
-            <div className="flex min-h-64 items-center justify-center p-6">
+          <LogContext value={push}>
+            <div className="flex min-h-48 items-center justify-center p-6">
               {children}
             </div>
-          </ReportContext>
+          </LogContext>
           {log && (
-            <ol
+            <p
               role="log"
-              aria-label="Callbacks"
-              className="flex h-20 flex-col justify-end border-t border-(--rule) px-4 py-2.5 font-mono text-xs leading-5"
+              aria-label="Console"
+              className="flex h-10 items-center gap-2 truncate border-t border-(--rule) px-4 font-mono text-xs"
             >
-              {lines.length === 0 ? (
-                <li className="text-(--ink-label)">
-                  {"// try it, and each callback shows up here"}
-                </li>
+              {line ? (
+                <>
+                  <span aria-hidden className="text-(--mark-text)">
+                    ›
+                  </span>
+                  <span key={line.id} className="truncate text-(--ink)">
+                    {line.message}
+                  </span>
+                </>
               ) : (
-                lines.map((line, index) => (
-                  <li
-                    key={line.id}
-                    className="flex min-w-0 gap-2"
-                    style={{
-                      opacity: 0.45 + ((index + 1) / lines.length) * 0.55,
-                    }}
-                  >
-                    <span aria-hidden className="text-(--mark-text)">
-                      ›
-                    </span>
-                    <span className="shrink-0 text-(--ink)">{line.call}</span>
-                    {line.note && (
-                      <span className="truncate text-(--ink-label)">
-                        {`// ${line.note}`}
-                      </span>
-                    )}
-                  </li>
-                ))
+                <span className="text-(--ink-label)">
+                  {"// console.log output shows up here"}
+                </span>
               )}
-            </ol>
+            </p>
           )}
         </SiteTabPanel>
         <SiteTabPanel value="code">{code}</SiteTabPanel>

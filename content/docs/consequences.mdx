@@ -1,0 +1,80 @@
+---
+title: Consequences
+description: A list of what a confirmation will remove, with counts and names.
+---
+
+<Example name="consequences/demo" />
+
+## Installation
+
+<Install args="add @sureui/consequences" />
+
+## Usage
+
+```tsx
+import { Consequences } from "@/components/ui/sureui/consequences"
+
+<Consequences
+  title="Deleting acme-prod removes"
+  items={[
+    { label: "deployments", count: 128 },
+    { label: "domains", count: 4, names: ["acme.com", "www.acme.com"] },
+  ]}
+/>
+```
+
+[Type to Confirm](/docs/type-to-confirm) and [Confirm Dialog](/docs/confirm-dialog) take a list in their `consequences` prop.
+
+## Examples
+
+### Long lists
+
+Names past `limit` collapse into an "and N more" button. Set `expandable={false}` to keep it as text.
+
+<Example name="consequences/long-lists" />
+
+### Destructive
+
+`variant="destructive"` tints the list. Items can also be `ConsequencesItem` children, each with an `icon` and a `description`.
+
+<Example name="consequences/destructive" />
+
+## API reference
+
+### Consequences
+
+Takes every prop of a `div`. Each entry in `items` takes the props of `ConsequencesItem`.
+
+| Prop | Type | Default |
+| --- | --- | --- |
+| `items` | `Consequence[]` | — |
+| `children` | `ReactNode` | — |
+| `title` | `ReactNode` | — |
+| `variant` | `"default" \| "destructive"` | `"default"` |
+| `limit` | `number` | `3` |
+| `expandable` | `boolean` | `true` |
+| `moreLabel` | `(hidden: number) => string` | `"and {hidden} more"` |
+| `lessLabel` | `string` | `"Show less"` |
+| `...props` | `ComponentProps<"div">` | — |
+
+### ConsequencesItem
+
+Takes every prop of an `li`. `limit`, `expandable`, `moreLabel` and `lessLabel` default to the values set on `Consequences`.
+
+| Prop | Type | Default |
+| --- | --- | --- |
+| `label` | `ReactNode` | required |
+| `count` | `number` | — |
+| `names` | `string[]` | `[]` |
+| `icon` | `ReactNode` | — |
+| `description` | `ReactNode` | — |
+| `limit` | `number` | — |
+| `expandable` | `boolean` | — |
+| `moreLabel` | `(hidden: number) => string` | — |
+| `lessLabel` | `string` | — |
+| `...props` | `ComponentProps<"li">` | — |
+
+## Accessibility
+
+- It renders a list, named by `title` when there is one.
+- The "and N more" button sets `aria-expanded` and doesn't submit a surrounding form.

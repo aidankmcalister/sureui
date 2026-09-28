@@ -1,0 +1,38 @@
+---
+title: Introduction
+description: Confirmation components for shadcn/ui, built on Base UI and installed with the shadcn CLI.
+---
+
+When every action opens an "Are you sure?" dialog, people stop reading and confirm on reflex. The one dialog that matters gets the same click as the fifty before it.
+
+SureUI has other ways to ask: undo, a second click, a press and hold, a typed name, or a dialog when you want one. Each component installs into your project from the `@sureui` registry, so the code is yours to change.
+
+## Components
+
+- [Confirm Button](/docs/confirm-button) confirms on a click, a second click or a press and hold, with optional undo.
+- [Confirm Menu Item](/docs/confirm-menu-item) brings the same gestures to dropdown and context menu items.
+- [Confirm Switch](/docs/confirm-switch) asks before the risky direction of a switch and toggles the other way at once.
+- [Type to Confirm](/docs/type-to-confirm) unlocks only after the exact phrase is typed.
+- [Confirm Dialog](/docs/confirm-dialog) puts a confirmation in an alert dialog, with an awaitable `useConfirm`.
+- [Confirm Popover](/docs/confirm-popover) anchors a one-line confirmation to its trigger.
+- [Consequences](/docs/consequences) lists what a confirmation will remove, with counts and names.
+- [Undo Toast](/docs/undo-toast) shows a toast with Undo and resolves once nobody undoes.
+- [Undoable](/docs/undoable) collapses a removed row in place to a label and an Undo button.
+
+## One contract
+
+Every component takes the same `onConfirm`. Return a promise and the control stays pending until it settles. `onCancel` runs when someone backs out or presses Undo. Every control sets `data-state`, so you can style around it.
+
+```tsx
+async function deleteProject() {
+  await api.projects.delete(id)
+}
+
+<ConfirmButton undo onConfirm={deleteProject}>Delete</ConfirmButton>
+<ConfirmButton gesture="click-again" onConfirm={deleteProject}>Delete</ConfirmButton>
+<ConfirmButton gesture="hold" onConfirm={deleteProject}>Delete</ConfirmButton>
+<TypeToConfirm phrase="acme-prod" onConfirm={deleteProject} />
+<ConfirmDialog title="Delete acme-prod?" onConfirm={deleteProject}>
+  <Button>Delete</Button>
+</ConfirmDialog>
+```

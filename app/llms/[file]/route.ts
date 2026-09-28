@@ -1,5 +1,5 @@
 import { pageMarkdown, textResponse } from "@/lib/site/llms"
-import { pages } from "@/lib/site/pages"
+import { pages } from "@/lib/site/docs"
 
 export const dynamic = "force-static"
 export const dynamicParams = false

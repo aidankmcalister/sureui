@@ -1,0 +1,101 @@
+---
+title: Confirm Dialog
+description: An alert dialog that asks before an action runs, with a confirm button, a hold or a typed phrase, and an awaitable confirm().
+---
+
+<Example name="confirm-dialog/demo" />
+
+## Installation
+
+<Install args="add @sureui/confirm-dialog" />
+
+## Usage
+
+```tsx
+import { Button } from "@/components/ui/button"
+import { ConfirmDialog } from "@/components/ui/sureui/confirm-dialog"
+
+<ConfirmDialog
+  title="Leave the Design team?"
+  description="An admin can add you back later."
+  confirmLabel="Leave team"
+  variant="destructive"
+  onConfirm={leaveTeam}
+>
+  <Button variant="outline">Leave team</Button>
+</ConfirmDialog>
+```
+
+If `onConfirm` returns a promise, the dialog stays open until it settles.
+
+## Examples
+
+### Typed phrase
+
+With `phrase`, the confirm button stays disabled until people type it. `acknowledgements` adds checkboxes.
+
+<Example name="confirm-dialog/typed-phrase" />
+
+### Hold
+
+`gesture` works as on [Confirm Button](/docs/confirm-button), here with `"hold"`.
+
+<Example name="confirm-dialog/hold" />
+
+### Consequences
+
+Pass a [Consequences](/docs/consequences) list to show what the action removes.
+
+<Example name="confirm-dialog/consequences" />
+
+### Awaiting the answer
+
+`useConfirm()` returns a `confirm()` to await in a handler and a `dialog` to render once.
+
+<Example name="confirm-dialog/use-confirm" />
+
+## API reference
+
+### ConfirmDialog
+
+For a way back after it closes, use [Undo Toast](/docs/undo-toast).
+
+| Prop | Type | Default |
+| --- | --- | --- |
+| `title` | `string` | required |
+| `children` | `ReactElement` | required |
+| `onConfirm` | `() => void \| Promise<unknown>` | required |
+| `onCancel` | `() => void` | — |
+| `description` | `ReactNode` | — |
+| `consequences` | `ReactNode` | — |
+| `confirmLabel` | `string` | `"Confirm"` |
+| `cancelLabel` | `string` | `"Cancel"` |
+| `variant` | `"default" \| "outline" \| "secondary" \| "ghost" \| "destructive" \| "link"` | `"default"` |
+| `gesture` | `"click" \| "click-again" \| "hold"` | `"click"` |
+| `timeout` | `number` | `3000` |
+| `cancelOnBlur` | `boolean` | `true` |
+| `duration` | `number` | `1200` |
+| `confirmOnRelease` | `boolean` | `true` |
+| `cancelHoldOnLeave` | `boolean` | `true` |
+| `holdFallback` | `"click-again" \| "none"` | `"click-again"` |
+| `phrase` | `string` | — |
+| `caseSensitive` | `boolean` | `true` |
+| `trim` | `boolean` | `false` |
+| `acknowledgements` | `string[]` | — |
+| `announcements` | `{ armed?, hold?, fallback?, ready?, match? }` | — |
+
+### useConfirm()
+
+Takes no arguments.
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `confirm` | `(options: ConfirmOptions) => Promise<boolean>` | Opens the dialog. Resolves `false` on cancel, when another `confirm()` replaces it, or on unmount. |
+| `dialog` | `ReactElement` | The dialog. Render it once. |
+| `ConfirmOptions` | `object` | `ConfirmDialog` props without `children` and `onCancel`. `onConfirm` is optional. |
+
+## Accessibility
+
+- The dialog has the `alertdialog` role, named by `title` and described by `description`.
+- Focus moves into the dialog when it opens and back to the trigger when it closes.
+- While `onConfirm` is pending, Cancel and Escape do nothing and the confirm button keeps focus.

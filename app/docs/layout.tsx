@@ -1,5 +1,7 @@
 import { DocsBar, DocsPager, DocsSidebar } from "@/components/site/docs/nav"
+import { DemoToaster } from "@/components/site/docs/toaster"
 import { Band } from "@/components/site/layout/frame"
+import { pages } from "@/lib/site/docs"
 
 export default function DocsLayout({
   children,
@@ -10,16 +12,17 @@ export default function DocsLayout({
     <>
       <div className="lg:hidden">
         <Band>
-          <DocsBar />
+          <DocsBar pages={pages} />
         </Band>
       </div>
       <Band grow className="grid lg:grid-cols-[240px_minmax(0,1fr)]">
-        <DocsSidebar />
+        <DocsSidebar pages={pages} />
         <main className="flex min-w-0 flex-col">
           <div className="flex-1">{children}</div>
-          <DocsPager />
+          <DocsPager pages={pages} />
         </main>
       </Band>
+      <DemoToaster />
     </>
   )
 }
