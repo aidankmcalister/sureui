@@ -7,19 +7,35 @@ import { siteButton } from "@/components/site/ui/button"
 
 const ResetContext = React.createContext({ version: 0, reset() {} })
 
-function ResetButton({
+function ResetScope({
   onReset,
-  className,
+  children,
 }: {
-  onReset: () => void
-  className?: string
+  onReset?: () => void
+  children: React.ReactNode
 }) {
+  const [version, setVersion] = React.useState(0)
+
+  function reset() {
+    setVersion((value) => value + 1)
+    onReset?.()
+  }
+
+  return <ResetContext value={{ version, reset }}>{children}</ResetContext>
+}
+
+function useReset() {
+  return React.useContext(ResetContext).reset
+}
+
+function ResetTrigger({ className }: { className?: string }) {
+  const reset = useReset()
   return (
     <button
       type="button"
       aria-label="Reset example"
       title="Reset"
-      onClick={onReset}
+      onClick={reset}
       className={siteButton({
         variant: "ghost",
         size: "icon",
@@ -31,21 +47,9 @@ function ResetButton({
   )
 }
 
-function ResetScope({ children }: { children: React.ReactNode }) {
-  const [version, setVersion] = React.useState(0)
-  const reset = React.useCallback(() => setVersion((value) => value + 1), [])
-  const value = React.useMemo(() => ({ version, reset }), [version, reset])
-  return <ResetContext value={value}>{children}</ResetContext>
-}
-
-function ResetTrigger({ className }: { className?: string }) {
-  const { reset } = React.useContext(ResetContext)
-  return <ResetButton onReset={reset} className={className} />
-}
-
 function ResetContent({ children }: { children: React.ReactNode }) {
   const { version } = React.useContext(ResetContext)
   return <React.Fragment key={version}>{children}</React.Fragment>
 }
 
-export { ResetButton, ResetContent, ResetScope, ResetTrigger }
+export { ResetContent, ResetScope, ResetTrigger, useReset }

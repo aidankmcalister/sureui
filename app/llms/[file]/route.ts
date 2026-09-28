@@ -13,7 +13,6 @@ export async function GET(
   { params }: RouteContext<"/llms/[file]">
 ) {
   const { file } = await params
-  const page = pages.find((item) => `${item.slug}.md` === file)
-  if (!page) return new Response("Not found", { status: 404 })
+  const page = pages.find((item) => `${item.slug}.md` === file)!
   return textResponse(pageMarkdown(page), "text/markdown")
 }

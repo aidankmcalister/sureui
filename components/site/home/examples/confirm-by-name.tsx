@@ -10,12 +10,7 @@ export function ConfirmByName() {
   const [deleted, setDeleted] = React.useState(false)
 
   return (
-    <Outcome
-      done={deleted}
-      icon={<Trash2Icon />}
-      title="acme-prod was deleted"
-      onReset={() => setDeleted(false)}
-    >
+    <Outcome done={deleted} icon={<Trash2Icon />} title="acme-prod was deleted">
       <TypeToConfirm
         phrase="acme-prod"
         acknowledgements={["I understand active deployments will go offline."]}

@@ -15,7 +15,8 @@ import type { ToolApprovalProps } from "@/components/ui/sureui/tool-approval"
 import type { TypeToConfirmProps } from "@/components/ui/sureui/type-to-confirm"
 import type { UndoToastOptions } from "@/components/ui/sureui/undo-toast"
 import type { UndoableProps } from "@/components/ui/sureui/undoable"
-import { docsSource, exampleFile, exampleNames, pages } from "@/lib/site/docs"
+import { docsSource, pages } from "@/lib/site/docs"
+import { exampleFile, exampleNames } from "@/lib/site/examples"
 
 type OwnProps<T> = Exclude<keyof T, keyof React.ComponentProps<typeof Button>>
 

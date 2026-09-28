@@ -2,4 +2,4 @@ blank_issues_enabled: true
 contact_links:
   - name: Docs
     url: https://sureui.com/docs
-    about: Installation, props and behavior for each style.
+    about: Installation, examples and props for each component.

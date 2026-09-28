@@ -2,15 +2,9 @@ import { readFile } from "node:fs/promises"
 import { join } from "node:path"
 import { ImageResponse } from "next/og"
 
-export const ogSize = { width: 1200, height: 630 }
+import { brand } from "@/components/site/og/brand"
 
-const colors = {
-  paper: "#121213",
-  ink: "#f4f4f5",
-  muted: "#a1a1aa",
-  rule: "#2a2a2e",
-  mark: "#f97316",
-}
+export const ogSize = { width: 1200, height: 630 }
 
 const inset = 64
 const top = 112
@@ -28,7 +22,7 @@ function Rule({ x, y }: { x?: number; y?: number }) {
     <div
       style={{
         position: "absolute",
-        background: colors.rule,
+        background: brand.rule,
         ...(x === undefined
           ? { left: 0, right: 0, top: y, height: 1 }
           : { top: 0, bottom: 0, left: x, width: 1 }),
@@ -45,7 +39,7 @@ function Plus({ x, y }: { x: number; y: number }) {
       viewBox="0 0 15 15"
       style={{ position: "absolute", left: x - 7, top: y - 7 }}
     >
-      <path d="M7.5 0v15M0 7.5h15" stroke={colors.mark} strokeWidth="1.5" />
+      <path d="M7.5 0v15M0 7.5h15" stroke={brand.mark} strokeWidth="1.5" />
     </svg>
   )
 }
@@ -69,7 +63,7 @@ export function card({
         display: "flex",
         width: "100%",
         height: "100%",
-        background: colors.paper,
+        background: brand.paper,
         fontFamily: "Geist",
       }}
     >
@@ -91,11 +85,11 @@ export function card({
           fontFamily: "Space Grotesk",
           fontSize: 34,
           letterSpacing: -0.85,
-          color: colors.ink,
+          color: brand.ink,
         }}
       >
         SureUI
-        <span style={{ color: colors.mark }}>.</span>
+        <span style={{ color: brand.mark }}>.</span>
       </div>
       <div
         style={{
@@ -118,13 +112,13 @@ export function card({
             fontSize: 80,
             lineHeight: 1.05,
             letterSpacing: -3.2,
-            color: colors.ink,
+            color: brand.ink,
           }}
         >
-          <span style={{ color: colors.mark }}>{lead}</span>
+          <span style={{ color: brand.mark }}>{lead}</span>
           {rest && <span>{rest}</span>}
         </div>
-        <div style={{ fontSize: 28, lineHeight: 1.4, color: colors.muted }}>
+        <div style={{ fontSize: 28, lineHeight: 1.4, color: brand.muted }}>
           {detail}
         </div>
       </div>

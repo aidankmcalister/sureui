@@ -2,7 +2,11 @@
 
 import * as React from "react"
 
-import type { Control, ControlValue, ControlValues } from "@/lib/site/controls"
+import type {
+  Control,
+  ControlValue,
+  ControlValues,
+} from "@/lib/site/example-source"
 
 const ControlContext = React.createContext<ControlValues>({})
 
@@ -15,10 +19,6 @@ export function useControl() {
   return function control<T extends ControlValue>(name: string, fallback: T) {
     return (values[name] as T | undefined) ?? fallback
   }
-}
-
-export function ControlText({ name }: { name: string }) {
-  return <>{String(useControlValues()[name])}</>
 }
 
 const box =

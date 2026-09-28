@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import { ConfirmButton } from "@/components/ui/sureui/confirm-button"
+import { click, setVisibility } from "./helpers"
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "performance"] })
@@ -10,20 +11,6 @@ beforeEach(() => {
 afterEach(() => {
   Reflect.deleteProperty(document, "visibilityState")
 })
-
-async function click(button: HTMLElement) {
-  await act(async () => fireEvent.click(button))
-}
-
-function setVisibility(state: DocumentVisibilityState) {
-  Object.defineProperty(document, "visibilityState", {
-    configurable: true,
-    get: () => state,
-  })
-  act(() => {
-    document.dispatchEvent(new Event("visibilitychange"))
-  })
-}
 
 describe("ConfirmButton", () => {
   it("click: confirms on a single click", async () => {

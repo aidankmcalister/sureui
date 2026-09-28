@@ -1,6 +1,7 @@
 import Link from "next/link"
 
 import { cn } from "@/lib/utils"
+import { figureNumber } from "@/lib/site/docs"
 import { aboveMark, Label, tapTarget } from "@/components/site/layout/frame"
 import {
   ResetContent,
@@ -40,7 +41,7 @@ export function Cell({
         <div className="grid gap-1 pb-5">
           <div className="mb-2 flex items-center justify-between gap-2">
             <Label>
-              Fig. {String(figure).padStart(2, "0")} ·{" "}
+              Fig. {figureNumber(figure - 1)} ·{" "}
               <Link
                 href={href}
                 className={cn(

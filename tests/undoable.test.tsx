@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import { Button } from "@/components/ui/button"
 import { Undoable, type UndoableProps } from "@/components/ui/sureui/undoable"
+import { click, setVisibility } from "./helpers"
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "performance"] })
@@ -12,23 +13,9 @@ afterEach(() => {
   Reflect.deleteProperty(document, "visibilityState")
 })
 
-async function click(element: HTMLElement) {
-  await act(async () => fireEvent.click(element))
-}
-
 function advance(ms: number) {
   act(() => {
     vi.advanceTimersByTime(ms)
-  })
-}
-
-function setVisibility(state: DocumentVisibilityState) {
-  Object.defineProperty(document, "visibilityState", {
-    configurable: true,
-    get: () => state,
-  })
-  act(() => {
-    document.dispatchEvent(new Event("visibilitychange"))
   })
 }
 

@@ -7,27 +7,25 @@ import { Button } from "@/components/ui/button"
 import {
   Empty,
   EmptyContent,
-  EmptyDescription,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty"
+import { useReset } from "@/components/site/ui/reset"
 
 export function Outcome({
   done,
   icon,
   title,
-  description,
-  onReset,
   children,
 }: {
   done: boolean
   icon: React.ReactNode
   title: string
-  description?: string
-  onReset: () => void
   children: React.ReactNode
 }) {
+  const reset = useReset()
+
   return (
     <div className="relative grid w-full">
       <div
@@ -42,12 +40,9 @@ export function Outcome({
             <EmptyHeader>
               <EmptyMedia variant="icon">{icon}</EmptyMedia>
               <EmptyTitle>{title}</EmptyTitle>
-              {description && (
-                <EmptyDescription>{description}</EmptyDescription>
-              )}
             </EmptyHeader>
             <EmptyContent>
-              <Button variant="outline" size="sm" autoFocus onClick={onReset}>
+              <Button variant="outline" size="sm" autoFocus onClick={reset}>
                 Reset demo
               </Button>
             </EmptyContent>
@@ -82,6 +77,5 @@ export function useToggle() {
           : [...prev, item]
       ),
     count: items.length,
-    reset: () => setItems([]),
   }
 }

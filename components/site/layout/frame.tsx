@@ -82,3 +82,38 @@ export function Label({
     </span>
   )
 }
+
+export function PageTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <h1 className="font-display text-4xl leading-10 font-bold tracking-[-0.04em] text-balance sm:text-[44px] sm:leading-12 lg:text-[64px] lg:leading-17">
+      {children}
+    </h1>
+  )
+}
+
+export function PageLead({
+  className,
+  children,
+}: {
+  className?: string
+  children: React.ReactNode
+}) {
+  return (
+    <p
+      className={cn(
+        "max-w-140 text-[19px] leading-7.5 text-pretty text-(--ink-muted)",
+        className
+      )}
+    >
+      {children}
+    </p>
+  )
+}
+
+export function Wordmark() {
+  return (
+    <>
+      SureUI<span className="text-(--mark-text)">.</span>
+    </>
+  )
+}

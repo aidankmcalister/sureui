@@ -5,6 +5,7 @@ import { useRender } from "@base-ui/react/use-render"
 
 import { Button } from "@/components/ui/button"
 import {
+  isPromise,
   composeHandlers,
   type ConfirmationOptions,
 } from "@/components/ui/sureui/confirmation"
@@ -50,14 +51,6 @@ type Collapsed = {
 
 const focusable =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-
-function isPromise(value: unknown): value is PromiseLike<unknown> {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    typeof (value as PromiseLike<unknown>).then === "function"
-  )
-}
 
 function pathTo(root: Element, node: Element) {
   const path: number[] = []

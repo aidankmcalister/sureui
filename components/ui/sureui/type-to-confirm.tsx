@@ -10,7 +10,10 @@ import {
   ConfirmButton,
   type ConfirmButtonProps,
 } from "@/components/ui/sureui/confirm-button"
-import { type ConfirmationOptions } from "@/components/ui/sureui/confirmation"
+import {
+  isPromise,
+  type ConfirmationOptions,
+} from "@/components/ui/sureui/confirmation"
 
 type TypeToConfirmProps = ConfirmationOptions & {
   phrase: string
@@ -68,9 +71,7 @@ function TypeToConfirm({
 
   function run() {
     const result = onConfirm()
-    if (
-      typeof (result as PromiseLike<unknown> | undefined)?.then === "function"
-    ) {
+    if (isPromise(result)) {
       const settle = () => setPending(false)
       setPending(true)
       Promise.resolve(result).then(settle, settle)

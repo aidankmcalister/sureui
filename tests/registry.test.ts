@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs"
 import { basename, dirname, join } from "node:path"
 import { describe, expect, it } from "vitest"
 
+import { components } from "@/lib/site/registry"
 import registry from "@/registry.json"
 
 type Item = (typeof registry.items)[number]
@@ -128,6 +129,31 @@ describe("registry", () => {
           }
         }
       }
+    }
+  )
+})
+
+describe("hand-written item lists", () => {
+  const readme = readFileSync("README.md", "utf8")
+  const introduction = readFileSync(
+    "content/docs/getting-started/introduction.mdx",
+    "utf8"
+  )
+  const bugReport = readFileSync(
+    ".github/ISSUE_TEMPLATE/bug_report.yml",
+    "utf8"
+  )
+  const nav = JSON.parse(
+    readFileSync("content/docs/components/meta.json", "utf8")
+  ) as { pages: string[] }
+
+  it.each(components)(
+    "$name is in the README, introduction, bug report and docs nav",
+    ({ name, exports }) => {
+      expect(readme).toContain(`| \`${exports[0]}\``)
+      expect(introduction).toContain(`](/docs/${name})`)
+      expect(bugReport).toContain(`- ${name}\n`)
+      expect(nav.pages).toContain(name)
     }
   )
 })

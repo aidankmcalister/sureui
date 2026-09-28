@@ -14,6 +14,9 @@ When every action opens an "Are you sure?" dialog, people stop reading and confi
 | `Consequences`    | Lists what a confirmation will remove, with counts and names                |
 | `undoToast`       | A toast with Undo that resolves once nobody undoes                          |
 | `Undoable`        | Collapses a removed row in place to a label and an Undo button              |
+| `ToolApproval`    | Approves or denies an AI SDK tool call with a gesture that matches its risk |
+
+The [blocks](https://sureui.com/blocks) are full screens built from these components, installed as app code you edit.
 
 ## Install
 
@@ -39,7 +42,7 @@ Full docs are at [sureui.com/docs](https://sureui.com/docs). Coding agents can r
 
 ## Usage
 
-Every component takes the same `onConfirm`. `ConfirmButton` also takes every Button prop:
+Every component except `ToolApproval` takes the same `onConfirm`; `ToolApproval` answers the AI SDK through `onRespond`. `ConfirmButton` also takes every Button prop:
 
 ```tsx
 <ConfirmButton onConfirm={archive}>Archive</ConfirmButton>

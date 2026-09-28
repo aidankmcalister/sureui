@@ -8,9 +8,14 @@ body:
       label: Item
       options:
         - confirm-button
+        - confirm-menu-item
         - type-to-confirm
         - confirm-dialog
+        - confirm-popover
+        - consequences
         - undo-toast
+        - undoable
+        - tool-approval
         - A block
         - The docs site
         - Other

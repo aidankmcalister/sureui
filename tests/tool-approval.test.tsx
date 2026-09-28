@@ -7,6 +7,7 @@ import {
   type ToolApprovalPart,
   type ToolApprovalProps,
 } from "@/components/ui/sureui/tool-approval"
+import { click } from "./helpers"
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "performance"] })
@@ -15,10 +16,6 @@ beforeEach(() => {
 const requested = {
   state: "approval-requested",
   approval: { id: "approval_1" },
-}
-
-async function click(element: HTMLElement) {
-  await act(async () => fireEvent.click(element))
 }
 
 describe("ToolApproval", () => {

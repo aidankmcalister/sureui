@@ -16,14 +16,14 @@ import {
   SiteDrawerTrigger,
 } from "@/components/site/ui/drawer"
 import { githubUrl } from "@/lib/site/config"
-import type { Page } from "@/lib/site/docs"
+import type { Section } from "@/lib/site/docs"
 
 export function SiteMenu({
   links,
-  pages,
+  sections,
 }: {
   links: { href: string; label: string; matches?: string[] }[]
-  pages: Page[]
+  sections: Section[]
 }) {
   const [open, setOpen] = React.useState(false)
   const pathname = usePathname()
@@ -76,7 +76,7 @@ export function SiteMenu({
             })}
           </nav>
           <div className="px-3 py-6">
-            <DocsNav pages={pages} onNavigate={() => setOpen(false)} />
+            <DocsNav sections={sections} onNavigate={() => setOpen(false)} />
           </div>
         </div>
       </SiteDrawerContent>

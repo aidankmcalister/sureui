@@ -16,6 +16,7 @@ import {
   type ConfirmButtonProps,
 } from "@/components/ui/sureui/confirm-button"
 import {
+  isPromise,
   type ConfirmationOptions,
   type GestureOptions,
 } from "@/components/ui/sureui/confirmation"
@@ -42,14 +43,6 @@ type ConfirmPopoverProps = Pick<ConfirmationOptions, "onConfirm" | "onCancel"> &
       fallback?: string
     }
   }
-
-function isPromise(value: unknown): value is PromiseLike<unknown> {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    typeof (value as PromiseLike<unknown>).then === "function"
-  )
-}
 
 function ConfirmPopover({
   children,

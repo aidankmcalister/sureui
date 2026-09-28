@@ -18,7 +18,6 @@ export function MessageToolbar() {
       done={status !== "open"}
       icon={status === "deleted" ? <Trash2Icon /> : <ArchiveIcon />}
       title={`Message ${status}`}
-      onReset={() => setStatus("open")}
     >
       <div className="grid w-full gap-3 text-sm">
         <div className="flex items-center gap-3">

@@ -11,12 +11,7 @@ export function Workspace() {
   const [left, setLeft] = React.useState(false)
 
   return (
-    <Outcome
-      done={left}
-      icon={<LogOutIcon />}
-      title="You left Acme"
-      onReset={() => setLeft(false)}
-    >
+    <Outcome done={left} icon={<LogOutIcon />} title="You left Acme">
       <div className="grid w-full gap-3 text-sm">
         <Details
           rows={[

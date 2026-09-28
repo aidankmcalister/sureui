@@ -16,6 +16,7 @@ import {
   ConfirmMenuItem,
   type ConfirmMenuItemProps,
 } from "@/components/ui/sureui/confirm-menu-item"
+import { click } from "./helpers"
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "performance"] })
@@ -37,10 +38,6 @@ function renderMenu(props: Partial<ConfirmMenuItemProps> = {}) {
   )
   const item = screen.getByRole("menuitem", { name: "Delete" })
   return { item, onConfirm, onOpenChange }
-}
-
-async function click(element: HTMLElement) {
-  await act(async () => fireEvent.click(element))
 }
 
 async function flush() {

@@ -7,25 +7,21 @@ import {
   Band,
   Label,
   tapTarget,
+  Wordmark,
 } from "@/components/site/layout/frame"
 import { GitHubIcon } from "@/components/site/layout/github-icon"
 import { SiteLink } from "@/components/site/layout/site-link"
 import { githubUrl } from "@/lib/site/config"
-import { pages } from "@/lib/site/docs"
+import { sections } from "@/lib/site/docs"
 
 const columns = [
-  {
-    title: "Docs",
-    links: pages
-      .filter((page) => page.section !== "components")
-      .map((page) => ({ href: page.href, label: page.title })),
-  },
-  {
-    title: "Components",
-    links: pages
-      .filter((page) => page.section === "components")
-      .map((page) => ({ href: page.href, label: page.title })),
-  },
+  ...sections.map((section) => ({
+    title: section.folder === "components" ? "Components" : "Docs",
+    links: section.pages.map((page) => ({
+      href: page.href,
+      label: page.title,
+    })),
+  })),
   {
     title: "Resources",
     links: [
@@ -54,7 +50,7 @@ export function Footer() {
             href="/"
             className="font-display text-xl font-bold tracking-tight"
           >
-            SureUI<span className="text-(--mark-text)">.</span>
+            <Wordmark />
           </Link>
           <p className="max-w-64 text-sm leading-6 text-(--ink-muted)">
             Open source confirmation components for shadcn/ui.

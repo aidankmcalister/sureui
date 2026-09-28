@@ -1,9 +1,9 @@
 import type { Metadata } from "next"
 
 import { DocsArticle } from "@/components/site/docs/article"
-import { getPage } from "@/lib/site/docs"
+import { pageAt } from "@/lib/site/docs"
 
-const page = getPage("introduction")!
+const page = pageAt("/docs")!
 
 export const metadata: Metadata = {
   title: page.title,

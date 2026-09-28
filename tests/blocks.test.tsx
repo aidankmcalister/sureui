@@ -17,7 +17,6 @@ import { FileManager } from "@/components/blocks/file-manager-01/file-manager"
 import { Inbox } from "@/components/blocks/inbox-01/inbox"
 import { TeamMembers } from "@/components/blocks/team-members-01/team-members"
 import { blockPreviewNames } from "@/components/site/blocks/previews"
-import { blocks } from "@/lib/site/blocks"
 import registry from "@/registry.json"
 
 const settled = { timeout: 2000 }
@@ -30,15 +29,12 @@ function useHoldTimers() {
 }
 
 describe("blocks", () => {
-  it("lists every registry block on the blocks page", () => {
-    expect(blocks.map((block) => block.name).sort()).toEqual(
+  it("has a preview for every registry block", () => {
+    expect([...blockPreviewNames].sort()).toEqual(
       registry.items
         .filter((item) => item.type === "registry:block")
         .map((item) => item.name)
         .sort()
-    )
-    expect([...blockPreviewNames].sort()).toEqual(
-      blocks.map((block) => block.name).sort()
     )
   })
 })

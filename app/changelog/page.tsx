@@ -2,7 +2,12 @@ import * as React from "react"
 import type { Metadata } from "next"
 
 import Content from "@/content/changelog.mdx"
-import { Band, Label } from "@/components/site/layout/frame"
+import {
+  Band,
+  Label,
+  PageLead,
+  PageTitle,
+} from "@/components/site/layout/frame"
 
 export const metadata: Metadata = {
   title: "Changelog",
@@ -90,13 +95,11 @@ export default function Changelog() {
   return (
     <main className="flex flex-1 flex-col">
       <Band className="grid gap-6 px-3 py-14 sm:px-6 sm:py-16 lg:py-20">
-        <h1 className="font-display text-4xl leading-10 font-bold tracking-[-0.04em] text-balance sm:text-[44px] sm:leading-12 lg:text-[64px] lg:leading-17">
-          Changelog
-        </h1>
-        <p className="max-w-140 text-[19px] leading-7.5 text-pretty text-(--ink-muted)">
+        <PageTitle>Changelog</PageTitle>
+        <PageLead>
           What changed in each release. Registry items always install the latest
           version.
-        </p>
+        </PageLead>
       </Band>
       <Content components={components} />
     </main>

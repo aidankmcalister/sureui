@@ -1,29 +1,35 @@
 import Link from "next/link"
 
 import { cn } from "@/lib/utils"
-import { Band, Label, tapTarget } from "@/components/site/layout/frame"
+import {
+  Band,
+  Label,
+  tapTarget,
+  Wordmark,
+} from "@/components/site/layout/frame"
 import { GitHubIcon } from "@/components/site/layout/github-icon"
 import { SiteLink } from "@/components/site/layout/site-link"
 import { githubUrl } from "@/lib/site/config"
-import { pages } from "@/lib/site/docs"
+import { sections } from "@/lib/site/docs"
 import { SiteMenu } from "@/components/site/layout/site-menu"
 import { ThemeToggle } from "@/components/site/layout/theme-toggle"
 import { siteButton } from "@/components/site/ui/button"
 
-const firstComponent = pages.find((page) => page.section === "components")
-
-const sections: Record<string, string[]> = {
-  Docs: pages
-    .filter((page) => page.section !== "components")
-    .map((page) => page.href),
-  Components: pages
-    .filter((page) => page.section === "components")
-    .map((page) => page.href),
-}
+const components = sections.find((section) => section.folder === "components")!
 
 const links = [
-  { href: "/docs", label: "Docs" },
-  { href: firstComponent?.href ?? "/docs", label: "Components" },
+  {
+    href: "/docs",
+    label: "Docs",
+    matches: sections
+      .filter((section) => section !== components)
+      .flatMap((section) => section.pages.map((page) => page.href)),
+  },
+  {
+    href: components.pages[0].href,
+    label: "Components",
+    matches: components.pages.map((page) => page.href),
+  },
   { href: "/blocks", label: "Blocks" },
 ]
 
@@ -38,7 +44,7 @@ export function Header() {
           href="/"
           className="mr-auto font-display font-bold tracking-tight"
         >
-          SureUI<span className="text-(--mark-text)">.</span>
+          <Wordmark />
         </Link>
         {links.map((link) => (
           <Link
@@ -67,14 +73,8 @@ export function Header() {
           <ThemeToggle />
           <div className="lg:hidden">
             <SiteMenu
-              pages={pages}
-              links={[
-                ...links.map((link) => ({
-                  ...link,
-                  matches: sections[link.label],
-                })),
-                { href: "/changelog", label: "Changelog" },
-              ]}
+              sections={sections}
+              links={[...links, { href: "/changelog", label: "Changelog" }]}
             />
           </div>
         </div>

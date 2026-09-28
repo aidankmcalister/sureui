@@ -21,7 +21,6 @@ export function Members() {
       done={removed.count === people.length}
       icon={<UserMinusIcon />}
       title="Everyone was removed"
-      onReset={removed.reset}
     >
       <div className="grid w-full gap-1">
         {people.map((person) => (

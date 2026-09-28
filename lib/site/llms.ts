@@ -1,12 +1,8 @@
 import registry from "@/registry.json"
 import { siteUrl } from "@/lib/site/config"
-import {
-  docsBody,
-  docsSource,
-  exampleSource,
-  pages,
-  type Page,
-} from "@/lib/site/docs"
+import { renderExample } from "@/lib/site/example-source"
+import { loadExample } from "@/lib/site/examples"
+import { docsBody, pageAt, pages, type Page } from "@/lib/site/docs"
 
 const description =
   "Confirmation components for shadcn/ui: undo, click again, hold, type to confirm, dialogs and popovers. Installed with the shadcn CLI from the `@sureui` registry and built on Base UI."
@@ -27,10 +23,10 @@ function toMarkdown(body: string) {
     )
     .replace(
       /<Example name="([^"]+)" \/>/g,
-      (_, name) => "```tsx\n" + exampleSource(name) + "\n```"
+      (_, name) => "```tsx\n" + renderExample(loadExample(name)) + "\n```"
     )
     .replace(/\]\(\/docs(?:\/([a-z-]+))?(?:#[a-z-]+)?\)/g, (_, slug) => {
-      const page = pages.find((item) => item.slug === (slug ?? "introduction"))
+      const page = pageAt(slug ? `/docs/${slug}` : "/docs")
       return `](${page ? markdownUrl(page) : siteUrl})`
     })
 }
@@ -40,7 +36,7 @@ function pageMarkdown(page: Page) {
     `# ${page.title}`,
     page.description,
     `Source: ${siteUrl}${page.href}`,
-    toMarkdown(docsBody(docsSource(page.slug))),
+    toMarkdown(docsBody(page.slug)),
   ].join("\n\n")
 }
 
@@ -48,7 +44,7 @@ function llmsIndex() {
   return [
     "# SureUI",
     `> ${description}`,
-    "Every component takes the same `onConfirm`, which can return a promise, and sets `data-state` so you can style around it. Add the registry to `components.json` first; the Installation page shows how.",
+    "Every component except ToolApproval takes the same `onConfirm`, which can return a promise, and sets `data-state` so you can style around it. Add the registry to `components.json` first; the Installation page shows how.",
     "## Docs",
     list(
       pages.map(

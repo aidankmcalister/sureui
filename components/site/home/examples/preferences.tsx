@@ -12,12 +12,7 @@ export function Preferences() {
   const [reset, setReset] = React.useState(false)
 
   return (
-    <Outcome
-      done={reset}
-      icon={<RotateCcwIcon />}
-      title="Preferences reset"
-      onReset={() => setReset(false)}
-    >
+    <Outcome done={reset} icon={<RotateCcwIcon />} title="Preferences reset">
       <div className="grid w-full gap-3 text-sm">
         <Details rows={Object.entries(preferences)} />
         <ConfirmButton

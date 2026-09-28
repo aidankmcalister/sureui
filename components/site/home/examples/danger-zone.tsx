@@ -76,7 +76,6 @@ export function DangerZone() {
       done={done.count === dangers.length}
       icon={<CheckIcon />}
       title="All three actions ran"
-      onReset={done.reset}
     >
       <div className="grid w-full divide-y text-sm">
         {dangers.map((danger) => (

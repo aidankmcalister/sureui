@@ -20,7 +20,6 @@ export function ApiKeys() {
       done={revoked.count === keys.length}
       icon={<KeyRoundIcon />}
       title="Every key is revoked"
-      onReset={revoked.reset}
     >
       <div className="grid w-full divide-y">
         {keys.map((key) => (

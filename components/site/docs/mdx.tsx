@@ -1,5 +1,4 @@
 import * as React from "react"
-import Link from "next/link"
 
 import { cn } from "@/lib/utils"
 import { Code } from "@/components/site/code/code"
@@ -7,6 +6,7 @@ import { InstallCommand } from "@/components/site/code/install-command"
 import { Example } from "@/components/site/docs/example"
 import { FramedTable } from "@/components/site/docs/framed-table"
 import { Label, Plus } from "@/components/site/layout/frame"
+import { SiteLink } from "@/components/site/layout/site-link"
 import { slugify } from "@/lib/site/docs"
 
 type Props<T extends React.ElementType> = React.ComponentProps<T>
@@ -65,26 +65,14 @@ function Ul({ children }: Props<"ul">) {
   )
 }
 
-function Ol({ children }: Props<"ol">) {
-  return (
-    <ol className="grid max-w-160 list-decimal gap-2 pl-5 text-base leading-7 text-pretty text-(--ink-muted) marker:font-mono marker:text-sm marker:text-(--ink-label)">
-      {children}
-    </ol>
-  )
-}
-
 function A({ href = "", children }: Props<"a">) {
-  const className =
-    "font-medium text-(--ink) underline decoration-(--rule) underline-offset-4 hover:decoration-(--ink)"
-
-  return href.startsWith("/") || href.startsWith("#") ? (
-    <Link href={href} className={className}>
+  return (
+    <SiteLink
+      href={href}
+      className="font-medium text-(--ink) underline decoration-(--rule) underline-offset-4 hover:decoration-(--ink)"
+    >
       {children}
-    </Link>
-  ) : (
-    <a href={href} className={className}>
-      {children}
-    </a>
+    </SiteLink>
   )
 }
 
@@ -200,20 +188,15 @@ function Table({ children }: Props<"table">) {
   )
 }
 
-function Install({ args }: { args: string }) {
-  return <InstallCommand args={args} />
-}
-
 export const mdxComponents = {
   h2: H2,
   h3: H3,
   p: P,
   ul: Ul,
-  ol: Ol,
   a: A,
   code: InlineCode,
   pre: Pre,
   table: Table,
   Example,
-  Install,
+  Install: InstallCommand,
 }

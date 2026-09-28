@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils"
 import { ContextMenuItem } from "@/components/ui/context-menu"
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import {
+  isPromise,
   useConfirmation,
   type ConfirmationOptions,
   type ConfirmationState,
@@ -33,14 +34,6 @@ type ConfirmMenuItemProps = Omit<
       undo?: string
     }
   }
-
-function isPromise(value: unknown): value is PromiseLike<unknown> {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    typeof (value as PromiseLike<unknown>).then === "function"
-  )
-}
 
 function ConfirmMenuItem({
   onConfirm,

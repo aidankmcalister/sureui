@@ -24,10 +24,6 @@ export function Files() {
       done={trashed.length === files.length}
       icon={<Trash2Icon />}
       title="Moved to trash"
-      onReset={() => {
-        setTrashed([])
-        setSelected(files.map((file) => file.name))
-      }}
     >
       <div className="group grid w-full gap-3">
         <div className="divide-y text-sm">

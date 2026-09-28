@@ -64,6 +64,14 @@ function clearSelection() {
   if (hasSelection()) window.getSelection()?.removeAllRanges()
 }
 
+function isPromise(value: unknown): value is PromiseLike<unknown> {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    typeof (value as PromiseLike<unknown>).then === "function"
+  )
+}
+
 function toMs(value: number, fallback: number, min: number) {
   return Number.isFinite(value)
     ? Math.min(Math.max(value, min), 60000)
@@ -151,10 +159,7 @@ function useConfirmationMachine(options: ConfirmationOptions) {
         enter("idle")
         throw error
       }
-      if (
-        result &&
-        typeof (result as PromiseLike<unknown>).then === "function"
-      ) {
+      if (isPromise(result)) {
         enter("pending")
         ;(async () => {
           try {
@@ -453,6 +458,7 @@ function useConfirmation<T extends Element = HTMLElement>({
 export {
   useConfirmation,
   composeHandlers,
+  isPromise,
   type ConfirmationState,
   type ConfirmationOptions,
   type GestureOptions,

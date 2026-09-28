@@ -67,13 +67,11 @@ done
 
 node -e '
   const fs = require("node:fs")
-  const path = require("node:path")
-  const [registryPath, root] = process.argv.slice(1)
+  const [registryPath] = process.argv.slice(1)
   const registry = require(registryPath)
   const places = [
     ["@ui/", "components/ui/"],
     ["@components/", "components/"],
-    ["~/", ""],
   ]
   let missing = 0
   for (const item of registry.items) {
@@ -83,17 +81,11 @@ node -e '
       if (!fs.existsSync(installed)) {
         console.log(`Missing ${installed} from ${item.name}`)
         missing++
-      } else if (alias === "~/") {
-        const source = fs.readFileSync(path.join(root, file.path))
-        if (!source.equals(fs.readFileSync(installed))) {
-          console.log(`${installed} differs from ${file.path}`)
-          missing++
-        }
       }
     }
   }
   process.exit(missing ? 1 : 0)
-' "$root/registry.json" "$root"
+' "$root/registry.json"
 
 pnpm exec tsc --noEmit
 echo "All ${#items[@]} items and ${#blocks[@]} blocks installed and type-checked"

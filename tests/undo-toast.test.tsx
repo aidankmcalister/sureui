@@ -3,22 +3,13 @@ import { toast, Toaster } from "sonner"
 import { afterEach, describe, expect, it, vi } from "vitest"
 
 import { undoToast } from "@/components/ui/sureui/undo-toast"
+import { setVisibility } from "./helpers"
 
 afterEach(() => {
   toast.dismiss()
   vi.restoreAllMocks()
   Reflect.deleteProperty(document, "visibilityState")
 })
-
-function setVisibility(state: DocumentVisibilityState) {
-  Object.defineProperty(document, "visibilityState", {
-    configurable: true,
-    get: () => state,
-  })
-  act(() => {
-    document.dispatchEvent(new Event("visibilitychange"))
-  })
-}
 
 describe("undoToast", () => {
   it("resolves false when undo is clicked", async () => {
