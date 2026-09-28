@@ -376,13 +376,11 @@
       "type": "registry:block",
       "title": "Delete Account",
       "description": "An account deletion screen with an export link first, a list of what gets deleted, and a form that unlocks after you type your email and check each acknowledgement.",
-      "dependencies": ["lucide-react"],
       "registryDependencies": [
         "@sureui/consequences",
         "@sureui/type-to-confirm",
         "button",
-        "card",
-        "empty"
+        "card"
       ],
       "files": [
         {
