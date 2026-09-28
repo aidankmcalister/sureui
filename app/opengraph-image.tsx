@@ -9,6 +9,6 @@ export default function Image() {
   return card({
     lead: "Confirmation components",
     rest: "for shadcn/ui.",
-    detail: "Hold, click again, type to confirm, undo and dialogs.",
+    detail: "Undo, hold to confirm, type to confirm and more.",
   })
 }
