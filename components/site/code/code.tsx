@@ -72,11 +72,13 @@ export function Code({
   label = "tsx",
   highlight = [],
   framed = true,
+  bodyClassName,
   children,
 }: {
   label?: string
   highlight?: number[]
   framed?: boolean
+  bodyClassName?: string
   children: string
 }) {
   const { tokens } = highlighter.codeToTokens(children, {
@@ -99,7 +101,12 @@ export function Code({
         </Label>
         <CopyButton value={children} />
       </div>
-      <pre className="overflow-x-auto py-4 font-mono text-[13px] leading-6">
+      <pre
+        className={cn(
+          "overflow-x-auto py-4 font-mono text-[13px] leading-6",
+          bodyClassName
+        )}
+      >
         <code className="grid min-w-fit">
           {tokens.map((line, index) => (
             <span
