@@ -7,7 +7,18 @@ import { undoToast } from "@/components/ui/sureui/undo-toast"
 afterEach(() => {
   toast.dismiss()
   vi.restoreAllMocks()
+  Reflect.deleteProperty(document, "visibilityState")
 })
+
+function setVisibility(state: DocumentVisibilityState) {
+  Object.defineProperty(document, "visibilityState", {
+    configurable: true,
+    get: () => state,
+  })
+  act(() => {
+    document.dispatchEvent(new Event("visibilitychange"))
+  })
+}
 
 describe("undoToast", () => {
   it("resolves false when undo is clicked", async () => {
@@ -144,6 +155,32 @@ describe("undoToast pausing", () => {
     await advance(4999)
     expect(state.value).toBeUndefined()
     await advance(1)
+    expect(state.value).toBe(true)
+  })
+
+  it("pauses while the tab is hidden", async () => {
+    const { state } = await show()
+    await advance(1000)
+    setVisibility("hidden")
+    await advance(20000)
+    expect(state.value).toBeUndefined()
+    setVisibility("visible")
+    await advance(3999)
+    expect(state.value).toBeUndefined()
+    await advance(1)
+    expect(state.value).toBe(true)
+  })
+
+  it("stays paused while hidden even after the pointer leaves", async () => {
+    const { state, undo } = await show()
+    const toaster = undo.closest("[data-sonner-toaster]")!
+    fireEvent.pointerEnter(toaster)
+    setVisibility("hidden")
+    fireEvent.pointerLeave(toaster)
+    await advance(20000)
+    expect(state.value).toBeUndefined()
+    setVisibility("visible")
+    await advance(5000)
     expect(state.value).toBe(true)
   })
 

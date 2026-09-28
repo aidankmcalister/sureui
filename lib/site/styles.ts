@@ -73,7 +73,8 @@ if (await undoToast("Moved 3 files to trash")) {
     behavior: [
       "Nothing runs until the window ends: 5 seconds by default, or the number you pass. Anything under 4 seconds is raised to 4, because a shorter window ends before most people notice the mistake.",
       "Undo calls onCancel, and onConfirm never runs.",
-      "If someone leaves the button and comes back to it, by pointer or keyboard, the window pauses until they leave again. Turn this off with pauseUndoOnHover={false} or pauseUndoOnFocus={false}.",
+      "If someone leaves the button and comes back to it, by pointer or keyboard, the window pauses until they leave again. Turn this off with pauseUndoOnHover={false} or pauseUndoOnFocus={false}. The window also pauses while the tab is hidden.",
+      "Disabling the button during the window keeps Undo pressable, so an action is never stuck without a way back.",
       "Unmounting the control during the window drops the action without calling either handler. Closing the tab does the same.",
       "undoToast pauses while the toast is hovered or has keyboard focus, and while the tab is hidden. Turn this off with pauseOnHover: false or pauseOnFocus: false.",
       "Keep a trash or history view too, so people can still restore things after the window closes.",
@@ -177,6 +178,7 @@ if (await undoToast("Moved 3 files to trash")) {
       "Set confirmOnRelease={false} to confirm the moment the fill completes. Pair it with undo, since there is no last chance to back out.",
       "With undo, the Undo button runs on click, so pressing it and sliding off does nothing.",
       "The context menu is blocked on the button so a long press on a phone doesn't open it.",
+      "With prefers-reduced-motion, fills don't animate: the hold fill appears when it completes and the undo fill clears when the window ends.",
     ],
     useWhen: [
       "Revoking an API key or resetting preferences.",
@@ -227,6 +229,14 @@ async function discard() {
           gesture,
           ["phrase", "string", "—"],
           ["acknowledgements", "string[]", "—"],
+          ["timeout", "number", "3000"],
+          ["cancelOnBlur", "boolean", "true"],
+          ["duration", "number", "1200, min 800"],
+          ["confirmOnRelease", "boolean", "true"],
+          ["cancelHoldOnLeave", "boolean", "true"],
+          ["caseSensitive", "boolean", "true"],
+          ["trim", "boolean", "false"],
+          ["announcements", "{ hold, ready, armed, match }", "—"],
         ],
       },
       {
@@ -242,6 +252,10 @@ async function discard() {
           ["confirm() resolves", "Promise<boolean>", "—"],
         ],
       },
+    ],
+    behavior: [
+      "Gesture options (timeout, cancelOnBlur, duration, confirmOnRelease, cancelHoldOnLeave) apply when phrase is not set. caseSensitive, trim and announcements.match apply when it is.",
+      "The dialog stays open, and Cancel and Escape do nothing, while a promise from onConfirm is pending.",
     ],
     useWhen: [
       "Leaving a team or removing someone else's access.",
@@ -298,6 +312,7 @@ async function discard() {
     behavior: [
       "The phrase must match exactly by default, including case and spaces. Relax it with caseSensitive={false} or trim.",
       "Acknowledgements are optional. Leave them out and typing the phrase is enough.",
+      "The button is a ConfirmButton, so key-repeat clicks are ignored and its width doesn't change between Confirm and Undo.",
       "The input and checkboxes clear after confirming, so after an undo the form isn't one click from running again.",
       "While a promise from onConfirm is pending, the input is read-only and the button is disabled but keeps focus.",
     ],

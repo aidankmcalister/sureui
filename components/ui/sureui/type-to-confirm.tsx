@@ -3,14 +3,14 @@
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
-  useConfirmation,
-  type ConfirmationOptions,
-} from "@/components/ui/sureui/confirmation"
+  ConfirmButton,
+  type ConfirmButtonProps,
+} from "@/components/ui/sureui/confirm-button"
+import { type ConfirmationOptions } from "@/components/ui/sureui/confirmation"
 
 type TypeToConfirmProps = ConfirmationOptions & {
   phrase: string
@@ -23,10 +23,14 @@ type TypeToConfirmProps = ConfirmationOptions & {
   }
   confirmLabel?: string
   undoLabel?: string
-  variant?: React.ComponentProps<typeof Button>["variant"]
+  variant?: ConfirmButtonProps["variant"]
   acknowledgements?: string[]
   renderActions?: (confirmButton: React.ReactElement) => React.ReactNode
   className?: string
+}
+
+function isIdle(button: HTMLElement | null) {
+  return button?.getAttribute("data-state") === "idle"
 }
 
 function TypeToConfirm({
@@ -47,16 +51,10 @@ function TypeToConfirm({
   renderActions,
   className,
 }: TypeToConfirmProps) {
-  const { state, fillRef, confirm, cancel, pauseUndo, resumeUndo } =
-    useConfirmation({
-      onConfirm,
-      onCancel,
-      undo,
-      pauseUndoOnHover,
-      pauseUndoOnFocus,
-    })
   const [value, setValue] = React.useState("")
   const [checked, setChecked] = React.useState<number[]>([])
+  const [pending, setPending] = React.useState(false)
+  const buttonRef = React.useRef<HTMLButtonElement>(null)
   const inputId = React.useId()
 
   const normalize = (text: string) => {
@@ -66,27 +64,40 @@ function TypeToConfirm({
   const matches = normalize(value) === normalize(phrase)
   const ready = matches && checked.length === acknowledgements.length
 
+  function run() {
+    const result = onConfirm()
+    if (
+      typeof (result as PromiseLike<unknown> | undefined)?.then === "function"
+    ) {
+      const settle = () => setPending(false)
+      setPending(true)
+      Promise.resolve(result).then(settle, settle)
+    }
+    return result
+  }
+
   const confirmButton = (
-    <Button
-      type={state === "undo" ? "button" : "submit"}
+    <ConfirmButton
+      ref={buttonRef}
+      type="button"
       variant={variant}
-      data-state={state}
-      disabled={state === "undo" ? false : !ready || state === "pending"}
-      focusableWhenDisabled={state === "pending"}
-      className="relative justify-self-start overflow-hidden aria-disabled:opacity-50"
-      onClick={state === "undo" ? cancel : undefined}
-      onPointerEnter={() => pauseUndo("hover")}
-      onPointerLeave={() => resumeUndo("hover")}
-      onFocus={() => pauseUndo("focus")}
-      onBlur={() => resumeUndo("focus")}
+      undo={undo}
+      undoLabel={undoLabel}
+      announcements={{ undo: announcements?.undo }}
+      pauseUndoOnHover={pauseUndoOnHover}
+      pauseUndoOnFocus={pauseUndoOnFocus}
+      disabled={!ready}
+      className="justify-self-start"
+      onClick={(event) => {
+        if (!isIdle(event.currentTarget)) return
+        setValue("")
+        setChecked([])
+      }}
+      onConfirm={run}
+      onCancel={onCancel}
     >
-      <span
-        ref={fillRef}
-        aria-hidden
-        className="absolute inset-0 origin-left scale-x-0 bg-current opacity-20"
-      />
-      {state === "undo" ? undoLabel : confirmLabel}
-    </Button>
+      {confirmLabel}
+    </ConfirmButton>
   )
 
   return (
@@ -94,10 +105,7 @@ function TypeToConfirm({
       className={cn("grid gap-4", className)}
       onSubmit={(event) => {
         event.preventDefault()
-        if (!ready || state !== "idle") return
-        confirm()
-        setValue("")
-        setChecked([])
+        if (ready && isIdle(buttonRef.current)) buttonRef.current?.click()
       }}
     >
       <div className="grid gap-2">
@@ -113,15 +121,11 @@ function TypeToConfirm({
           value={value}
           autoComplete="off"
           spellCheck={false}
-          readOnly={state === "pending"}
+          readOnly={pending}
           onChange={(event) => setValue(event.target.value)}
         />
         <p aria-live="polite" className="sr-only">
-          {state === "undo"
-            ? (announcements?.undo ?? "Done. Undo is available.")
-            : matches
-              ? (announcements?.match ?? "Phrase matches")
-              : ""}
+          {matches ? (announcements?.match ?? "Phrase matches") : ""}
         </p>
       </div>
       {acknowledgements.map((text, index) => (
@@ -129,7 +133,7 @@ function TypeToConfirm({
           <Checkbox
             className="mt-0.5"
             checked={checked.includes(index)}
-            disabled={state === "pending"}
+            disabled={pending}
             onCheckedChange={(on) =>
               setChecked((prev) =>
                 on ? [...prev, index] : prev.filter((item) => item !== index)

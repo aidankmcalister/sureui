@@ -119,6 +119,52 @@ describe("TypeToConfirm", () => {
     expect(onConfirm).not.toHaveBeenCalled()
   })
 
+  it("regression: holding Enter on the button does not undo straight away", async () => {
+    const onConfirm = vi.fn()
+    const onCancel = vi.fn()
+    render(
+      <TypeToConfirm
+        phrase="acme"
+        undo
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+      />
+    )
+    type("acme")
+    const button = screen.getByRole("button", { name: "Confirm" })
+    fireEvent.keyDown(button, { key: "Enter" })
+    fireEvent.click(button)
+    expect(button.getAttribute("data-state")).toBe("undo")
+    fireEvent.keyDown(button, { key: "Enter", repeat: true })
+    fireEvent.click(button)
+    expect(onCancel).not.toHaveBeenCalled()
+    expect(button.getAttribute("data-state")).toBe("undo")
+    fireEvent.keyUp(button, { key: "Enter" })
+    await act(async () => vi.advanceTimersByTime(5000))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("undo: keeps both labels in the layout so the width never changes", () => {
+    render(
+      <TypeToConfirm
+        phrase="acme"
+        undo
+        confirmLabel="Delete project"
+        onConfirm={vi.fn()}
+      />
+    )
+    const button = screen.getByRole("button", { name: "Delete project" })
+    const hidden = () =>
+      [...button.querySelectorAll("[aria-hidden=true].invisible")].map(
+        (label) => label.textContent
+      )
+    expect(hidden()).toEqual(["Undo"])
+    type("acme")
+    fireEvent.click(button)
+    expect(screen.getByRole("button", { name: "Undo" })).toBe(button)
+    expect(hidden()).toEqual(["Delete project"])
+  })
+
   it("undo: commits once after the window", async () => {
     const onConfirm = vi.fn()
     render(<TypeToConfirm phrase="acme" undo onConfirm={onConfirm} />)

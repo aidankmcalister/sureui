@@ -10,10 +10,10 @@ SureUI is a shadcn/ui registry of confirmation controls. These terms are the sha
 
 **Surface**: where a confirmation appears. Inline is the default. A dialog is an optional surface that wraps an inline control, never the default.
 
-**Undo window**: an optional delay after confirming, before `onConfirm` runs. The control shows "Undo" while it drains. Undoing cancels. Leaving the control and coming back to it, by pointer or focus, pauses the window until you leave again. Unmounting during the window, including closing the tab, discards the confirmation without calling either handler.
+**Undo window**: an optional delay after confirming, before `onConfirm` runs. The control shows "Undo" while it drains. Undoing cancels. Leaving the control and coming back to it, by pointer or focus, pauses the window until you leave again, and a hidden tab pauses it until the tab is visible. Unmounting during the window, including closing the tab, discards the confirmation without calling either handler.
 
 **Pending**: the state while an async `onConfirm` is running. The control is disabled until it settles.
 
-**Confirmation core**: the module every control is built on (`components/ui/sureui/confirmation.ts`). It owns the state machine, timing, announcements and handler composition. Controls are thin adapters over it.
+**Confirmation core**: the module every control is built on (`components/ui/sureui/confirmation.ts`). It owns the state machine, the gesture rules (which pointer, key and focus events arm, hold, confirm, cancel or undo), timing and handler composition. `useConfirmation` returns the state, a fill ref and `getTriggerProps`, which a control spreads on its trigger. Controls are thin adapters over it: labels, announcements and styling.
 
-**Undo toast**: `undoToast()`, an optional Sonner-based undo for actions whose control disappears. It is separate from the core on purpose: its lifecycle belongs to Sonner.
+**Undo toast**: `undoToast()`, an optional Sonner-based undo for actions whose control disappears. It is separate from the core on purpose: its lifecycle belongs to Sonner. It shares the undo window's timing with the core (`components/ui/sureui/undo-window.ts`), but pauses as soon as the toast is hovered or focused, since a toast appears away from the control that was clicked.
