@@ -59,7 +59,7 @@ describe("ConfirmDialog", () => {
     )
   })
 
-  it("gesture=hold: holding then advancing time confirms and closes", async () => {
+  it("gesture=hold: holding then releasing confirms and closes", async () => {
     const onConfirm = vi.fn()
     render(
       <ConfirmDialog title="Revoke key?" gesture="hold" onConfirm={onConfirm}>
@@ -73,6 +73,7 @@ describe("ConfirmDialog", () => {
     vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "performance"] })
     fireEvent.pointerDown(confirmButton, { button: 0 })
     await act(async () => vi.advanceTimersByTimeAsync(1200))
+    await act(async () => fireEvent.pointerUp(confirmButton))
     expect(onConfirm).toHaveBeenCalledOnce()
     vi.useRealTimers()
     await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
