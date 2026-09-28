@@ -4,9 +4,9 @@ import type { Metadata } from "next"
 import { BlockDemo } from "@/components/site/blocks/demos"
 import { Code } from "@/components/site/code/code"
 import { CodeFiles } from "@/components/site/code/code-files"
-import { InstallCommand } from "@/components/site/code/install-command"
+import { InstallInline } from "@/components/site/code/install-command"
 import { Preview } from "@/components/site/docs/preview"
-import { InlineCode, StyleLink } from "@/components/site/docs/sections"
+import { InlineCode } from "@/components/site/docs/sections"
 import { Band, Label } from "@/components/site/layout/frame"
 import { blocks, blocksLead, blocksNote, type Block } from "@/lib/site/blocks"
 import { addArgs } from "@/lib/site/config"
@@ -50,9 +50,14 @@ function BlockSection({ block, index }: { block: Block; index: number }) {
         <p className="text-[17px] leading-7 text-pretty text-(--ink-muted)">
           {block.description}
         </p>
+        {block.setup && (
+          <p className="text-sm text-pretty text-(--ink-muted) [&_code]:font-mono [&_code]:text-[0.9em] [&_code]:text-(--ink)">
+            <InlineCode>{block.setup}</InlineCode>
+          </p>
+        )}
       </div>
       <Preview
-        label={block.name}
+        actions={<InstallInline args={addArgs([block.name])} />}
         log={false}
         resettable
         stageClassName="min-h-96 px-3 py-8 sm:p-10"
@@ -62,49 +67,6 @@ function BlockSection({ block, index }: { block: Block; index: number }) {
           <BlockDemo name={block.name} />
         </div>
       </Preview>
-      <div className="grid gap-px border border-(--rule) bg-(--rule) lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-        <div className="grid content-start gap-5 bg-(--paper) p-5">
-          <Label>Why each action asks what it does</Label>
-          <ul className="grid gap-5 text-sm">
-            {block.actions.map((action) => (
-              <li
-                key={action.action}
-                className="grid gap-1 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-6"
-              >
-                <div className="grid content-start gap-0.5">
-                  <span className="font-medium text-(--ink)">
-                    {action.action}
-                  </span>
-                  {action.style ? (
-                    <StyleLink slug={action.style}>
-                      {action.styleName} →
-                    </StyleLink>
-                  ) : (
-                    <span className="text-(--ink-label)">
-                      {action.styleName}
-                    </span>
-                  )}
-                </div>
-                <p className="text-pretty text-(--ink-muted)">{action.why}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="grid content-start gap-4 bg-(--paper) p-5">
-          <Label>Installation</Label>
-          <InstallCommand args={addArgs([block.name])} />
-          <p className="text-sm text-pretty text-(--ink-muted) [&_code]:font-mono [&_code]:text-[0.9em] [&_code]:text-(--ink)">
-            Adds{" "}
-            {block.files.map((file, fileIndex) => (
-              <span key={file.target}>
-                {fileIndex > 0 && ", "}
-                <code>{file.target}</code>
-              </span>
-            ))}{" "}
-            and the SureUI components it uses.
-          </p>
-        </div>
-      </div>
     </section>
   )
 }

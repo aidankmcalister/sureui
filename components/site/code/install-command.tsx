@@ -4,6 +4,7 @@ import * as React from "react"
 
 import { SiteTab, SiteTabs, SiteTabsList } from "@/components/site/ui/tabs"
 import { CopyButton } from "@/components/site/code/copy-button"
+import { Label } from "@/components/site/layout/frame"
 
 const runners = {
   npm: "npx",
@@ -42,12 +43,26 @@ function write(value: Runner) {
   listeners.forEach((listener) => listener())
 }
 
-export function InstallCommand({ args }: { args: string }) {
-  const runner = React.useSyncExternalStore<Runner>(
-    subscribe,
-    read,
-    () => "npm"
+function useRunner() {
+  return React.useSyncExternalStore<Runner>(subscribe, read, () => "npm")
+}
+
+export function InstallInline({ args }: { args: string }) {
+  const command = `${runners[useRunner()]} shadcn@latest ${args}`
+
+  return (
+    <div className="flex min-w-0 items-center gap-1">
+      <span className="truncate font-mono text-xs text-(--ink-muted) max-sm:hidden">
+        {command}
+      </span>
+      <Label className="sm:hidden">Install</Label>
+      <CopyButton value={command} />
+    </div>
   )
+}
+
+export function InstallCommand({ args }: { args: string }) {
+  const runner = useRunner()
   const command = `${runners[runner]} shadcn@latest ${args}`
 
   return (

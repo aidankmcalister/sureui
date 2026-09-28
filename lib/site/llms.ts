@@ -197,6 +197,7 @@ function blockMarkdown(block: Block) {
     `${block.description} Preview: ${siteUrl}/blocks#${block.name}`,
     command(addArgs([block.name])),
     `Installs ${block.files.map((file) => `\`${file.target}\``).join(", ")}.`,
+    ...(block.setup ? [block.setup] : []),
     "### Why each action asks what it does",
     list(
       block.actions.map(

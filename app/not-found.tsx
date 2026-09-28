@@ -18,8 +18,7 @@ export default function NotFound() {
           This page doesn&apos;t exist.
         </h1>
         <p className="max-w-140 text-[19px] leading-7.5 text-pretty text-(--ink-muted)">
-          The link may be out of date, or the address has a typo. The docs and
-          the home page are both a click away.
+          The link may be out of date, or the address may have a typo.
         </p>
         <div className="flex flex-wrap gap-2">
           <Link

@@ -1,9 +1,20 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react"
+import { toast, Toaster } from "sonner"
 import { describe, expect, it, vi } from "vitest"
 
 import { ApiKeys } from "@/components/blocks/api-keys-01/api-keys"
 import { DangerZone } from "@/components/blocks/danger-zone-01/danger-zone"
 import { DeleteAccount } from "@/components/blocks/delete-account-01/delete-account"
+import { FileManager } from "@/components/blocks/file-manager-01/file-manager"
+import { Inbox } from "@/components/blocks/inbox-01/inbox"
+import { TeamMembers } from "@/components/blocks/team-members-01/team-members"
 import { blockDemoNames } from "@/components/site/blocks/demos"
 import { blocks } from "@/lib/site/blocks"
 
@@ -148,5 +159,179 @@ describe("delete-account-01", () => {
     fireEvent.click(screen.getByRole("button", { name: "Export data" }))
     await screen.findByRole("button", { name: "Export requested" }, settled)
     expect(screen.getByRole("button", { name: "Delete account" })).toBeTruthy()
+  })
+})
+
+describe("team-members-01", () => {
+  it("removes someone only after a second click in their row menu", async () => {
+    render(<TeamMembers />)
+    fireEvent.click(
+      screen.getByRole("button", { name: "Actions for Ava Diaz" })
+    )
+    const item = await screen.findByRole("menuitem", {
+      name: "Remove from team",
+    })
+    await act(async () => fireEvent.click(item))
+    expect(screen.getByText("ava@acme.com")).toBeTruthy()
+    const armed = screen.getByRole("menuitem", {
+      name: "Click again to remove",
+    })
+    await act(async () => fireEvent.click(armed))
+    await waitFor(
+      () => expect(screen.queryByText("ava@acme.com")).toBeNull(),
+      settled
+    )
+    expect(screen.getByText("4 people have access to Acme.")).toBeTruthy()
+  })
+
+  it("transfers ownership only from the dialog", async () => {
+    render(<TeamMembers />)
+    fireEvent.click(
+      screen.getByRole("button", { name: "Actions for Leo Park" })
+    )
+    fireEvent.click(await screen.findByRole("menuitem", { name: "Make owner" }))
+    const dialog = await screen.findByRole("alertdialog")
+    expect(
+      within(dialog).getByText("Make Leo Park the owner of Acme?")
+    ).toBeTruthy()
+    fireEvent.click(
+      within(dialog).getByRole("button", { name: "Transfer ownership" })
+    )
+    await waitFor(
+      () => expect(screen.queryByRole("alertdialog")).toBeNull(),
+      settled
+    )
+    const rows = screen.getAllByRole("listitem")
+    expect(within(rows[0]).getAllByText("Admin").length).toBeGreaterThan(0)
+    expect(within(rows[1]).getAllByText("Owner").length).toBeGreaterThan(0)
+    expect(
+      screen.queryByRole("button", { name: "Actions for Leo Park" })
+    ).toBeNull()
+    fireEvent.click(screen.getByRole("button", { name: "Actions for Sam Lee" }))
+    await screen.findByRole("menuitem", { name: "Remove from team" })
+    expect(screen.queryByRole("menuitem", { name: "Make owner" })).toBeNull()
+  })
+})
+
+describe("file-manager-01", () => {
+  function names(list: string) {
+    return within(screen.getByRole("list", { name: list }))
+      .getAllByRole("listitem")
+      .map((item) => item.textContent)
+  }
+
+  it("moves files to trash with an undo toast", async () => {
+    render(
+      <>
+        <FileManager />
+        <Toaster />
+      </>
+    )
+    fireEvent.click(screen.getByRole("checkbox", { name: /q3-report\.pdf/ }))
+    fireEvent.click(screen.getByRole("checkbox", { name: /meeting-notes\.md/ }))
+    fireEvent.click(screen.getByRole("button", { name: "Move to trash" }))
+    await screen.findByText("Moved 2 files to trash")
+    expect(names("Files").join()).not.toMatch(/q3-report|meeting-notes/)
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }))
+    await waitFor(() =>
+      expect(names("Files").join()).toMatch(/q3-report.*meeting-notes/)
+    )
+    act(() => {
+      toast.dismiss()
+    })
+  })
+
+  it("restores from the Trash tab after the toast is gone", async () => {
+    render(
+      <>
+        <FileManager />
+        <Toaster />
+      </>
+    )
+    fireEvent.click(screen.getByRole("checkbox", { name: /q3-report\.pdf/ }))
+    fireEvent.click(screen.getByRole("button", { name: "Move to trash" }))
+    await screen.findByText("Moved q3-report.pdf to trash")
+    act(() => {
+      toast.dismiss()
+    })
+    fireEvent.click(screen.getByRole("tab", { name: /Trash/ }))
+    await waitFor(() => expect(names("Trash").join()).toMatch(/q3-report/))
+    fireEvent.click(
+      screen.getByRole("button", { name: "Restore q3-report.pdf" })
+    )
+    fireEvent.click(screen.getByRole("tab", { name: "Files" }))
+    await waitFor(() => expect(names("Files").join()).toMatch(/q3-report/))
+  })
+
+  it("empties the trash only after the phrase is typed", async () => {
+    render(<FileManager />)
+    fireEvent.click(screen.getByRole("tab", { name: /Trash/ }))
+    fireEvent.click(await screen.findByRole("button", { name: "Empty trash" }))
+    const dialog = await screen.findByRole("alertdialog")
+    const list = within(dialog).getByRole("list", {
+      name: "What gets deleted",
+    })
+    expect(within(list).getByText("old-logo.svg, draft-v1.docx")).toBeTruthy()
+    const confirm = within(dialog).getByRole("button", { name: "Empty trash" })
+    expect(confirm.hasAttribute("disabled")).toBe(true)
+    fireEvent.change(within(dialog).getByRole("textbox"), {
+      target: { value: "empty trash" },
+    })
+    await waitFor(() => expect(confirm.hasAttribute("disabled")).toBe(false))
+    fireEvent.click(confirm)
+    await screen.findByText("Trash is empty", undefined, settled)
+  })
+})
+
+describe("inbox-01", () => {
+  it("collapses a row in place with Undo, then removes it", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "performance"] })
+    render(<Inbox />)
+    fireEvent.click(
+      screen.getByRole("button", { name: "Archive Launch checklist" })
+    )
+    expect(screen.getByText("Archived: Launch checklist")).toBeTruthy()
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }))
+    expect(
+      screen.getByRole("button", { name: "Archive Launch checklist" })
+    ).toBeTruthy()
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Delete Offsite venue options" })
+    )
+    expect(screen.getByText("Deleted: Offsite venue options")).toBeTruthy()
+    await act(async () => vi.advanceTimersByTime(5000))
+    expect(screen.queryByText("Deleted: Offsite venue options")).toBeNull()
+    expect(screen.queryByText("Offsite venue options")).toBeNull()
+  })
+
+  it("archives the open message on a second click and deletes on a hold", async () => {
+    useHoldTimers()
+    render(<Inbox />)
+    const reader = screen.getByRole("region", { name: "Message" })
+    expect(within(reader).getByText("Launch checklist")).toBeTruthy()
+    const archive = within(reader).getByRole("button", { name: "Archive" })
+    await act(async () => fireEvent.click(archive))
+    expect(archive.getAttribute("data-state")).toBe("armed")
+    await act(async () => fireEvent.click(archive))
+    await act(async () => vi.advanceTimersByTime(600))
+    await waitFor(
+      () => expect(within(reader).getByText("Re: Q3 numbers")),
+      settled
+    )
+    expect(screen.queryByText("Launch checklist")).toBeNull()
+
+    const remove = within(reader).getByRole("button", {
+      name: "Hold to delete",
+    })
+    fireEvent.pointerDown(remove, { button: 0 })
+    await act(async () => vi.advanceTimersByTime(1200))
+    await act(async () => fireEvent.pointerUp(remove))
+    await act(async () => vi.advanceTimersByTime(600))
+    await waitFor(
+      () => expect(within(reader).getByText("Design review moved to Friday")),
+      settled
+    )
+    expect(screen.queryByText("Re: Q3 numbers")).toBeNull()
   })
 })

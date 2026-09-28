@@ -7,7 +7,7 @@
       "name": "confirm-button",
       "type": "registry:ui",
       "title": "Confirm Button",
-      "description": "A Button that confirms with a click, a second click, or a press-and-hold, with optional inline undo and an async pending state.",
+      "description": "A Button that confirms on a click, a second click or a press and hold. Supports inline undo and a pending state for an async onConfirm.",
       "registryDependencies": ["button"],
       "files": [
         {
@@ -37,7 +37,7 @@
       "name": "confirm-menu-item",
       "type": "registry:ui",
       "title": "Confirm Menu Item",
-      "description": "A DropdownMenu or ContextMenu item that confirms with a click, a second click, or a press-and-hold. The menu stays open while it is armed, held, pending or showing Undo, and closes once the action commits.",
+      "description": "A DropdownMenu or ContextMenu item that confirms on a click, a second click or a press and hold. The menu stays open while the item is armed, held, pending or showing Undo, and closes once the action commits.",
       "registryDependencies": ["dropdown-menu", "context-menu"],
       "files": [
         {
@@ -67,7 +67,7 @@
       "name": "type-to-confirm",
       "type": "registry:ui",
       "title": "Type to Confirm",
-      "description": "An inline form that only calls onConfirm after the exact phrase is typed and every acknowledgement is checked, with optional inline undo and an async pending state.",
+      "description": "An inline form that calls onConfirm only after the exact phrase is typed and every acknowledgement is checked. Supports inline undo and a pending state for an async onConfirm.",
       "registryDependencies": ["button", "checkbox", "input", "label"],
       "files": [
         {
@@ -102,7 +102,7 @@
       "name": "confirm-dialog",
       "type": "registry:ui",
       "title": "Confirm Dialog",
-      "description": "An optional alert dialog that wraps a ConfirmButton or TypeToConfirm as its confirm action, closing only after an async onConfirm settles. Includes useConfirm, which returns an awaitable confirm() and a dialog element you render yourself.",
+      "description": "An alert dialog with a ConfirmButton or TypeToConfirm as its confirm action, which closes only after an async onConfirm settles. Includes useConfirm, which returns an awaitable confirm() and a dialog element you render yourself.",
       "registryDependencies": ["alert-dialog", "button", "checkbox", "input", "label"],
       "files": [
         {
@@ -142,7 +142,7 @@
       "name": "confirm-popover",
       "type": "registry:ui",
       "title": "Confirm Popover",
-      "description": "A popover anchored to any trigger with one line about the consequence and a ConfirmButton, for actions that need a sentence but not a dialog. Stays open while an async onConfirm is pending.",
+      "description": "A popover anchored to any trigger, with one line about the consequence and a ConfirmButton, for actions that need a sentence but not a dialog. It stays open while an async onConfirm is pending.",
       "registryDependencies": ["popover", "button"],
       "files": [
         {
@@ -177,7 +177,7 @@
       "name": "confirm-switch",
       "type": "registry:ui",
       "title": "Confirm Switch",
-      "description": "A Switch that asks before it turns off something protective, like two-factor authentication. The safe direction toggles at once; the risky one asks with a second click, a hold, a popover or a dialog. Shows the new value while an async onConfirm saves and reverts if it rejects.",
+      "description": "A Switch that asks before the risky direction (turning off, by default) with a second click, a hold, a popover or a dialog, and toggles the other way at once. It shows the new value while an async onConfirm saves and reverts if it rejects.",
       "registryDependencies": [
         "switch",
         "button",
@@ -249,7 +249,7 @@
       "name": "undo-toast",
       "type": "registry:lib",
       "title": "Undo Toast",
-      "description": "undoToast(message) shows a Sonner toast with an Undo button and resolves true when it closes or false if Undo is clicked. Run the real action only after it resolves true.",
+      "description": "undoToast(message) shows a Sonner toast with an Undo button. It resolves true when the toast closes and false if Undo is clicked, so run the action only on true.",
       "dependencies": ["sonner"],
       "registryDependencies": ["button", "sonner"],
       "files": [
@@ -379,7 +379,7 @@
       "name": "delete-account-01",
       "type": "registry:block",
       "title": "Delete Account",
-      "description": "An account deletion screen: an export link placed before anything else, a list of what gets deleted, and a form that asks for your email and each acknowledgement before it unlocks.",
+      "description": "An account deletion screen with an export link first, a list of what gets deleted, and a form that unlocks after you type your email and check each acknowledgement.",
       "dependencies": ["lucide-react"],
       "registryDependencies": [
         "@sureui/consequences",
@@ -396,6 +396,80 @@
         }
       ],
       "categories": ["block", "settings"]
+    },
+    {
+      "name": "team-members-01",
+      "type": "registry:block",
+      "title": "Team Members",
+      "description": "A team members list whose row menu removes someone after a second click, and makes someone the owner after a dialog explains what changes.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": [
+        "@sureui/confirm-dialog",
+        "@sureui/confirm-menu-item",
+        "avatar",
+        "badge",
+        "button",
+        "card",
+        "dropdown-menu"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/team-members-01/team-members.tsx",
+          "type": "registry:component",
+          "target": "@components/team-members.tsx"
+        }
+      ],
+      "categories": ["block", "settings"]
+    },
+    {
+      "name": "file-manager-01",
+      "type": "registry:block",
+      "title": "File Manager",
+      "description": "A file list where selected files move to trash with an undo toast, a Trash tab restores them one at a time, and an Empty trash dialog lists what goes and asks you to type a phrase.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": [
+        "@sureui/confirm-dialog",
+        "@sureui/consequences",
+        "@sureui/undo-toast",
+        "badge",
+        "button",
+        "card",
+        "checkbox",
+        "empty",
+        "tabs"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/file-manager-01/file-manager.tsx",
+          "type": "registry:component",
+          "target": "@components/file-manager.tsx"
+        }
+      ],
+      "categories": ["block", "files"]
+    },
+    {
+      "name": "inbox-01",
+      "type": "registry:block",
+      "title": "Inbox",
+      "description": "A message list where archive and delete collapse the row in place with an Undo, and a reading pane whose toolbar archives on a second click and deletes on a hold.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": [
+        "@sureui/confirm-button",
+        "@sureui/undoable",
+        "avatar",
+        "badge",
+        "button",
+        "card",
+        "empty"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/inbox-01/inbox.tsx",
+          "type": "registry:component",
+          "target": "@components/inbox.tsx"
+        }
+      ],
+      "categories": ["block", "mail"]
     }
   ]
 }

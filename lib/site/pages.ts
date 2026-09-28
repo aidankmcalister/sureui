@@ -3,7 +3,7 @@ import { styles } from "@/lib/site/styles"
 
 export const intro = [
   'When every action opens an "Are you sure?" dialog, people stop reading and confirm on reflex, so the one dialog that matters gets the same click as the fifty before it.',
-  "SureUI gives you more ways to ask: an undo, a second click, a hold, a typed name, or a dialog when you want one. If you're not sure which fits, the Which one page has a question for each.",
+  "SureUI has other ways to ask: undo, a second click, a hold, a typed name, or a dialog when you want one. The Which one page has a question for each to help you choose.",
 ]
 
 export const contractNote =
@@ -12,7 +12,7 @@ export const contractNote =
 export const coreNote = {
   slug: "how-its-built",
   link: "How it's built",
-  text: "walks through the confirmation core every control shares: its states, timing, undo window and tests.",
+  text: "covers the confirmation core every control shares: its states, timing, undo window and tests.",
 }
 
 export const contract = `async function deleteProject() {
@@ -42,7 +42,7 @@ export type InstallStep = {
 export const installSteps: InstallStep[] = [
   {
     title: "Set up shadcn/ui",
-    body: "SureUI adds to a shadcn/ui project built on Base UI, the shadcn default. If your project doesn't use shadcn yet, start with:",
+    body: "SureUI installs into a shadcn/ui project on Base UI, the shadcn default. If your project doesn't use shadcn yet, run:",
     command: "init",
   },
   {
@@ -61,7 +61,7 @@ export const installSteps: InstallStep[] = [
   },
   {
     title: "Add the items you need",
-    body: `Each item brings the confirmation core with it, so install only the ones you use: ${items
+    body: `Each item includes the confirmation core, so install only the ones you use: ${items
       .map((item, index) =>
         index === 0
           ? `\`${item}\``
@@ -71,8 +71,8 @@ export const installSteps: InstallStep[] = [
     command: addArgs(["confirm-button"]),
   },
   {
-    title: "Mount the Toaster, for undo toasts only",
-    body: "`undoToast` shows a shadcn toast. Everything else needs no setup.",
+    title: "Mount the Toaster for undo toasts",
+    body: "`undoToast` shows a shadcn toast, so it needs the `Toaster` in your root layout. Nothing else needs setup.",
     code: {
       lang: "tsx",
       label: "app/layout.tsx",
@@ -97,8 +97,8 @@ export const agentRules = {
   intro: {
     label: "What it is",
     paragraphs: [
-      "Coding agents tend to put every delete behind an alert dialog. The agent rules give them the questions from the Which one page, in order, with install commands and usage for each style and the contract every control shares.",
-      "The rules are generated from the same data as these docs, so they change when the docs do.",
+      "Coding agents tend to put every delete behind an alert dialog. The agent rules give them the Which one questions in order, the install command and usage for each style, and the contract every control shares.",
+      "The rules are generated from the same data as these docs and change with them.",
     ],
   },
   shadcn: {
@@ -108,7 +108,7 @@ export const agentRules = {
   },
   skill: {
     label: "Install as a skill",
-    body: "The same rules are an agent skill in the SureUI repository. The skills CLI asks which agents to install it for.",
+    body: "The SureUI repository has the same rules as an agent skill. The skills CLI asks which agents to install it for.",
     command: `npx skills add ${githubUrl.replace("https://github.com/", "")}`,
   },
   contents: {
@@ -149,7 +149,7 @@ const docs = [
     slug: "which-one",
     title: "Which one should I use?",
     group: "Guides",
-    lead: "A quick guide, if you're not sure where to start.",
+    lead: "A question for each style, and a table that compares them.",
   },
   {
     href: "/docs/agent-rules",
