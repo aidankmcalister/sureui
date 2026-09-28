@@ -28,6 +28,7 @@ node -e '
     .listen(Number(port), "127.0.0.1")
 ' "$root/public" "$port" &
 server=$!
+disown "$server"
 trap 'kill "$server" 2>/dev/null || true; rm -rf "$workdir"' EXIT
 cd "$workdir"
 
