@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen } from "@testing-library/react"
+import { act, fireEvent, render, screen } from "@testing-library/react"
 import { toast, Toaster } from "sonner"
 import { afterEach, describe, expect, it, vi } from "vitest"
 
@@ -6,8 +6,6 @@ import { undoToast } from "@/components/ui/sureui/undo-toast"
 
 afterEach(() => {
   toast.dismiss()
-  cleanup()
-  vi.useRealTimers()
   vi.restoreAllMocks()
 })
 
