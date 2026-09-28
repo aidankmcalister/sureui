@@ -162,6 +162,7 @@ function useConfirmationMachine(options: ConfirmationOptions) {
       duration: undoWindow.duration,
       startedAt: performance.now(),
     })
+    setPaused(undoWindow.paused())
   }, [commit, clearTimer, enter])
 
   const pauseUndo = React.useCallback((reason: PauseReason) => {

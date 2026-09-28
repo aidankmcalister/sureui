@@ -648,6 +648,30 @@ describe("ConfirmButton", () => {
     expect(onConfirm).toHaveBeenCalledOnce()
   })
 
+  it("undo: a window that starts while the tab is hidden waits for it", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmButton
+        gesture="hold"
+        confirmOnRelease={false}
+        undo
+        onConfirm={onConfirm}
+      >
+        Archive
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    fireEvent.pointerDown(button, { button: 0 })
+    setVisibility("hidden")
+    await act(async () => vi.advanceTimersByTime(1200))
+    expect(button.getAttribute("data-state")).toBe("undo")
+    await act(async () => vi.advanceTimersByTime(20000))
+    expect(onConfirm).not.toHaveBeenCalled()
+    setVisibility("visible")
+    await act(async () => vi.advanceTimersByTime(5000))
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
   it("undo: a hidden tab and hover pause independently", async () => {
     const onConfirm = vi.fn()
     render(
