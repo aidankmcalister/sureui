@@ -42,5 +42,9 @@
   {
     "prompt": "Add a delete button next to each branch on the branches page, with a short note that open pull requests from it will close.",
     "expected": "dialogs"
+  },
+  {
+    "prompt": "Add a switch to turn two-factor authentication on and off on the security settings page.",
+    "expected": "click-again"
   }
 ]

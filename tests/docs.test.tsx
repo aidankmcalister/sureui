@@ -3,10 +3,12 @@ import { describe, expect, it } from "vitest"
 
 import type { Button } from "@/components/ui/button"
 import type { DropdownMenuItem } from "@/components/ui/dropdown-menu"
+import type { Switch } from "@/components/ui/switch"
 import type { ConfirmButtonProps } from "@/components/ui/sureui/confirm-button"
 import type { ConfirmDialogProps } from "@/components/ui/sureui/confirm-dialog"
 import type { ConfirmPopoverProps } from "@/components/ui/sureui/confirm-popover"
 import type { ConfirmMenuItemProps } from "@/components/ui/sureui/confirm-menu-item"
+import type { ConfirmSwitchProps } from "@/components/ui/sureui/confirm-switch"
 import type {
   ConsequencesItemProps,
   ConsequencesProps,
@@ -134,6 +136,35 @@ const confirmPopover = {
   open: true,
   onOpenChange: true,
 } satisfies Record<keyof ConfirmPopoverProps, true>
+const confirmSwitch = {
+  onConfirm: true,
+  onCancel: true,
+  checked: true,
+  defaultChecked: true,
+  onCheckedChange: true,
+  confirmWhen: true,
+  gesture: true,
+  timeout: true,
+  cancelOnBlur: true,
+  duration: true,
+  confirmOnRelease: true,
+  cancelHoldOnLeave: true,
+  holdFallback: true,
+  title: true,
+  description: true,
+  confirmLabel: true,
+  cancelLabel: true,
+  variant: true,
+  announcements: true,
+} satisfies Record<
+  | Exclude<keyof ConfirmSwitchProps, keyof React.ComponentProps<typeof Switch>>
+  | "checked"
+  | "defaultChecked"
+  | "onCheckedChange"
+  | "title",
+  true
+>
+
 const consequences = {
   items: true,
   title: true,
@@ -200,6 +231,7 @@ const documented = {
   TypeToConfirm: typeToConfirm,
   ConfirmDialog: confirmDialog,
   ConfirmPopover: confirmPopover,
+  ConfirmSwitch: confirmSwitch,
   Consequences: consequences,
   ConsequencesItem: consequencesItem,
   "undoToast(message, options)": undoToast,

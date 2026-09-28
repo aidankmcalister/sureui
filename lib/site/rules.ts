@@ -11,6 +11,7 @@ const imports = `import { ConfirmButton } from "@/components/ui/sureui/confirm-b
 import { TypeToConfirm } from "@/components/ui/sureui/type-to-confirm"
 import { ConfirmDialog, useConfirm } from "@/components/ui/sureui/confirm-dialog"
 import { ConfirmPopover } from "@/components/ui/sureui/confirm-popover"
+import { ConfirmSwitch } from "@/components/ui/sureui/confirm-switch"
 import { undoToast } from "@/components/ui/sureui/undo-toast"
 import { Undoable } from "@/components/ui/sureui/undoable"`
 
@@ -84,6 +85,7 @@ function rulesBody() {
       '"Taken back" means your app keeps the thing after the action runs: in a trash, an archive, or hidden. If the data is gone once `onConfirm` runs, the answer is no, even when it is quick to recreate. The undo window alone does not make an action reversible.',
       "Restorable and routine: Undo, never a dialog.",
       "Deleting one row or one small item for good: Click again.",
+      "A switch whose toggle is the action, like turning off two-factor authentication: `ConfirmSwitch` (`npx shadcn@latest add @sureui/confirm-switch`). It asks only in the risky direction and toggles the other at once.",
       "A dialog is only for actions that need a sentence of explanation or affect other people.",
       "When one line of context is enough and the action only touches the item in front of you, use `ConfirmPopover` (`npx shadcn@latest add @sureui/confirm-popover`) instead of a dialog. Keep `ConfirmDialog` for actions that affect other people or need more than a line.",
       "Use the SureUI components. Don't hand-roll timers, armed states or hold progress.",

@@ -23,7 +23,7 @@ export const howItsBuilt = {
     id: "core",
     label: "The core",
     paragraphs: [
-      "Every control is a thin adapter over one module, `confirmation.ts`. It owns the state machine, the gesture rules, timing and handler composition. `ConfirmButton` and `ConfirmMenuItem` call its `useConfirmation` hook. `TypeToConfirm`, `ConfirmDialog` and `ConfirmPopover` render a `ConfirmButton`. `undoToast` and `Undoable` reuse the undo window and the fill directly, because the thing that starts their undo isn't the thing that shows it.",
+      "Every control is a thin adapter over one module, `confirmation.ts`. It owns the state machine, the gesture rules, timing and handler composition. `ConfirmButton`, `ConfirmMenuItem` and `ConfirmSwitch` call its `useConfirmation` hook. `TypeToConfirm`, `ConfirmDialog` and `ConfirmPopover` render a `ConfirmButton`. `undoToast` and `Undoable` reuse the undo window and the fill directly, because the thing that starts their undo isn't the thing that shows it.",
       "The controls add labels, announcements and styling. Everything on this page lives in three files: `confirmation.ts`, `undo-window.ts` and `fill.ts`.",
     ],
   } satisfies GuideSection,
@@ -110,7 +110,7 @@ animation.currentTime = performance.now() - fill.startedAt`,
       paragraphs: [
         "`useConfirmation` returns `state`, a `fillRef` and `getTriggerProps`. A control passes its remaining props through `getTriggerProps` and spreads the result on its trigger. Every pointer, key, focus and click handler the gesture needs is composed: yours runs first, then ours, and ours always runs, so an `onClick` or `onKeyDown` you pass can't break the gesture.",
         "`getTriggerProps` also sets `disabled`. Pending disables the trigger, and a disabled control keeps Undo pressable during the window.",
-        "The gesture rules exist once. `ConfirmButton` spreads the props on a `Button` and `ConfirmMenuItem` on a menu item, and both get the same click-again, hold and undo behavior.",
+        "The gesture rules exist once. `ConfirmButton` spreads the props on a `Button`, `ConfirmMenuItem` on a menu item and `ConfirmSwitch` on a switch, so all three get the same click-again and hold behavior.",
       ],
       excerpt: {
         file: `${core}/confirmation.ts`,
