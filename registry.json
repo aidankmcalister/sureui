@@ -46,6 +46,11 @@
           "target": "@ui/sureui/confirmation.ts"
         },
         {
+          "path": "components/ui/sureui/confirm-button.tsx",
+          "type": "registry:ui",
+          "target": "@ui/sureui/confirm-button.tsx"
+        },
+        {
           "path": "components/ui/sureui/type-to-confirm.tsx",
           "type": "registry:ui",
           "target": "@ui/sureui/type-to-confirm.tsx"

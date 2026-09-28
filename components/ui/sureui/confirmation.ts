@@ -375,7 +375,6 @@ function useConfirmation<T extends Element = HTMLElement>({
 
 export {
   useConfirmation,
-  useConfirmationMachine,
   composeHandlers,
   type ConfirmationState,
   type ConfirmationOptions,
