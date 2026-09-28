@@ -7,6 +7,7 @@ export const items = [
   "confirm-menu-item",
   "type-to-confirm",
   "confirm-dialog",
+  "confirm-popover",
   "undo-toast",
 ]
 

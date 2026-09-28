@@ -1,5 +1,5 @@
 ---
-description: Picks and uses SureUI confirmation controls (undo, click again, hold, type to confirm, dialog) from the @sureui shadcn registry. Use when adding or reviewing a delete, remove, revoke, archive, reset, leave or other destructive action in a React or shadcn/ui app, and before reaching for AlertDialog or window.confirm.
+description: Picks and uses SureUI confirmation controls (undo, click again, hold, type to confirm, dialog, popover) from the @sureui shadcn registry. Use when adding or reviewing a delete, remove, revoke, archive, reset, leave or other destructive action in a React or shadcn/ui app, and before reaching for AlertDialog or window.confirm.
 alwaysApply: false
 ---
 
@@ -15,6 +15,7 @@ SureUI is a shadcn/ui registry of confirmation controls: undo, click again, hold
 - Restorable and routine: Undo, never a dialog.
 - Deleting one row or one small item for good: Click again.
 - A dialog is only for actions that need a sentence of explanation or affect other people.
+- When one line of context is enough and the action only touches the item in front of you, use `ConfirmPopover` (`npx shadcn@latest add @sureui/confirm-popover`) instead of a dialog. Keep `ConfirmDialog` for actions that affect other people or need more than a line.
 - Use the SureUI components. Don't hand-roll timers, armed states or hold progress.
 
 ## Which style
@@ -32,10 +33,12 @@ SureUI is a shadcn/ui registry of confirmation controls: undo, click again, hold
    Use it when:
    - Leaving a team or removing someone else's access.
    - The consequence takes a sentence to explain.
+   - One line is enough and the action only touches this item, like deleting a branch: use ConfirmPopover, so the page stays in view.
+   - It affects other people or takes more than a line: use ConfirmDialog.
    - You need to await the answer inside a handler, with useConfirm.
    Use something else when:
    - It's routine and reversible: Undo.
-   - One extra click is warning enough: Click again.
+   - One extra click is warning enough, with nothing to explain: Click again.
    - It deletes something large for good: Type to confirm.
 3. **Can it be taken back?** Use Undo. Best for: trash, archive, anything you can restore.
    Use it when:
@@ -53,6 +56,7 @@ SureUI is a shadcn/ui registry of confirmation controls: undo, click again, hold
    Use something else when:
    - It's easy to reverse: Undo.
    - A stray tap on a phone would be costly: Hold.
+   - People need one line of context first, which ConfirmPopover gives: Dialogs.
    - It can't be undone: Type to confirm.
 5. **Could a stray tap trigger it?** Use Hold. Best for: touch screens and small resets.
    Use it when:
@@ -99,6 +103,7 @@ Every component takes the same `onConfirm`. Return a promise and the control sta
 import { ConfirmButton } from "@/components/ui/sureui/confirm-button"
 import { TypeToConfirm } from "@/components/ui/sureui/type-to-confirm"
 import { ConfirmDialog, useConfirm } from "@/components/ui/sureui/confirm-dialog"
+import { ConfirmPopover } from "@/components/ui/sureui/confirm-popover"
 import { undoToast } from "@/components/ui/sureui/undo-toast"
 ```
 
@@ -143,7 +148,7 @@ npx shadcn@latest add @sureui/type-to-confirm
 
 ### Dialogs
 
-An optional alert dialog for actions that need a sentence of explanation.
+An optional alert dialog for actions that need a sentence of explanation, or a popover anchored to the button when one line is enough.
 
 ```bash
 npx shadcn@latest add @sureui/confirm-dialog
@@ -160,6 +165,15 @@ npx shadcn@latest add @sureui/confirm-dialog
   <Button variant="outline">Leave team</Button>
 </ConfirmDialog>
 
+<ConfirmPopover
+  description="Open pull requests from this branch will close."
+  confirmLabel="Delete branch"
+  variant="destructive"
+  onConfirm={deleteBranch}
+>
+  <Button variant="outline">Delete branch</Button>
+</ConfirmPopover>
+
 const { confirm, dialog } = useConfirm()
 
 async function discard() {
@@ -169,6 +183,10 @@ async function discard() {
 
 - Gesture options (timeout, cancelOnBlur, duration, confirmOnRelease, cancelHoldOnLeave) apply when phrase is not set. caseSensitive, trim and announcements.match apply when it is.
 - The dialog stays open, and Cancel and Escape do nothing, while a promise from onConfirm is pending.
+- ConfirmPopover, added with @sureui/confirm-popover, is the lighter surface: a popover anchored to its trigger with one line and a confirm button. The rest of the page stays visible and usable.
+- The popover moves focus to its confirm button when it opens and back to the trigger when it closes. Cancel, Escape, a click outside and tabbing out of it all close it and call onCancel.
+- The popover stays open while a promise from onConfirm is pending, and Cancel, Escape and clicks outside do nothing. If the promise rejects, it stays open so people can try again.
+- ConfirmPopover has no undo prop. It closes once the action commits, so an Undo button inside it would close too. For a way back, use undoToast.
 
 ### Undo
 
