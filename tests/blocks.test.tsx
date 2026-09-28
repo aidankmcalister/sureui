@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest"
 
 import { ApiKeys } from "@/components/blocks/api-keys-01/api-keys"
 import { DangerZone } from "@/components/blocks/danger-zone-01/danger-zone"
+import { DeleteAccount } from "@/components/blocks/delete-account-01/delete-account"
 import { blockDemoNames } from "@/components/site/blocks/demos"
 import { blocks } from "@/lib/site/blocks"
 
@@ -101,5 +102,46 @@ describe("api-keys-01", () => {
     expect(
       screen.queryByRole("button", { name: "Hold to revoke Staging" })
     ).toBeNull()
+  })
+})
+
+describe("delete-account-01", () => {
+  it("lists what goes and offers an export before the form", () => {
+    render(<DeleteAccount email="ada@example.com" />)
+    const exportButton = screen.getByRole("button", { name: "Export data" })
+    const deleteButton = screen.getByRole("button", { name: "Delete account" })
+    expect(
+      exportButton.compareDocumentPosition(deleteButton) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
+    for (const item of [
+      "12 projects",
+      "38 invoices",
+      "Membership in 3 teams",
+    ]) {
+      expect(screen.getByText(item)).toBeTruthy()
+    }
+  })
+
+  it("unlocks only after the email and every acknowledgement", async () => {
+    render(<DeleteAccount email="ada@example.com" />)
+    const confirm = screen.getByRole("button", { name: "Delete account" })
+    fireEvent.change(screen.getByRole("textbox"), {
+      target: { value: " Ada@Example.com " },
+    })
+    const [first, second] = screen.getAllByRole("checkbox")
+    fireEvent.click(first)
+    expect(confirm.hasAttribute("disabled")).toBe(true)
+    fireEvent.click(second)
+    await waitFor(() => expect(confirm.hasAttribute("disabled")).toBe(false))
+    fireEvent.click(confirm)
+    await screen.findByText("Your account was deleted", undefined, settled)
+  })
+
+  it("starts an export without touching the account", async () => {
+    render(<DeleteAccount email="ada@example.com" />)
+    fireEvent.click(screen.getByRole("button", { name: "Export data" }))
+    await screen.findByRole("button", { name: "Export requested" }, settled)
+    expect(screen.getByRole("button", { name: "Delete account" })).toBeTruthy()
   })
 })

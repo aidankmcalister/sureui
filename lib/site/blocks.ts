@@ -59,6 +59,21 @@ const notes: BlockNote[] = [
       },
     ],
   },
+  {
+    name: "delete-account-01",
+    actions: [
+      {
+        action: "Delete account",
+        style: "type-to-confirm",
+        why: "It is permanent and removes everything you have. Typing your email and checking each acknowledgement means reading what goes before it unlocks.",
+      },
+      {
+        action: "Export data",
+        style: null,
+        why: "Exporting changes nothing, so it runs on one click. It sits above the delete form so you see it before you need it.",
+      },
+    ],
+  },
 ]
 
 function styleName(slug: string | null) {

@@ -236,6 +236,27 @@
         }
       ],
       "categories": ["block", "settings"]
+    },
+    {
+      "name": "delete-account-01",
+      "type": "registry:block",
+      "title": "Delete Account",
+      "description": "An account deletion screen: an export link placed before anything else, a list of what gets deleted, and a form that asks for your email and each acknowledgement before it unlocks.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": [
+        "@sureui/type-to-confirm",
+        "button",
+        "card",
+        "empty"
+      ],
+      "files": [
+        {
+          "path": "components/blocks/delete-account-01/delete-account.tsx",
+          "type": "registry:component",
+          "target": "@components/delete-account.tsx"
+        }
+      ],
+      "categories": ["block", "settings"]
     }
   ]
 }
