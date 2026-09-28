@@ -324,6 +324,7 @@
       "description": "An account deletion screen: an export link placed before anything else, a list of what gets deleted, and a form that asks for your email and each acknowledgement before it unlocks.",
       "dependencies": ["lucide-react"],
       "registryDependencies": [
+        "@sureui/consequences",
         "@sureui/type-to-confirm",
         "button",
         "card",
