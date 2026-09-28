@@ -1,4 +1,5 @@
 import registry from "@/registry.json"
+import { blocks, blocksLead, blocksNote, type Block } from "@/lib/site/blocks"
 import { addArgs, siteUrl } from "@/lib/site/config"
 import {
   agentRules,
@@ -158,6 +159,31 @@ function pageMarkdown(page: Page) {
   ].join("\n\n")
 }
 
+function blockMarkdown(block: Block) {
+  return [
+    `## ${block.title}`,
+    `${block.description} Preview: ${siteUrl}/blocks#${block.name}`,
+    command(addArgs([block.name])),
+    `Installs ${block.files.map((file) => `\`${file.target}\``).join(", ")}.`,
+    "### Why each action asks what it does",
+    list(
+      block.actions.map(
+        (action) => `${action.action}: ${action.styleName}. ${action.why}`
+      )
+    ),
+  ].join("\n\n")
+}
+
+function blocksMarkdown() {
+  return [
+    "# Blocks",
+    blocksLead,
+    blocksNote,
+    `Source: ${siteUrl}/blocks`,
+    ...blocks.map(blockMarkdown),
+  ].join("\n\n")
+}
+
 function llmsIndex() {
   return [
     "# SureUI",
@@ -169,22 +195,33 @@ function llmsIndex() {
     ),
     "## Registry items",
     list(
-      registry.items.map(
-        (item) =>
-          `[@sureui/${item.name}](${siteUrl}/r/${item.name}.json): ${item.description}`
+      registry.items
+        .filter((item) => item.type !== "registry:block")
+        .map(
+          (item) =>
+            `[@sureui/${item.name}](${siteUrl}/r/${item.name}.json): ${item.description}`
+        )
+    ),
+    "## Blocks",
+    list(
+      blocks.map(
+        (block) =>
+          `[@sureui/${block.name}](${siteUrl}/r/${block.name}.json): ${block.description}`
       )
     ),
     "## Optional",
     list([
-      `[Full docs](${siteUrl}/llms-full.txt): every page above in one file`,
+      `[Full docs](${siteUrl}/llms-full.txt): every page above and every block in one file`,
     ]),
   ].join("\n\n")
 }
 
 function llmsFull() {
-  return [`# SureUI\n\n> ${description}`, ...pages.map(pageMarkdown)].join(
-    "\n\n---\n\n"
-  )
+  return [
+    `# SureUI\n\n> ${description}`,
+    ...pages.map(pageMarkdown),
+    blocksMarkdown(),
+  ].join("\n\n---\n\n")
 }
 
 function textResponse(body: string, type: string) {
