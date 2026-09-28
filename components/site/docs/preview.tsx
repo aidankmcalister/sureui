@@ -21,7 +21,7 @@ export function useReport() {
 
 export function Preview({
   figure,
-  label,
+  actions,
   code,
   log = true,
   resettable = false,
@@ -29,7 +29,7 @@ export function Preview({
   children,
 }: {
   figure?: string
-  label?: string
+  actions?: React.ReactNode
   code: React.ReactNode
   log?: boolean
   resettable?: boolean
@@ -49,9 +49,9 @@ export function Preview({
             <SiteTab value="code">Code</SiteTab>
           </SiteTabsList>
           <div className="flex min-w-0 items-center gap-3">
-            <Label className="truncate">
-              {label ?? (figure ? `Fig. ${figure}` : null)}
-            </Label>
+            {actions ?? (
+              <Label className="truncate">{figure && `Fig. ${figure}`}</Label>
+            )}
             {resettable && tab === "preview" && (
               <SiteButton
                 variant="ghost"

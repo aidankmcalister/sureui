@@ -92,8 +92,7 @@ const notes: BlockNote[] = [
   },
   {
     name: "file-manager-01",
-    setup:
-      "The undo toast needs the shadcn `<Toaster />` in your root layout. Without it, files move to trash with no Undo.",
+    setup: "Needs the shadcn `<Toaster />` in your root layout for Undo.",
     actions: [
       {
         action: "Move to trash",
