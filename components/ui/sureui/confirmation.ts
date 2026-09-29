@@ -202,11 +202,12 @@ interface ConfirmationOptions {
 }
 
 interface GestureOptions {
-  gesture?: "click" | "click-again" | "hold"
+  gesture?: "click" | "click-again" | "hold" | "slide"
   timeout?: number
   duration?: number
   holdFallback?: "click-again" | "none"
   armDelay?: number
+  wait?: number
   disabled?: boolean
 }
 
@@ -217,6 +218,7 @@ type TriggerProps<T extends Element> = {
   onFocus?(event: React.FocusEvent<T>): void
   onPointerDown?(event: React.PointerEvent<T>): void
   onPointerUp?(event: React.PointerEvent<T>): void
+  onPointerMove?(event: React.PointerEvent<T>): void
   onPointerEnter?(event: React.PointerEvent<T>): void
   onPointerLeave?(event: React.PointerEvent<T>): void
   onPointerCancel?(event: React.PointerEvent<T>): void
@@ -411,22 +413,36 @@ function useConfirmationMachine(
     [confirm, enter]
   )
 
-  const release = React.useCallback(() => {
-    const now = performance.now()
-    const fraction = Math.min(
-      (now - holdStartRef.current) / holdDurationRef.current,
-      1
-    )
-    clearTimer()
-    enter("idle", {
-      from: fraction,
-      to: 0,
-      duration: 200,
-      startedAt: now,
-      easing: "ease-out",
-    })
-    optionsRef.current.onCancel?.()
-  }, [clearTimer, enter])
+  const slide = React.useCallback(
+    (fraction: number) => {
+      enter("holding", {
+        from: fraction,
+        to: fraction,
+        duration: 0,
+        startedAt: performance.now(),
+      })
+    },
+    [enter]
+  )
+
+  const release = React.useCallback(
+    (from?: number) => {
+      const now = performance.now()
+      const fraction =
+        from ??
+        Math.min((now - holdStartRef.current) / holdDurationRef.current, 1)
+      clearTimer()
+      enter("idle", {
+        from: fraction,
+        to: 0,
+        duration: 200,
+        startedAt: now,
+        easing: "ease-out",
+      })
+      optionsRef.current.onCancel?.()
+    },
+    [clearTimer, enter]
+  )
 
   const cancel = React.useCallback(() => {
     clearTimer()
@@ -446,6 +462,7 @@ function useConfirmationMachine(
     failed,
     arm,
     hold,
+    slide,
     release,
     confirm,
     cancel,
@@ -464,6 +481,7 @@ function useConfirmation<
   duration = 1200,
   holdFallback = "click-again",
   armDelay = 0,
+  wait = 0,
   disabled = false,
   ...options
 }: ConfirmationOptions & GestureOptions) {
@@ -475,6 +493,7 @@ function useConfirmation<
     failed,
     arm,
     hold,
+    slide,
     release,
     confirm,
     cancel,
@@ -484,6 +503,13 @@ function useConfirmation<
   } = useConfirmationMachine(options, triggerRef)
   const fillRef = React.useRef<F>(null)
   useFill(fillRef, fill, paused)
+  const [waiting, setWaiting] = React.useState(() => waitSeconds(wait))
+
+  React.useEffect(() => {
+    if (waiting <= 0) return
+    const timer = setTimeout(() => setWaiting((left) => left - 1), 1000)
+    return () => clearTimeout(timer)
+  }, [waiting])
   const armDelayRef = React.useRef(armDelay)
   const quietRef = React.useRef(false)
   const quietTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -492,6 +518,14 @@ function useConfirmation<
   const pressRef = React.useRef<"none" | "pointer" | "virtual" | "key">("none")
   const fallbackRef = React.useRef(false)
   const selectedRef = React.useRef(false)
+  const slideRef = React.useRef<{
+    id: number
+    startX: number
+    width: number
+    progress: number
+    moved: boolean
+  } | null>(null)
+  const slidClickRef = React.useRef(false)
 
   React.useEffect(() => {
     armDelayRef.current = armDelay
@@ -529,6 +563,7 @@ function useConfirmation<
   }, [state, timeout, cancel])
 
   const isHold = gesture === "hold"
+  const isSlide = gesture === "slide"
   const isHolding = state === "holding"
   const fallback = isHold && holdFallback === "click-again"
   const fallbackArmed = state === "armed" && fallbackRef.current
@@ -562,9 +597,30 @@ function useConfirmation<
     else if (state === "idle" && unpressed) armFallback()
   }
 
+  function endSlide(target: Element) {
+    const current = slideRef.current
+    if (!current) return
+    slideRef.current = null
+    if (target.hasPointerCapture?.(current.id))
+      target.releasePointerCapture(current.id)
+    if (!current.moved) return
+    slidClickRef.current = true
+    if (current.progress >= 1) confirm()
+    else release(current.progress)
+  }
+
   const handlers: Required<Omit<TriggerProps<T>, "disabled">> = {
     onClick() {
       if (quietRef.current) return
+      if (slidClickRef.current) {
+        slidClickRef.current = false
+        return
+      }
+      if (isSlide) {
+        const press = pressRef.current
+        pressRef.current = "none"
+        if (press === "pointer" && state !== "undo") return
+      }
       if (isHold) return holdClick()
       if (repeatRef.current) return
       if (state === "undo") cancel()
@@ -574,7 +630,9 @@ function useConfirmation<
     },
     onBlur() {
       resumeUndo("focus")
-      if (isHolding) release()
+      const sliding = slideRef.current
+      slideRef.current = null
+      if (isHolding) release(sliding?.progress)
       else if (state === "armed") cancel()
     },
     onFocus() {
@@ -585,10 +643,27 @@ function useConfirmation<
     },
     onPointerLeave() {
       resumeUndo("hover")
-      if (isHolding) release()
+      if (isHolding && !isSlide) release()
     },
     onPointerDown(event) {
       selectedRef.current = hasSelection()
+      slidClickRef.current = false
+      if (isSlide) {
+        pressRef.current = isVirtualPress(event) ? "virtual" : "pointer"
+        if (event.button !== 0 || quietRef.current || state !== "idle") return
+        if (pressRef.current === "virtual") return
+        try {
+          event.currentTarget.setPointerCapture?.(event.pointerId)
+        } catch {}
+        slideRef.current = {
+          id: event.pointerId,
+          startX: event.clientX,
+          width: event.currentTarget.getBoundingClientRect().width,
+          progress: 0,
+          moved: false,
+        }
+        return
+      }
       if (!isHold || event.button !== 0 || quietRef.current) return
       pressRef.current = isVirtualPress(event) ? "virtual" : "pointer"
       undoPressRef.current = state === "undo"
@@ -598,15 +673,34 @@ function useConfirmation<
         target.releasePointerCapture(event.pointerId)
       hold(duration)
     },
+    onPointerMove(event) {
+      const current = slideRef.current
+      if (!current || current.id !== event.pointerId) return
+      const distance = event.clientX - current.startX
+      if (!current.moved && Math.abs(distance) < 4) return
+      current.moved = true
+      current.progress = Math.min(
+        Math.max(distance / (current.width * 0.85), 0),
+        1
+      )
+      slide(current.progress)
+    },
     onPointerUp(event) {
       if (event.pointerType === "touch" && !selectedRef.current) {
         requestAnimationFrame(clearSelection)
       }
+      if (isSlide) return endSlide(event.currentTarget)
       if (state !== "holding") return
       if (fallback && pressRef.current === "virtual") reset()
       else release()
     },
     onPointerCancel() {
+      if (isSlide) {
+        const current = slideRef.current
+        slideRef.current = null
+        if (current?.moved) release(current.progress)
+        return
+      }
       if (isHolding) release()
     },
     onKeyDown(event) {
@@ -655,11 +749,12 @@ function useConfirmation<
     }
     return {
       ...composed,
-      disabled: (disabled && state !== "undo") || state === "pending",
+      disabled:
+        (disabled && state !== "undo") || state === "pending" || waiting > 0,
     }
   }
 
-  return { state, failed, fillRef, getTriggerProps }
+  return { state, failed, waiting, fillRef, getTriggerProps }
 }
 
 type ConfirmationAnnouncements = {
@@ -668,6 +763,8 @@ type ConfirmationAnnouncements = {
   fallback?: string
   undo?: string
   error?: string
+  wait?: string
+  slide?: string
 }
 
 interface ConfirmationLabelOptions {
@@ -680,9 +777,16 @@ interface ConfirmationLabelOptions {
   confirmLabel?: React.ReactNode
   undoLabel?: React.ReactNode
   errorLabel?: React.ReactNode
+  wait?: number
+  waiting?: number
+  waitLabel?: (seconds: number) => React.ReactNode
   announcements?: ConfirmationAnnouncements
   ariaLabel?: string
   describedBy?: string
+}
+
+function waitSeconds(wait: number) {
+  return Math.ceil(toMs(wait, 0, 0) / 1000)
 }
 
 function text(node: React.ReactNode, fallback: string) {
@@ -700,20 +804,32 @@ function useConfirmationLabels(options: ConfirmationLabelOptions) {
     confirmLabel,
     undoLabel = "Undo",
     errorLabel,
+    wait = 0,
+    waiting = 0,
+    waitLabel = (seconds: number) => `Wait ${seconds}s`,
     announcements,
     ariaLabel,
     describedBy,
   } = options
   const hintId = React.useId()
+  const waitTotal = waitSeconds(wait)
   const isHold = gesture === "hold"
+  const isSlide = gesture === "slide"
   const showError = failed && state === "idle" && errorLabel != null
   const shown =
-    state === "armed" || state === "undo" ? state : showError ? "error" : "idle"
+    state === "armed" || state === "undo"
+      ? state
+      : waiting > 0
+        ? "wait"
+        : showError
+          ? "error"
+          : "idle"
   const labels: { state: string; node: React.ReactNode }[] = [
     { state: "idle", node: label },
   ]
   if (
     gesture === "click-again" ||
+    isSlide ||
     (isHold && (confirmLabel != null || holdFallback !== "none"))
   ) {
     labels.push({
@@ -723,9 +839,14 @@ function useConfirmationLabels(options: ConfirmationLabelOptions) {
   }
   if (undo) labels.push({ state: "undo", node: undoLabel })
   if (errorLabel != null) labels.push({ state: "error", node: errorLabel })
+  if (waitTotal > 0) {
+    labels.push({ state: "wait", node: waitLabel(waiting || waitTotal) })
+  }
 
   let announcement = ""
-  if (state === "armed" && isHold) {
+  if (shown === "wait") {
+    announcement = announcements?.wait ?? `Available in ${waitTotal} seconds`
+  } else if (state === "armed" && isHold) {
     announcement = announcements?.fallback ?? "Activate again to confirm"
   } else if (state === "armed") {
     announcement =
@@ -747,9 +868,10 @@ function useConfirmationLabels(options: ConfirmationLabelOptions) {
         : ariaLabel && shown === "error"
           ? text(errorLabel, ariaLabel)
           : ariaLabel,
-    ariaDescribedBy: isHold
-      ? [hintId, describedBy].filter(Boolean).join(" ")
-      : describedBy,
+    ariaDescribedBy:
+      isHold || isSlide
+        ? [hintId, describedBy].filter(Boolean).join(" ")
+        : describedBy,
     hint: isHold
       ? {
           id: hintId,
@@ -759,7 +881,14 @@ function useConfirmationLabels(options: ConfirmationLabelOptions) {
               ? "Press and hold to confirm"
               : "Press and hold, or activate twice, to confirm"),
         }
-      : null,
+      : isSlide
+        ? {
+            id: hintId,
+            text:
+              announcements?.slide ??
+              "Slide to the end, or activate twice, to confirm",
+          }
+        : null,
     announcement,
   }
 }

@@ -22,7 +22,7 @@ function toMarkdown(body: string) {
       (_, args) => "```bash\nnpx shadcn@latest " + args + "\n```"
     )
     .replace(
-      /<Example name="([^"]+)" \/>/g,
+      /<Example name="([^"]+)"[^>]*\/>/g,
       (_, name) => "```tsx\n" + renderExample(loadExample(name)) + "\n```"
     )
     .replace(/\]\(\/docs(?:\/([a-z-]+))?(?:#[a-z-]+)?\)/g, (_, slug) => {

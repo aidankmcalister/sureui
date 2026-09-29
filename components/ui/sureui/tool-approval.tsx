@@ -6,6 +6,7 @@ import { RadioGroup } from "@base-ui/react/radio-group"
 
 import { cn } from "@/lib/utils"
 import { Button, buttonVariants } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { ConfirmButton } from "@/components/ui/sureui/confirm-button"
 import {
   isPromise,
@@ -50,6 +51,8 @@ interface ToolApprovalOptions
   deniedLabel?: React.ReactNode
   scopes?: ToolApprovalScope[]
   scopeLabels?: ToolApprovalScopeLabels
+  note?: boolean
+  noteLabel?: string
   className?: string
 }
 
@@ -87,7 +90,7 @@ type ApprovalActionsProps = Omit<
   scope?: ToolApprovalScope
   onScopeChange: (scope: ToolApprovalScope) => void
   disabled: boolean
-  onAnswer: (approved: boolean) => void | Promise<unknown>
+  onAnswer: (approved: boolean, reason?: string) => void | Promise<unknown>
 }
 
 const answered = new Set([
@@ -110,11 +113,16 @@ function isRequested(part: ToolApprovalPart) {
   return part.state === "approval-requested" && part.approval !== undefined
 }
 
-function withScope(
+function withChoices(
   response: ToolApprovalResponse,
-  scope: ToolApprovalScope | undefined
+  scope: ToolApprovalScope | undefined,
+  reason: string | undefined
 ) {
-  return scope ? { ...response, scope } : response
+  return {
+    ...response,
+    ...(reason && { reason }),
+    ...(scope && { scope }),
+  }
 }
 
 function Outcome({
@@ -134,10 +142,13 @@ function Outcome({
     <p
       data-slot={slot}
       data-state={approval.approved ? "approved" : "denied"}
-      className={cn("text-sm text-muted-foreground", className)}
+      className={cn(
+        "flex min-h-8 items-center text-sm text-muted-foreground",
+        className
+      )}
     >
       {approval.approved ? approvedLabel : deniedLabel}
-      {!approval.approved && approval.reason && `: ${approval.reason}`}
+      {approval.reason && `: ${approval.reason}`}
     </p>
   )
 }
@@ -158,11 +169,15 @@ function ApprovalActions({
   scopeLabels,
   scope,
   onScopeChange,
+  note,
+  noteLabel = "Add a note for the agent",
   disabled,
   onAnswer,
   className,
 }: ApprovalActionsProps) {
   const [undoing, setUndoing] = React.useState(false)
+  const [text, setText] = React.useState("")
+  const reason = text.trim() || undefined
   const labels = { ...defaultScopeLabels, ...scopeLabels }
 
   const scopeGroup =
@@ -190,10 +205,22 @@ function ApprovalActions({
       </RadioGroup>
     ) : null
 
+  const noteField = note ? (
+    <Input
+      data-slot="tool-approval-note"
+      aria-label={noteLabel}
+      placeholder={noteLabel}
+      value={text}
+      onChange={(event) => setText(event.target.value)}
+      disabled={undoing || disabled}
+      className="basis-full"
+    />
+  ) : null
+
   function deny() {
-    if (!onConfirmError) return onAnswer(false)
+    if (!onConfirmError) return onAnswer(false, reason)
     try {
-      const result = onAnswer(false)
+      const result = onAnswer(false, reason)
       if (isPromise(result)) result.then(undefined, onConfirmError)
     } catch (error) {
       onConfirmError(error)
@@ -219,10 +246,11 @@ function ApprovalActions({
           variant="destructive"
           confirmLabel={approveLabel}
           errorLabel={errorLabel}
-          onConfirm={() => onAnswer(true)}
+          onConfirm={() => onAnswer(true, reason)}
           onConfirmError={onConfirmError}
           renderActions={(approveButton) => (
             <div className="flex flex-wrap gap-2">
+              {noteField}
               {scopeGroup}
               {disabled
                 ? React.cloneElement(
@@ -244,12 +272,17 @@ function ApprovalActions({
       data-state="requested"
       className={cn("flex flex-wrap gap-2", className)}
     >
+      {noteField}
       {scopeGroup}
       <ConfirmButton
         gesture={
           risk === "low" ? "click" : risk === "medium" ? "click-again" : "hold"
         }
         variant={risk === "high" ? "destructive" : "default"}
+        confirmLabel={risk === "medium" ? "Confirm" : undefined}
+        announcements={
+          risk === "medium" ? { armed: "Click again to approve" } : undefined
+        }
         undo={risk === "low" ? undo : undefined}
         timeout={timeout}
         duration={duration}
@@ -264,7 +297,7 @@ function ApprovalActions({
         onCancel={() => setUndoing(false)}
         onConfirm={() => {
           setUndoing(false)
-          return onAnswer(true)
+          return onAnswer(true, reason)
         }}
         onConfirmError={onConfirmError}
       >
@@ -293,6 +326,8 @@ function ToolApproval(props: ToolApprovalProps) {
     armDelay,
     scopes,
     scopeLabels,
+    note,
+    noteLabel,
     className,
   } = props
   const [responding, setResponding] = React.useState(false)
@@ -318,7 +353,7 @@ function ToolApproval(props: ToolApprovalProps) {
 
   const id = approval.id
 
-  function respond(approved: boolean) {
+  function respond(approved: boolean, reason?: string) {
     if (respondedRef.current) return
     respondedRef.current = true
     setResponding(true)
@@ -327,7 +362,7 @@ function ToolApproval(props: ToolApprovalProps) {
       setResponding(false)
     }
     try {
-      const result = onRespond(withScope({ id, approved }, scope))
+      const result = onRespond(withChoices({ id, approved }, scope, reason))
       if (!result) return
       return Promise.resolve(result).then(undefined, (error: unknown) => {
         release()
@@ -356,6 +391,8 @@ function ToolApproval(props: ToolApprovalProps) {
       scopeLabels={scopeLabels}
       scope={scope}
       onScopeChange={setScope}
+      note={note}
+      noteLabel={noteLabel}
       disabled={responding}
       onAnswer={respond}
       className={className}
@@ -383,6 +420,8 @@ function ToolApprovalBatch<P extends ToolApprovalPart>(
     armDelay,
     scopes,
     scopeLabels,
+    note,
+    noteLabel,
     className,
   } = props
   const [sent, setSent] = React.useState<ReadonlySet<string>>(() => new Set())
@@ -432,13 +471,13 @@ function ToolApprovalBatch<P extends ToolApprovalPart>(
     })
   }
 
-  function respond(approved: boolean) {
+  function respond(approved: boolean, reason?: string) {
     if (ids.length === 0) return
     setSent((current) => new Set([...current, ...ids]))
     const results: PromiseLike<unknown>[] = []
     for (const [index, id] of ids.entries()) {
       try {
-        const result = onRespond(withScope({ id, approved }, scope))
+        const result = onRespond(withChoices({ id, approved }, scope, reason))
         if (!result) continue
         results.push(
           Promise.resolve(result).then(undefined, (error: unknown) => {
@@ -475,6 +514,8 @@ function ToolApprovalBatch<P extends ToolApprovalPart>(
       scopeLabels={scopeLabels}
       scope={scope}
       onScopeChange={setScope}
+      note={note}
+      noteLabel={noteLabel}
       disabled={ids.length === 0}
       onAnswer={respond}
       className={className}

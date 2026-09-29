@@ -45,6 +45,7 @@ interface ConfirmDialogOptions
   cancelLabel?: React.ReactNode
   confirmLabel?: React.ReactNode
   errorLabel?: React.ReactNode
+  waitLabel?: ConfirmButtonProps["waitLabel"]
   variant?: ConfirmButtonProps["variant"]
   initialFocus?: "cancel" | "confirm" | "none"
   alternative?: ConfirmDialogAlternative
@@ -57,6 +58,8 @@ interface ConfirmDialogOptions
     hold?: string
     armed?: string
     fallback?: string
+    slide?: string
+    wait?: string
     match?: string
     error?: string
   }

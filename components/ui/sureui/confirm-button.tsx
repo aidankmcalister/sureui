@@ -20,6 +20,7 @@ interface ConfirmButtonProps
   confirmLabel?: React.ReactNode
   undoLabel?: React.ReactNode
   errorLabel?: React.ReactNode
+  waitLabel?: (seconds: number) => React.ReactNode
   announcements?: ConfirmationAnnouncements
 }
 
@@ -36,17 +37,19 @@ function ConfirmButton(props: ConfirmButtonProps) {
     duration,
     holdFallback = "click-again",
     armDelay,
+    wait,
     disabled,
     confirmLabel,
     undoLabel,
     errorLabel,
+    waitLabel,
     announcements,
     className,
     children,
     "aria-describedby": describedBy,
     ...rest
   } = props
-  const { state, failed, fillRef, getTriggerProps } =
+  const { state, failed, waiting, fillRef, getTriggerProps } =
     useConfirmation<HTMLButtonElement>({
       onConfirm,
       onCancel,
@@ -59,6 +62,7 @@ function ConfirmButton(props: ConfirmButtonProps) {
       duration,
       holdFallback,
       armDelay,
+      wait,
       disabled,
     })
   const { shown, labels, ariaLabel, ariaDescribedBy, hint, announcement } =
@@ -72,6 +76,9 @@ function ConfirmButton(props: ConfirmButtonProps) {
       confirmLabel,
       undoLabel,
       errorLabel,
+      wait,
+      waiting,
+      waitLabel,
       announcements,
       ariaLabel: rest["aria-label"],
       describedBy,
@@ -87,7 +94,11 @@ function ConfirmButton(props: ConfirmButtonProps) {
         data-error={failed || undefined}
         className={cn(
           "relative overflow-hidden transition-[color,background-color,border-color,box-shadow] active:not-aria-[haspopup]:translate-y-0 aria-disabled:opacity-50 motion-safe:data-[state=pending]:animate-pulse motion-safe:aria-disabled:data-[state=pending]:opacity-100",
-          gesture === "hold" ? "touch-none" : "touch-manipulation",
+          gesture === "hold"
+            ? "touch-none"
+            : gesture === "slide"
+              ? "touch-pan-y"
+              : "touch-manipulation",
           className
         )}
         focusableWhenDisabled={

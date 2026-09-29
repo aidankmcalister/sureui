@@ -3,7 +3,13 @@ import { ExampleCode } from "@/components/site/docs/example-code"
 import { Preview } from "@/components/site/docs/preview"
 import { loadExample } from "@/lib/site/examples"
 
-export async function Example({ name }: { name: string }) {
+export async function Example({
+  name,
+  appear,
+}: {
+  name: string
+  appear?: string
+}) {
   const { default: Component } = await import(
     `@/components/site/docs/examples/${name}.tsx`
   )
@@ -13,6 +19,7 @@ export async function Example({ name }: { name: string }) {
     <Preview
       log={example.log}
       controls={example.controls}
+      appear={appear}
       code={
         <ExampleCode lines={highlight(example.template)} example={example} />
       }

@@ -50,7 +50,7 @@ function NumberControl({
         onBlur={() => setDraft(String(value))}
         className={`${box} field-sizing-content min-w-[5ch] text-right`}
       />
-      ms
+      {name !== "count" && "ms"}
     </label>
   )
 }

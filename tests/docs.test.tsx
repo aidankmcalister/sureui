@@ -18,6 +18,7 @@ import type {
   ToolApprovalProps,
 } from "@/components/ui/sureui/tool-approval"
 import type { TypeToConfirmProps } from "@/components/ui/sureui/type-to-confirm"
+import type { BulkConfirmProps } from "@/components/ui/sureui/bulk-confirm"
 import type { UndoToastOptions } from "@/components/ui/sureui/undo-toast"
 import type { UndoableProps } from "@/components/ui/sureui/undoable"
 import type { UnsavedChangesOptions } from "@/components/ui/sureui/unsaved-changes"
@@ -39,6 +40,8 @@ const confirmButton = {
   timeout: true,
   duration: true,
   armDelay: true,
+  wait: true,
+  waitLabel: true,
   onConfirmError: true,
   errorLabel: true,
   holdFallback: true,
@@ -93,6 +96,19 @@ const typeToConfirm = {
   className: true,
 } satisfies Record<keyof TypeToConfirmProps, true>
 
+const bulkConfirm = {
+  count: true,
+  label: true,
+  onConfirm: true,
+  onCancel: true,
+  onConfirmError: true,
+  thresholds: true,
+  errorLabel: true,
+  variant: true,
+  disabled: true,
+  className: true,
+} satisfies Record<keyof BulkConfirmProps, true>
+
 const confirmDialog = {
   onConfirm: true,
   onCancel: true,
@@ -115,6 +131,8 @@ const confirmDialog = {
   caseSensitive: true,
   trim: true,
   armDelay: true,
+  wait: true,
+  waitLabel: true,
   onConfirmError: true,
   errorLabel: true,
   announcements: true,
@@ -139,6 +157,8 @@ const confirmPopover = {
   align: true,
   open: true,
   armDelay: true,
+  wait: true,
+  waitLabel: true,
   onConfirmError: true,
   errorLabel: true,
   onOpenChange: true,
@@ -236,6 +256,8 @@ const toolApproval = {
   onConfirmError: true,
   scopes: true,
   scopeLabels: true,
+  note: true,
+  noteLabel: true,
   className: true,
 } satisfies Record<keyof ToolApprovalProps, true>
 
@@ -256,6 +278,8 @@ const toolApprovalBatch = {
   onConfirmError: true,
   scopes: true,
   scopeLabels: true,
+  note: true,
+  noteLabel: true,
   className: true,
 } satisfies Record<keyof ToolApprovalBatchProps, true>
 
@@ -281,6 +305,7 @@ const documented = {
   ConfirmMenuItem: confirmMenuItem,
   ConfirmSwitch: confirmSwitch,
   TypeToConfirm: typeToConfirm,
+  BulkConfirm: bulkConfirm,
   ConfirmDialog: confirmDialog,
   ConfirmPopover: confirmPopover,
   Consequences: consequences,

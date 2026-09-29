@@ -76,6 +76,12 @@ Keep `"cancel"` for anything that deletes data or can't be undone. The WAI-ARIA 
 
 <Example name="confirm-dialog/arm-delay" />
 
+### Wait
+
+`wait` keeps the confirm button disabled for that many milliseconds after the dialog opens, with a countdown on it, so people read the dialog before confirming. It starts again each time the dialog opens, and works as on [Confirm Button](/docs/confirm-button#wait). With a `phrase`, typing already slows people down, so `wait` doesn't apply.
+
+<Example name="confirm-dialog/wait" />
+
 ### Errors
 
 With `onConfirmError`, a failed `onConfirm` keeps the dialog open and the error goes to your handler. `errorLabel` replaces the confirm label until the next activation, which tries again.
@@ -115,8 +121,10 @@ For a way back after it closes, use [Undo Toast](/docs/undo-toast).
 | `variant` | [`Button`](https://ui.shadcn.com/docs/components/base/button) `variant` | `"default"` |
 | `initialFocus` | `"cancel" \| "confirm" \| "none"` | `"cancel"`, the first field with `phrase` |
 | `alternative` | `{ label: ReactNode, onSelect: () => void \| Promise<unknown> }` | — |
-| `gesture` | `"click" \| "click-again" \| "hold"` | `"click"` |
+| `gesture` | `"click" \| "click-again" \| "hold" \| "slide"` | `"click"` |
 | `armDelay` | `number` | `0` |
+| `wait` | `number` | `0` |
+| `waitLabel` | `(seconds: number) => ReactNode` | ``(s) => `Wait ${s}s` `` |
 | `timeout` | `number` | `3000` |
 | `duration` | `number` | `1200` |
 | `holdFallback` | `"click-again" \| "none"` | `"click-again"` |
@@ -125,7 +133,7 @@ For a way back after it closes, use [Undo Toast](/docs/undo-toast).
 | `trim` | `boolean` | `false` |
 | `acknowledgements` | `string[]` | — |
 | `choices` | `{ name: string, label: ReactNode, defaultChecked?: boolean }[]` | — |
-| `announcements` | `{ armed?, hold?, fallback?, match?, error? }` | — |
+| `announcements` | `{ armed?, hold?, slide?, fallback?, wait?, match?, error? }` | — |
 
 ### useConfirm()
 

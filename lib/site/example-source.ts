@@ -26,6 +26,7 @@ function stripDocsHooks(file: string) {
     )
     .replace(/^ *const \{[^}]*\} = useActions\((?:[^()]|\([^()]*\))*\)\n/m, "")
     .replace(/^ *const control = useControl\(\)\n/m, "")
+    .replace(/^ *useAutoReset\(.*\)\n/m, "")
     .replace(/\{\n\n+/g, "{\n")
     .trim()
 }
@@ -47,10 +48,12 @@ export function parseExample(file: string): ExampleSource {
     .join("\n")
 
   return {
-    controls: [...file.matchAll(call)].map(([, name, value]) => ({
-      name,
-      value: parseValue(value),
-    })),
+    controls: [...file.matchAll(call)]
+      .filter(
+        ([, name], index, all) =>
+          all.findIndex(([, other]) => other === name) === index
+      )
+      .map(([, name, value]) => ({ name, value: parseValue(value) })),
     log: file.includes("useActions("),
     template,
     conditions,

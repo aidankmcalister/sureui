@@ -2,6 +2,8 @@
 
 import * as React from "react"
 
+import { Button } from "@/components/ui/button"
+
 import {
   SiteTab,
   SiteTabPanel,
@@ -17,6 +19,7 @@ import {
 import { defaultValues, type Control } from "@/lib/site/example-source"
 
 export { useControl } from "@/components/site/docs/controls"
+export { useAutoReset } from "@/components/site/ui/reset"
 
 type Log = (message: string) => void
 
@@ -86,6 +89,22 @@ export function useActions(options: Record<string, ActionOptions> = {}) {
   )
 }
 
+function Appear({
+  label,
+  children,
+}: {
+  label?: string
+  children: React.ReactNode
+}) {
+  const [shown, setShown] = React.useState(!label)
+  if (shown) return children
+  return (
+    <Button variant="outline" onClick={() => setShown(true)}>
+      {label}
+    </Button>
+  )
+}
+
 function Stage({ children }: { children: React.ReactNode }) {
   const ref = React.useRef<HTMLDivElement>(null)
 
@@ -104,11 +123,13 @@ function Stage({ children }: { children: React.ReactNode }) {
 export function Preview({
   code,
   controls = [],
+  appear,
   log,
   children,
 }: {
   code: React.ReactNode
   controls?: Control[]
+  appear?: string
   log: boolean
   children: React.ReactNode
 }) {
@@ -153,7 +174,9 @@ export function Preview({
                     key={JSON.stringify(values)}
                     className="flex min-h-48 items-center justify-center p-6"
                   >
-                    <Stage>{children}</Stage>
+                    <Stage>
+                      <Appear label={appear}>{children}</Appear>
+                    </Stage>
                   </div>
                 </ResetContent>
               </LogContext>

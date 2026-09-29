@@ -55,6 +55,12 @@ Add a `title` to show a heading above the description.
 
 <Example name="confirm-popover/arm-delay" />
 
+### Wait
+
+`wait` keeps the confirm button disabled for that many milliseconds after the popover opens, with a countdown on it. It works as on [Confirm Button](/docs/confirm-button#wait).
+
+<Example name="confirm-popover/wait" />
+
 ### Errors
 
 With `onConfirmError`, a failed `onConfirm` keeps the popover open and the error goes to your handler. `errorLabel` replaces the confirm label until the next activation, which tries again.
@@ -90,12 +96,14 @@ It has no `undo`, since it closes when the action commits. Use [Undo Toast](/doc
 | `align` | `"start" \| "center" \| "end"` | `"center"` |
 | `open` | `boolean` | — |
 | `onOpenChange` | `(open: boolean) => void` | — |
-| `gesture` | `"click" \| "click-again" \| "hold"` | `"click"` |
+| `gesture` | `"click" \| "click-again" \| "hold" \| "slide"` | `"click"` |
 | `armDelay` | `number` | `0` |
+| `wait` | `number` | `0` |
+| `waitLabel` | `(seconds: number) => ReactNode` | ``(s) => `Wait ${s}s` `` |
 | `timeout` | `number` | `3000` |
 | `duration` | `number` | `1200` |
 | `holdFallback` | `"click-again" \| "none"` | `"click-again"` |
-| `announcements` | `{ armed?, hold?, fallback?, error? }` | — |
+| `announcements` | `{ armed?, hold?, slide?, fallback?, wait?, error? }` | — |
 
 ## Accessibility
 

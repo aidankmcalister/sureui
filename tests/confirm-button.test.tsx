@@ -1,3 +1,4 @@
+import * as React from "react"
 import { act, fireEvent, render, screen } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -1332,5 +1333,136 @@ describe("ConfirmButton armDelay", () => {
     await act(async () => vi.advanceTimersByTime(300))
     fireEvent.pointerDown(button, { button: 0 })
     expect(button.getAttribute("data-state")).toBe("holding")
+  })
+})
+
+describe("ConfirmButton wait", () => {
+  it("counts down on the button and ignores clicks until it's done", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmButton wait={3000} onConfirm={onConfirm}>
+        Delete
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button") as HTMLButtonElement
+    expect(button.disabled).toBe(true)
+    expect(screen.getByText("Wait 3s")).toBeTruthy()
+    expect(screen.getByText("Available in 3 seconds")).toBeTruthy()
+    await click(button)
+    expect(onConfirm).not.toHaveBeenCalled()
+    await act(async () => vi.advanceTimersByTime(1000))
+    expect(screen.getByText("Wait 2s")).toBeTruthy()
+    expect(screen.getByText("Available in 3 seconds")).toBeTruthy()
+    await act(async () => vi.advanceTimersByTime(1000))
+    await act(async () => vi.advanceTimersByTime(1000))
+    expect(button.disabled).toBe(false)
+    expect(screen.queryByText("Available in 3 seconds")).toBeNull()
+    await click(button)
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("takes a custom label and announcement", () => {
+    render(
+      <ConfirmButton
+        wait={2000}
+        waitLabel={(seconds) => `Delete in ${seconds}`}
+        announcements={{ wait: "Delete unlocks soon" }}
+        onConfirm={vi.fn()}
+      >
+        Delete
+      </ConfirmButton>
+    )
+    expect(screen.getByText("Delete in 2")).toBeTruthy()
+    expect(screen.getByText("Delete unlocks soon")).toBeTruthy()
+  })
+})
+
+describe("ConfirmButton slide", () => {
+  function setup(
+    props: Partial<React.ComponentProps<typeof ConfirmButton>> = {}
+  ) {
+    const onConfirm = vi.fn()
+    const onCancel = vi.fn()
+    render(
+      <ConfirmButton
+        gesture="slide"
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+        {...props}
+      >
+        Slide to delete
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    vi.spyOn(button, "getBoundingClientRect").mockReturnValue({
+      width: 200,
+    } as DOMRect)
+    return { button, onConfirm, onCancel }
+  }
+
+  function drag(button: HTMLElement, to: number) {
+    fireEvent.pointerDown(button, { button: 0, pointerId: 1, clientX: 0 })
+    fireEvent.pointerMove(button, { pointerId: 1, clientX: to })
+  }
+
+  it("confirms when dragged to the end and let go", () => {
+    const { button, onConfirm } = setup()
+    drag(button, 200)
+    expect(button.getAttribute("data-state")).toBe("holding")
+    expect(onConfirm).not.toHaveBeenCalled()
+    fireEvent.pointerUp(button, { pointerId: 1, clientX: 200 })
+    fireEvent.click(button)
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("letting go early cancels", () => {
+    const { button, onConfirm, onCancel } = setup()
+    drag(button, 80)
+    fireEvent.pointerUp(button, { pointerId: 1, clientX: 80 })
+    fireEvent.click(button)
+    expect(onConfirm).not.toHaveBeenCalled()
+    expect(onCancel).toHaveBeenCalledOnce()
+    expect(button.getAttribute("data-state")).toBe("idle")
+  })
+
+  it("cancels when the browser takes the pointer to scroll", () => {
+    const { button, onConfirm, onCancel } = setup()
+    drag(button, 120)
+    fireEvent.pointerCancel(button, { pointerId: 1 })
+    expect(onConfirm).not.toHaveBeenCalled()
+    expect(onCancel).toHaveBeenCalledOnce()
+  })
+
+  it("ignores a plain mouse click", () => {
+    const { button, onConfirm } = setup()
+    fireEvent.pointerDown(button, { button: 0, pointerId: 1, clientX: 10 })
+    fireEvent.pointerUp(button, { pointerId: 1, clientX: 10 })
+    fireEvent.click(button)
+    fireEvent.pointerDown(button, { button: 0, pointerId: 1, clientX: 10 })
+    fireEvent.pointerUp(button, { pointerId: 1, clientX: 10 })
+    fireEvent.click(button)
+    expect(button.getAttribute("data-state")).toBe("idle")
+    expect(onConfirm).not.toHaveBeenCalled()
+  })
+
+  it("confirms with two activations from the keyboard", async () => {
+    const { button, onConfirm } = setup()
+    await click(button)
+    expect(button.getAttribute("data-state")).toBe("armed")
+    expect(document.querySelector("[aria-live=polite]")?.textContent).toBe(
+      "Click again to confirm"
+    )
+    await click(button)
+    expect(onConfirm).toHaveBeenCalledOnce()
+  })
+
+  it("describes the gesture to screen readers", () => {
+    const { button } = setup()
+    const hint = document.getElementById(
+      button.getAttribute("aria-describedby")!
+    )
+    expect(hint?.textContent).toBe(
+      "Slide to the end, or activate twice, to confirm"
+    )
   })
 })

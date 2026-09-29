@@ -303,6 +303,103 @@ describe("ToolApproval scopes", () => {
   })
 })
 
+describe("ToolApproval note", () => {
+  it("shows no note field by default", () => {
+    render(<ToolApproval part={requested} onRespond={vi.fn()} />)
+    expect(screen.queryByRole("textbox")).toBeNull()
+  })
+
+  it("sends the note as the reason with an approval", async () => {
+    const onRespond = vi.fn()
+    render(<ToolApproval part={requested} note onRespond={onRespond} />)
+    await act(async () =>
+      fireEvent.change(
+        screen.getByRole("textbox", { name: "Add a note for the agent" }),
+        { target: { value: "  Only the staging table  " } }
+      )
+    )
+    const approve = screen.getByRole("button", { name: "Approve" })
+    await click(approve)
+    await click(approve)
+    expect(onRespond).toHaveBeenCalledWith({
+      id: "approval_1",
+      approved: true,
+      reason: "Only the staging table",
+    })
+  })
+
+  it("sends the note with a denial, and leaves out an empty one", async () => {
+    const onRespond = vi.fn()
+    const { unmount } = render(
+      <ToolApproval
+        part={requested}
+        note
+        noteLabel="Why?"
+        onRespond={onRespond}
+      />
+    )
+    await click(screen.getByRole("button", { name: "Deny" }))
+    expect(onRespond).toHaveBeenLastCalledWith({
+      id: "approval_1",
+      approved: false,
+    })
+    unmount()
+    render(<ToolApproval part={requested} note onRespond={onRespond} />)
+    await act(async () =>
+      fireEvent.change(screen.getByRole("textbox"), {
+        target: { value: "Use the archive tool" },
+      })
+    )
+    await click(screen.getByRole("button", { name: "Deny" }))
+    expect(onRespond).toHaveBeenLastCalledWith({
+      id: "approval_1",
+      approved: false,
+      reason: "Use the archive tool",
+    })
+  })
+
+  it("shows the note in the outcome for an approval too", () => {
+    render(
+      <ToolApproval
+        part={{
+          state: "approval-responded",
+          approval: {
+            id: "approval_1",
+            approved: true,
+            reason: "Only staging",
+          },
+        }}
+        onRespond={vi.fn()}
+      />
+    )
+    expect(screen.getByText("Approved: Only staging")).toBeTruthy()
+  })
+
+  it("sends one note with every call in a batch", async () => {
+    const onRespond = vi.fn()
+    render(
+      <ToolApprovalBatch
+        parts={[
+          { state: "approval-requested", approval: { id: "a" } },
+          { state: "approval-requested", approval: { id: "b" } },
+        ]}
+        note
+        onRespond={onRespond}
+      />
+    )
+    await act(async () =>
+      fireEvent.change(screen.getByRole("textbox"), {
+        target: { value: "Not these" },
+      })
+    )
+    await click(screen.getByRole("button", { name: "Deny all" }))
+    expect(onRespond.mock.calls).toEqual([
+      [{ id: "a", approved: false, reason: "Not these" }],
+      [{ id: "b", approved: false, reason: "Not these" }],
+    ])
+  })
+})
+
 function call(id: string, risk: "low" | "medium" | "high" | "critical") {
   return { state: "approval-requested", approval: { id }, risk }
 }

@@ -32,6 +32,7 @@ interface ConfirmPopoverProps
   title?: React.ReactNode
   confirmLabel?: React.ReactNode
   errorLabel?: React.ReactNode
+  waitLabel?: ConfirmButtonProps["waitLabel"]
   cancelLabel?: React.ReactNode
   initialFocus?: "confirm" | "cancel" | "none"
   variant?: ConfirmButtonProps["variant"]
@@ -43,6 +44,8 @@ interface ConfirmPopoverProps
     hold?: string
     armed?: string
     fallback?: string
+    slide?: string
+    wait?: string
     error?: string
   }
 }

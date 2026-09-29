@@ -19,7 +19,8 @@ interface ConfirmMenuItemProps
   extends
     Omit<React.ComponentProps<typeof DropdownMenuItem>, "closeOnClick">,
     ConfirmationOptions,
-    GestureOptions {
+    Omit<GestureOptions, "wait" | "gesture"> {
+  gesture?: "click" | "click-again" | "hold"
   menu?: "dropdown" | "context"
   confirmLabel?: React.ReactNode
   undoLabel?: React.ReactNode

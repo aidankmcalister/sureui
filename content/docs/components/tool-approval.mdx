@@ -114,6 +114,12 @@ Pass `scopes` to let people choose how long an answer holds: once, this session 
 
 <Example name="tool-approval/scopes" />
 
+### Note
+
+Pass `note` to add a field above Approve and Deny. Whatever people type goes out as `reason` with either answer. `addToolApprovalResponse` passes it to the model, so the agent can read "only the staging table" or "use the archive tool instead". The outcome shows the note after the answer.
+
+<Example name="tool-approval/note" />
+
 ## API reference
 
 ### ToolApproval
@@ -138,6 +144,8 @@ Pass `scopes` to let people choose how long an answer holds: once, this session 
 | `armDelay` | `number` | `0` |
 | `scopes` | `("once" \| "session" \| "always")[]` | — |
 | `scopeLabels` | `{ group?, once?, session?, always? }` | `{ group: "Remember", once: "Once", session: "This session", always: "Always" }` |
+| `note` | `boolean` | `false` |
+| `noteLabel` | `string` | `"Add a note for the agent"` |
 | `className` | `string` | — |
 
 `undo` applies to `"low"`, `timeout` to `"medium"` and `duration` to `"high"`. `scope` is only sent when `scopes` is set.
@@ -164,13 +172,15 @@ Takes the same props as `ToolApproval`, with `parts` in place of `part`.
 | `armDelay` | `number` | `0` |
 | `scopes` | `("once" \| "session" \| "always")[]` | — |
 | `scopeLabels` | `{ group?, once?, session?, always? }` | `{ group: "Remember", once: "Once", session: "This session", always: "Always" }` |
+| `note` | `boolean` | `false` |
+| `noteLabel` | `string` | `"Add a note for the agent"` |
 | `className` | `string` | — |
 
 `phrase` applies when the riskiest call is `"critical"`. The outcome shows once every part is answered the same way. When the pending calls change, a gesture in progress starts over.
 
 ### Data attributes
 
-The root sets `data-slot="tool-approval"` (or `"tool-approval-batch"`) and `data-state`. The scope choice sets `data-slot="tool-approval-scope"`.
+The root sets `data-slot="tool-approval"` (or `"tool-approval-batch"`) and `data-state`. The scope choice sets `data-slot="tool-approval-scope"`, and the note field sets `data-slot="tool-approval-note"`.
 
 | Value | When |
 | --- | --- |
@@ -183,6 +193,7 @@ The root sets `data-slot="tool-approval"` (or `"tool-approval-batch"`) and `data
 - Approve uses the same announcements as [Confirm Button](/docs/confirm-button#accessibility) and [Type to Confirm](/docs/type-to-confirm#accessibility), including the second-click fallback for a hold.
 - Only one response is ever sent per call. Deny is disabled during a low-risk undo window and while a response is pending, and both buttons come back if the response fails. In a batch, only the calls whose response failed come back.
 - The scope choice is a radio group named by `scopeLabels.group`, so arrow keys move between options.
+- The note field is named by `noteLabel`, and it is disabled with the buttons while a response is pending.
 
 ### WCAG
 

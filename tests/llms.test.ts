@@ -22,6 +22,7 @@ describe("llms.txt", () => {
       expect(markdown).not.toContain("<Example")
       expect(markdown).not.toContain("<Install")
       expect(markdown).not.toContain("useActions")
+      expect(markdown).not.toContain("useAutoReset")
       expect(markdown).not.toContain("](/docs")
     }
   })

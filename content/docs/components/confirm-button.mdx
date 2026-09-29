@@ -14,7 +14,7 @@ description: A button that runs its action on a click, a second click or a press
 ```tsx
 import { ConfirmButton } from "@/components/ui/sureui/confirm-button"
 
-<ConfirmButton gesture="click-again" onConfirm={deleteProject}>
+;<ConfirmButton gesture="click-again" onConfirm={deleteProject}>
   Delete project
 </ConfirmButton>
 ```
@@ -49,6 +49,12 @@ Press and hold until the fill completes, and it confirms. Letting go early cance
 
 Moving off the button or losing focus also cancels.
 
+### Slide
+
+`gesture="slide"` confirms when people drag across the button and let go at the end. Letting go early slides it back and cancels, and scrolling the page up or down still works. Keyboard and screen reader users confirm with two activations, like click again.
+
+<Example name="confirm-button/slide" />
+
 ### Pending
 
 Return a promise from `onConfirm` and the button pulses until it settles. If it rejects, the button goes back to idle.
@@ -65,9 +71,15 @@ The error label is announced in the polite live region. Change the text with `an
 
 ### Arm delay
 
-`armDelay` ignores activation for that many milliseconds after the button mounts or arms, so the second click of a double click can't pass through. It helps most inside a dialog or popover, where the button appears under the pointer.
+`armDelay` ignores activation for that many milliseconds after the button mounts or arms, so the second click of a double click can't pass through. It helps most inside a dialog or popover, where the button appears under the pointer. Double-click Show below: the second click lands on the new button and does nothing.
 
-<Example name="confirm-button/arm-delay" />
+<Example name="confirm-button/arm-delay" appear="Show" />
+
+### Wait
+
+`wait` keeps the button disabled for that many milliseconds after it appears, counting down on the button ("Wait 3s"), so people read before they confirm. Screen readers hear "Available in 3 seconds" once. Change the text with `waitLabel` and `announcements.wait`.
+
+<Example name="confirm-button/wait" appear="Show" />
 
 ### Labels
 
@@ -81,36 +93,38 @@ The error label is announced in the polite live region. Change the text with `an
 
 Extends the shadcn [`Button`](https://ui.shadcn.com/docs/components/base/button). The table lists the props it adds.
 
-| Prop | Type | Default |
-| --- | --- | --- |
-| `...buttonProps` | [`Button`](https://ui.shadcn.com/docs/components/base/button) props | — |
-| `onConfirm` | `() => void \| Promise<unknown>` | required |
-| `onCancel` | `() => void` | — |
-| `onConfirmError` | `(error: unknown) => void` | — |
-| `gesture` | `"click" \| "click-again" \| "hold"` | `"click"` |
-| `undo` | `boolean \| number \| "manual"` | — |
-| `pauseUndoOnHover` | `boolean` | `true` |
-| `pauseUndoOnFocus` | `boolean` | `true` |
-| `confirmLabel` | `ReactNode` | `"Click again to confirm"`, or `"Confirm"` for a hold |
-| `undoLabel` | `ReactNode` | `"Undo"` |
-| `errorLabel` | `ReactNode` | — |
-| `armDelay` | `number` | `0` |
-| `timeout` | `number` | `3000` |
-| `duration` | `number` | `1200` |
-| `holdFallback` | `"click-again" \| "none"` | `"click-again"` |
-| `announcements` | `{ armed?, hold?, fallback?, undo?, error? }` | — |
+| Prop               | Type                                                                | Default                                               |
+| ------------------ | ------------------------------------------------------------------- | ----------------------------------------------------- |
+| `...buttonProps`   | [`Button`](https://ui.shadcn.com/docs/components/base/button) props | —                                                     |
+| `onConfirm`        | `() => void \| Promise<unknown>`                                    | required                                              |
+| `onCancel`         | `() => void`                                                        | —                                                     |
+| `onConfirmError`   | `(error: unknown) => void`                                          | —                                                     |
+| `gesture`          | `"click" \| "click-again" \| "hold" \| "slide"`                     | `"click"`                                             |
+| `undo`             | `boolean \| number \| "manual"`                                     | —                                                     |
+| `pauseUndoOnHover` | `boolean`                                                           | `true`                                                |
+| `pauseUndoOnFocus` | `boolean`                                                           | `true`                                                |
+| `confirmLabel`     | `ReactNode`                                                         | `"Click again to confirm"`, or `"Confirm"` for a hold |
+| `undoLabel`        | `ReactNode`                                                         | `"Undo"`                                              |
+| `errorLabel`       | `ReactNode`                                                         | —                                                     |
+| `armDelay`         | `number`                                                            | `0`                                                   |
+| `wait`             | `number`                                                            | `0`                                                   |
+| `waitLabel`        | `(seconds: number) => ReactNode`                                    | ``(s) => `Wait ${s}s` ``                              |
+| `timeout`          | `number`                                                            | `3000`                                                |
+| `duration`         | `number`                                                            | `1200`                                                |
+| `holdFallback`     | `"click-again" \| "none"`                                           | `"click-again"`                                       |
+| `announcements`    | `{ armed?, hold?, slide?, fallback?, wait?, undo?, error? }`        | —                                                     |
 
 ### Data attributes
 
 The button sets `data-state`, so you can style around it. After `onConfirm` fails, it also sets `data-error` until the next activation.
 
-| Value | When |
-| --- | --- |
-| `idle` | Waiting for input. |
-| `armed` | Clicked once with `click-again`, or a hold that fell back to a second activation. |
-| `holding` | Being held with `gesture="hold"`. |
-| `undo` | The undo window is open. |
-| `pending` | `onConfirm` returned a promise that hasn't settled. |
+| Value     | When                                                                              |
+| --------- | --------------------------------------------------------------------------------- |
+| `idle`    | Waiting for input.                                                                |
+| `armed`   | Clicked once with `click-again`, or a hold that fell back to a second activation. |
+| `holding` | Being held with `gesture="hold"`.                                                 |
+| `undo`    | The undo window is open.                                                          |
+| `pending` | `onConfirm` returned a promise that hasn't settled.                               |
 
 ## Accessibility
 

@@ -113,6 +113,44 @@
       ]
     },
     {
+      "name": "bulk-confirm",
+      "type": "registry:ui",
+      "title": "Bulk Confirm",
+      "description": "A confirm for acting on many items at once that gets harder as the count grows: undo for a few, a second click for dozens, and typing the count for hundreds.",
+      "registryDependencies": [
+        "button",
+        "checkbox",
+        "input",
+        "label"
+      ],
+      "files": [
+        {
+          "path": "components/ui/sureui/confirmation.ts",
+          "type": "registry:lib",
+          "target": "@ui/sureui/confirmation.ts"
+        },
+        {
+          "path": "components/ui/sureui/confirm-button.tsx",
+          "type": "registry:ui",
+          "target": "@ui/sureui/confirm-button.tsx"
+        },
+        {
+          "path": "components/ui/sureui/type-to-confirm.tsx",
+          "type": "registry:ui",
+          "target": "@ui/sureui/type-to-confirm.tsx"
+        },
+        {
+          "path": "components/ui/sureui/bulk-confirm.tsx",
+          "type": "registry:ui",
+          "target": "@ui/sureui/bulk-confirm.tsx"
+        }
+      ],
+      "categories": [
+        "confirmation",
+        "bulk"
+      ]
+    },
+    {
       "name": "confirm-dialog",
       "type": "registry:ui",
       "title": "Confirm Dialog",
