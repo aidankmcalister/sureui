@@ -26,7 +26,7 @@ function SiteDrawerContent({
       <DialogPrimitive.Backdrop className="fixed inset-0 z-50 bg-black/40 transition-opacity duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0" />
       <DialogPrimitive.Popup
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-col border-r border-(--rule) bg-(--paper) text-(--ink) transition-[translate,opacity] duration-200 ease-out outline-none data-ending-style:-translate-x-6 data-ending-style:opacity-0 data-starting-style:-translate-x-6 data-starting-style:opacity-0",
+          "fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-col border-r border-(--rule) bg-(--paper) text-(--ink) transition-[translate,opacity] duration-200 ease-out outline-none data-ending-style:-translate-x-6 data-ending-style:opacity-0 data-starting-style:-translate-x-6 data-starting-style:opacity-0 motion-reduce:data-ending-style:translate-x-0 motion-reduce:data-starting-style:translate-x-0",
           className
         )}
         {...props}

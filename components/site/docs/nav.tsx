@@ -35,14 +35,6 @@ export function DocsNav({
                     "border-(--rule) bg-(--well) font-medium text-(--ink)"
                 )}
               >
-                <span
-                  className={cn(
-                    "font-mono text-[11px] text-(--ink-label)",
-                    current && "text-(--mark-text)"
-                  )}
-                >
-                  {page.sheet}
-                </span>
                 {page.title}
               </Link>
             )
@@ -107,9 +99,7 @@ function PagerLink({
         className
       )}
     >
-      <Label>
-        {label} · <span className="text-(--mark-text)">{page.sheet}</span>
-      </Label>
+      <Label>{label}</Label>
       <span className="font-display text-lg font-bold tracking-tight">
         {page.title}
       </span>

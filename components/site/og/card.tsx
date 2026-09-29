@@ -14,7 +14,10 @@ const display = await readFile(
   join(process.cwd(), "app/fonts/space-grotesk-latin-700-normal.woff")
 )
 const sans = await readFile(
-  join(process.cwd(), "app/fonts/atkinson-hyperlegible-next-latin-400-normal.woff")
+  join(
+    process.cwd(),
+    "app/fonts/atkinson-hyperlegible-next-latin-400-normal.woff"
+  )
 )
 
 function Rule({ x, y }: { x?: number; y?: number }) {
@@ -127,7 +130,12 @@ export function card({
       ...ogSize,
       fonts: [
         { name: "Space Grotesk", data: display, weight: 700, style: "normal" },
-        { name: "Atkinson Hyperlegible Next", data: sans, weight: 400, style: "normal" },
+        {
+          name: "Atkinson Hyperlegible Next",
+          data: sans,
+          weight: 400,
+          style: "normal",
+        },
       ],
     }
   )

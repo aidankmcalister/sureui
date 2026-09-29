@@ -1,7 +1,6 @@
 import Link from "next/link"
 
 import { cn } from "@/lib/utils"
-import { figureNumber } from "@/lib/site/docs"
 import { aboveMark, Label, tapTarget } from "@/components/site/layout/frame"
 import {
   ResetContent,
@@ -10,7 +9,6 @@ import {
 } from "@/components/site/ui/reset"
 
 export function Cell({
-  figure,
   gesture,
   href,
   title,
@@ -19,7 +17,6 @@ export function Cell({
   className,
   children,
 }: {
-  figure: number
   gesture: string
   href: string
   title: string
@@ -39,29 +36,30 @@ export function Cell({
         )}
       >
         <div className="grid gap-1 pb-5">
-          <div className="mb-2 flex items-center justify-between gap-2">
-            <Label>
-              Fig. {figureNumber(figure - 1)} ·{" "}
-              <Link
-                href={href}
-                className={cn(
-                  tapTarget,
-                  "underline-offset-4 hover:text-(--ink) hover:underline"
-                )}
-              >
-                {gesture}
-              </Link>
-            </Label>
-            <ResetTrigger className="-my-2 -mr-2" />
+          <div className="flex items-start justify-between gap-3">
+            <h3
+              className={cn(
+                "font-display font-bold tracking-tight text-(--ink)",
+                featured ? "text-2xl leading-8" : "text-lg leading-7"
+              )}
+            >
+              {title}
+            </h3>
+            <div className="flex shrink-0 items-center gap-3">
+              <Label>
+                <Link
+                  href={href}
+                  className={cn(
+                    tapTarget,
+                    "underline-offset-4 hover:text-(--ink) hover:underline"
+                  )}
+                >
+                  {gesture}
+                </Link>
+              </Label>
+              <ResetTrigger className="-my-2 -mr-2" />
+            </div>
           </div>
-          <h3
-            className={cn(
-              "font-display font-bold tracking-tight text-(--ink)",
-              featured ? "text-2xl leading-8" : "text-lg leading-7"
-            )}
-          >
-            {title}
-          </h3>
           <p className="text-sm leading-5 text-pretty text-(--ink-muted)">
             {description}
           </p>

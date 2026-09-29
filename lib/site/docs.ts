@@ -13,7 +13,6 @@ export type Page = {
   description: string
   group: string
   section: string
-  sheet: string
 }
 
 export type Section = { folder: string; title: string; pages: Page[] }
@@ -42,10 +41,6 @@ function parse(source: string) {
   return { meta, body: body.trim() }
 }
 
-export function figureNumber(index: number) {
-  return String(index + 1).padStart(2, "0")
-}
-
 const sources = new Map<
   string,
   { file: string; source: string; body: string }
@@ -58,7 +53,7 @@ export const sections: Section[] = readJson<{ sections: string[] }>(
   return {
     folder,
     title,
-    pages: pages.map((slug, index) => {
+    pages: pages.map((slug) => {
       const file = path.join(contentDir, folder, `${slug}.mdx`)
       const source = fs.readFileSync(file, "utf8")
       const { meta, body } = parse(source)
@@ -70,7 +65,6 @@ export const sections: Section[] = readJson<{ sections: string[] }>(
         description: meta.description,
         group: title,
         section: folder,
-        sheet: figureNumber(index),
       }
     }),
   }

@@ -9,11 +9,9 @@ import { InlineCode } from "@/components/site/docs/sections"
 import {
   aboveMark,
   Band,
-  Label,
   PageLead,
   PageTitle,
 } from "@/components/site/layout/frame"
-import { figureNumber } from "@/lib/site/docs"
 import { blocks, type Block } from "@/lib/site/registry"
 
 export const metadata: Metadata = {
@@ -24,17 +22,13 @@ export const metadata: Metadata = {
 const blocksLead =
   "Full screens built from SureUI components. The shadcn CLI installs each one into your `components/` folder as app code you edit, along with the SureUI components it uses."
 
-function BlockSection({ block, index }: { block: Block; index: number }) {
+function BlockSection({ block }: { block: Block }) {
   return (
     <section
       id={block.name}
       className="grid scroll-mt-4 grid-cols-1 gap-6 px-3 py-12 sm:px-6 lg:py-16"
     >
       <div className="grid max-w-160 gap-3">
-        <Label className="text-(--mark-text)">
-          Block {figureNumber(index)}{" "}
-          <span className="text-(--ink-label)">· {block.name}</span>
-        </Label>
         <h2
           id={`${block.name}-title`}
           className="font-display text-3xl leading-9 font-bold tracking-[-0.04em] text-balance sm:text-[40px] sm:leading-11"
@@ -85,9 +79,9 @@ export default function Blocks() {
           <InlineCode>{blocksLead}</InlineCode>
         </PageLead>
       </Band>
-      {blocks.map((block, index) => (
+      {blocks.map((block) => (
         <Band key={block.name} className={aboveMark}>
-          <BlockSection block={block} index={index} />
+          <BlockSection block={block} />
         </Band>
       ))}
     </main>

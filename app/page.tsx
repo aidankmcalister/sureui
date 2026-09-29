@@ -64,7 +64,6 @@ export default function Home() {
         <div className={grid}>
           <Cell
             featured
-            figure={1}
             gesture="Mixed"
             href="/docs"
             title="Database settings"
@@ -73,7 +72,6 @@ export default function Home() {
             <Database />
           </Cell>
           <Cell
-            figure={2}
             gesture="Hold"
             href="/docs/confirm-button#hold"
             title="Sign out other devices"
@@ -82,7 +80,6 @@ export default function Home() {
             <Sessions />
           </Cell>
           <Cell
-            figure={3}
             gesture="Type to confirm"
             href="/docs/type-to-confirm"
             title="Delete a repository"
@@ -91,7 +88,6 @@ export default function Home() {
             <ConfirmByName />
           </Cell>
           <Cell
-            figure={4}
             gesture="Dialog"
             href="/docs/confirm-dialog"
             title="Leave a workspace"
@@ -100,7 +96,6 @@ export default function Home() {
             <Workspace />
           </Cell>
           <Cell
-            figure={5}
             gesture="Tool approval"
             href="/docs/tool-approval"
             title="Approve an AI action"
@@ -113,7 +108,6 @@ export default function Home() {
       <Band>
         <div className={grid}>
           <Cell
-            figure={6}
             gesture="Undo"
             href="/docs/confirm-button#undo"
             title="Clear notifications"
@@ -123,7 +117,6 @@ export default function Home() {
             <Notifications />
           </Cell>
           <Cell
-            figure={7}
             gesture="Menu item"
             href="/docs/confirm-menu-item"
             title="Delete a variable"
@@ -132,7 +125,6 @@ export default function Home() {
             <Variables />
           </Cell>
           <Cell
-            figure={8}
             gesture="Undoable"
             href="/docs/undoable"
             title="Remove a webhook"
