@@ -9,7 +9,6 @@ import {
   SiteTabsList,
 } from "@/components/site/ui/tabs"
 import { ControlScope, ExampleControls } from "@/components/site/docs/controls"
-import { Label } from "@/components/site/layout/frame"
 import {
   ResetContent,
   ResetScope,
@@ -45,13 +44,11 @@ function Stage({ children }: { children: React.ReactNode }) {
 }
 
 export function Preview({
-  figure,
   code,
   controls = [],
   log,
   children,
 }: {
-  figure: string
   code: React.ReactNode
   controls?: Control[]
   log: boolean
@@ -87,8 +84,7 @@ export function Preview({
                   />
                 </div>
               )}
-              <div className="ml-auto flex items-center gap-2">
-                <Label>Fig. {figure}</Label>
+              <div className="ml-auto flex items-center">
                 <ResetTrigger />
               </div>
             </div>

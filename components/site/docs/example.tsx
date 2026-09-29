@@ -1,19 +1,16 @@
 import { highlight } from "@/components/site/code/highlight"
 import { ExampleCode } from "@/components/site/docs/example-code"
 import { Preview } from "@/components/site/docs/preview"
-import { figureNumber } from "@/lib/site/docs"
-import { exampleNames, loadExample } from "@/lib/site/examples"
+import { loadExample } from "@/lib/site/examples"
 
 export async function Example({ name }: { name: string }) {
   const { default: Component } = await import(
     `@/components/site/docs/examples/${name}.tsx`
   )
-  const index = exampleNames(name.split("/")[0]).indexOf(name)
   const example = loadExample(name)
 
   return (
     <Preview
-      figure={figureNumber(index)}
       log={example.log}
       controls={example.controls}
       code={

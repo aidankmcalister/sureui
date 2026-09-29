@@ -47,7 +47,6 @@ function BlockSection({ block, index }: { block: Block; index: number }) {
       </div>
       <InstallCommand args={`add @sureui/${block.name}`} />
       <Preview
-        figure={figureNumber(index)}
         log={false}
         code={
           <div className="divide-y divide-(--rule)">
