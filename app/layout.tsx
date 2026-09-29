@@ -60,7 +60,8 @@ export default function RootLayout({
         <Analytics />
         <SpeedInsights />
         <Script
-          src="https://cloud.umami.is/script.js"
+          src="/u/script.js"
+          data-host-url="/u"
           data-website-id="07b2fcd9-52fb-4fe8-aa0f-7a9e24ff6557"
           data-domains="sureui.com"
           strategy="afterInteractive"
