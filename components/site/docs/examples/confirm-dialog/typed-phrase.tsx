@@ -10,7 +10,7 @@ export default function ConfirmDialogTypedPhrase() {
   return (
     <ConfirmDialog
       title="Delete acme-prod?"
-      description="This deletes the project, its deployments and its domains for good."
+      description="This deletes the project, its deployments and its domains. It can't be undone."
       phrase="acme-prod"
       acknowledgements={["I understand active deployments will go offline."]}
       confirmLabel="Delete project"

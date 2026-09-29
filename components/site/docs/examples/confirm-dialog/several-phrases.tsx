@@ -10,7 +10,7 @@ export default function ConfirmDialogSeveralPhrases() {
   return (
     <ConfirmDialog
       title="Delete acme-prod?"
-      description="This deletes the project, its deployments and its domains for good."
+      description="This deletes the project, its deployments and its domains. It can't be undone."
       phrase={["acme-prod", "delete my project"]}
       confirmLabel="Delete project"
       variant="destructive"

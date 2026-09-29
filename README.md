@@ -48,6 +48,12 @@ Then add the items you need. Each one installs on its own into `components/ui/su
 npx shadcn@latest add @sureui/confirm-button
 ```
 
+Components also install straight from GitHub, with no registry entry. Blocks need the entry, because they depend on other `@sureui` items:
+
+```bash
+npx shadcn@latest add aidankmcalister/sureui/confirm-button
+```
+
 > [!NOTE]
 > `undoToast` uses the shadcn `<Toaster />`. Nothing else needs mounting.
 

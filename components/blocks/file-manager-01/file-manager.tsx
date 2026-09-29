@@ -150,7 +150,7 @@ function FileManager({
                 <div className="flex justify-end pb-3">
                   <ConfirmDialog
                     title="Empty the trash?"
-                    description="These files are deleted for good."
+                    description="These files are deleted. It can't be undone."
                     consequences={
                       <Consequences
                         title="What gets deleted"

@@ -52,10 +52,11 @@ function llmsIndex() {
       )
     ),
     "## Registry items",
+    "This is every item. Install one with the exact command shown; don't guess other names.",
     list(
       registry.items.map(
         (item) =>
-          `[@sureui/${item.name}](${siteUrl}/r/${item.name}.json): ${item.description}`
+          `[@sureui/${item.name}](${siteUrl}/r/${item.name}.json): ${item.description} Install: \`npx shadcn@latest add @sureui/${item.name}\``
       )
     ),
     "## Optional",
