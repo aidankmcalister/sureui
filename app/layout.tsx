@@ -1,5 +1,9 @@
 import type { Metadata } from "next"
-import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google"
+import {
+  Atkinson_Hyperlegible_Mono,
+  Atkinson_Hyperlegible_Next,
+  Space_Grotesk,
+} from "next/font/google"
 
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -12,7 +16,10 @@ import { siteUrl } from "@/lib/site/config"
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
-const fontSans = Geist({ subsets: ["latin"], variable: "--font-sans" })
+const fontSans = Atkinson_Hyperlegible_Next({
+  subsets: ["latin"],
+  variable: "--font-sans",
+})
 
 const fontDisplay = Space_Grotesk({
   subsets: ["latin"],
@@ -20,7 +27,7 @@ const fontDisplay = Space_Grotesk({
   variable: "--font-space-grotesk",
 })
 
-const fontMono = Geist_Mono({
+const fontMono = Atkinson_Hyperlegible_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
 })
