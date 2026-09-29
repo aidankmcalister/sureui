@@ -29,6 +29,10 @@ Each item includes the confirmation core, so install only the ones you use:
 
 The items are `confirm-button`, `confirm-menu-item`, `type-to-confirm`, `confirm-dialog`, `confirm-popover`, `consequences`, `undo-toast` and `undoable`. Each component page lists its own command.
 
+## Use them in a client component
+
+Every SureUI component takes functions like `onConfirm`, so in the Next.js App Router, render it from a file that starts with `"use client"`. A Server Component can't pass functions to it, the same as with `onClick` on a Button. The examples on these pages already start with `"use client"`.
+
 ## Mount the Toaster
 
 `undoToast` shows a shadcn toast, so it needs the `Toaster` in your root layout. Nothing else needs setup.

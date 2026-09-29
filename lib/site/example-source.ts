@@ -20,7 +20,6 @@ function parseValue(text: string): ControlValue {
 
 function stripDocsHooks(file: string) {
   return file
-    .replace(/^"use client"\n+/, "")
     .replace(
       /^import \{[^}]*\} from "@\/components\/site\/docs\/preview"\n/m,
       ""

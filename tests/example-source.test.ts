@@ -40,7 +40,8 @@ describe("example source", () => {
 
   it("renders the defaults without the docs hooks", () => {
     const text = renderExample(example)
-    expect(text).not.toMatch(/use client|useLog|useControl|control\(/)
+    expect(text).toMatch(/^"use client"\n\nimport /)
+    expect(text).not.toMatch(/useLog|useControl|control\(/)
     expect(text).toContain("duration={1200}")
     expect(text).not.toContain("confirmOnRelease")
     expect(text).toContain('console.log("Revoked")')
