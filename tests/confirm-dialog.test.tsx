@@ -69,7 +69,7 @@ describe("ConfirmDialog", () => {
     await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
   })
 
-  it("gesture=hold: forwards duration and confirmOnRelease", async () => {
+  it("gesture=hold: forwards duration", async () => {
     vi.useFakeTimers({
       toFake: ["setTimeout", "clearTimeout", "performance"],
       shouldAdvanceTime: true,
@@ -80,7 +80,6 @@ describe("ConfirmDialog", () => {
         title="Revoke key?"
         gesture="hold"
         duration={2000}
-        confirmOnRelease={false}
         onConfirm={onConfirm}
       >
         <Button>Revoke</Button>
@@ -98,33 +97,20 @@ describe("ConfirmDialog", () => {
     await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
   })
 
-  it("gesture=hold: forwards cancelHoldOnLeave and announcements", async () => {
-    vi.useFakeTimers({
-      toFake: ["setTimeout", "clearTimeout", "performance"],
-      shouldAdvanceTime: true,
-    })
+  it("gesture=hold: forwards announcements", async () => {
     render(
       <ConfirmDialog
         title="Revoke key?"
         gesture="hold"
-        confirmOnRelease
-        cancelHoldOnLeave={false}
-        announcements={{ hold: "Mantén pulsado", ready: "Suelta ahora" }}
+        announcements={{ hold: "Mantén pulsado" }}
         onConfirm={vi.fn()}
       >
         <Button>Revoke</Button>
       </ConfirmDialog>
     )
     fireEvent.click(screen.getByRole("button", { name: "Revoke" }))
-    const confirmButton = await screen.findByRole("button", {
-      name: "Confirm",
-    })
+    await screen.findByRole("button", { name: "Confirm" })
     expect(screen.getByText("Mantén pulsado")).toBeTruthy()
-    fireEvent.pointerDown(confirmButton, { button: 0 })
-    fireEvent.pointerLeave(confirmButton)
-    await act(async () => vi.advanceTimersByTimeAsync(1200))
-    expect(confirmButton.getAttribute("data-state")).toBe("ready")
-    expect(screen.getByText("Suelta ahora")).toBeTruthy()
   })
 
   it("gesture=click-again: forwards announcements.armed", async () => {
@@ -461,6 +447,32 @@ describe("ConfirmDialog", () => {
     await waitFor(() =>
       expect(onConfirm).toHaveBeenCalledWith({ snapshot: false, notify: false })
     )
+  })
+
+  it("acknowledgements: without a phrase, confirm waits for every one", async () => {
+    const onConfirm = vi.fn()
+    render(
+      <ConfirmDialog
+        title="Delete database?"
+        acknowledgements={["Backups are deleted", "This can't be undone"]}
+        onConfirm={onConfirm}
+      >
+        <Button>Delete database</Button>
+      </ConfirmDialog>
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Delete database" }))
+    const confirm = await screen.findByRole("button", { name: "Confirm" })
+    expect(confirm.hasAttribute("disabled")).toBe(true)
+    fireEvent.click(
+      screen.getByRole("checkbox", { name: "Backups are deleted" })
+    )
+    expect(confirm.hasAttribute("disabled")).toBe(true)
+    fireEvent.click(
+      screen.getByRole("checkbox", { name: "This can't be undone" })
+    )
+    expect(confirm.hasAttribute("disabled")).toBe(false)
+    fireEvent.click(confirm)
+    await waitFor(() => expect(onConfirm).toHaveBeenCalledWith({}))
   })
 
   it("choices: start from their defaults each time it opens", async () => {

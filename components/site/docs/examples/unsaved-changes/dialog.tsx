@@ -11,14 +11,15 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { useConfirmClose } from "@/components/ui/sureui/unsaved-changes"
+import { useUnsavedChanges } from "@/components/ui/sureui/unsaved-changes"
 import { useActions } from "@/components/site/docs/preview"
 
 export default function UnsavedChangesDialog() {
   const { saveProfile } = useActions()
   const [saved, setSaved] = React.useState("Ada Lovelace")
   const [name, setName] = React.useState(saved)
-  const { rootProps, question, close } = useConfirmClose(name !== saved, {
+  const { rootProps, question, close } = useUnsavedChanges({
+    when: name !== saved,
     onDiscard: () => setName(saved),
   })
 

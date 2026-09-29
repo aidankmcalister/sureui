@@ -17,6 +17,7 @@ export default function TypeToConfirmSeveralPhrases() {
           To verify, type <strong>delete my project</strong>
         </>,
       ]}
+      variant="destructive"
       confirmLabel="Delete project"
       onConfirm={deleteProject}
       className="w-full max-w-sm"

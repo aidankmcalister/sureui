@@ -98,33 +98,30 @@ For a way back after it closes, use [Undo Toast](/docs/undo-toast).
 
 | Prop | Type | Default |
 | --- | --- | --- |
-| `title` | `string` | required |
+| `title` | `ReactNode` | required |
 | `children` | `ReactElement` | required |
 | `onConfirm` | `(choices: Record<string, boolean>) => void \| Promise<unknown>` | required |
 | `onCancel` | `() => void` | — |
 | `onConfirmError` | `(error: unknown) => void` | — |
 | `description` | `ReactNode` | — |
 | `consequences` | `ReactNode` | — |
-| `confirmLabel` | `string` | `"Confirm"` |
-| `cancelLabel` | `string` | `"Cancel"` |
-| `errorLabel` | `string` | — |
+| `confirmLabel` | `ReactNode` | `"Confirm"` |
+| `cancelLabel` | `ReactNode` | `"Cancel"` |
+| `errorLabel` | `ReactNode` | — |
 | `variant` | [`Button`](https://ui.shadcn.com/docs/components/base/button) `variant` | `"default"` |
 | `initialFocus` | `"cancel" \| "confirm" \| "none"` | `"cancel"`, the first field with `phrase` |
 | `alternative` | `{ label: ReactNode, onSelect: () => void \| Promise<unknown> }` | — |
 | `gesture` | `"click" \| "click-again" \| "hold"` | `"click"` |
 | `armDelay` | `number` | `0` |
 | `timeout` | `number` | `3000` |
-| `cancelOnBlur` | `boolean` | `true` |
 | `duration` | `number` | `1200` |
-| `confirmOnRelease` | `boolean` | `false` |
-| `cancelHoldOnLeave` | `boolean` | `true` |
 | `holdFallback` | `"click-again" \| "none"` | `"click-again"` |
 | `phrase` | `string \| string[]` | — |
 | `caseSensitive` | `boolean` | `true` |
 | `trim` | `boolean` | `false` |
 | `acknowledgements` | `string[]` | — |
 | `choices` | `{ name: string, label: ReactNode, defaultChecked?: boolean }[]` | — |
-| `announcements` | `{ armed?, hold?, fallback?, ready?, match?, error? }` | — |
+| `announcements` | `{ armed?, hold?, fallback?, match?, error? }` | — |
 
 ### useConfirm()
 

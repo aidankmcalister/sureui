@@ -29,11 +29,10 @@ interface ConfirmPopoverProps
     Omit<GestureOptions, "disabled"> {
   children: React.ReactElement
   description: React.ReactNode
-  title?: string
-  confirmLabel?: string
-  errorLabel?: string
-  cancelLabel?: string
-  showCancel?: boolean
+  title?: React.ReactNode
+  confirmLabel?: React.ReactNode
+  errorLabel?: React.ReactNode
+  cancelLabel?: React.ReactNode
   initialFocus?: "confirm" | "cancel" | "none"
   variant?: ConfirmButtonProps["variant"]
   side?: PopoverContentProps["side"]
@@ -42,7 +41,6 @@ interface ConfirmPopoverProps
   onOpenChange?: (open: boolean) => void
   announcements?: {
     hold?: string
-    ready?: string
     armed?: string
     fallback?: string
     error?: string
@@ -57,7 +55,6 @@ function ConfirmPopover(props: ConfirmPopoverProps) {
     confirmLabel = "Confirm",
     errorLabel,
     cancelLabel = "Cancel",
-    showCancel = true,
     initialFocus = "confirm",
     variant = "default",
     side = "bottom",
@@ -117,7 +114,7 @@ function ConfirmPopover(props: ConfirmPopoverProps) {
         initialFocus={
           initialFocus === "none"
             ? popupRef
-            : initialFocus === "cancel" && showCancel
+            : initialFocus === "cancel"
               ? cancelRef
               : confirmRef
         }
@@ -135,18 +132,16 @@ function ConfirmPopover(props: ConfirmPopoverProps) {
           )}
         </PopoverHeader>
         <div className="flex justify-end gap-2">
-          {showCancel && (
-            <Button
-              ref={cancelRef}
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={pending}
-              onClick={() => handleOpenChange(false)}
-            >
-              {cancelLabel}
-            </Button>
-          )}
+          <Button
+            ref={cancelRef}
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={pending}
+            onClick={() => handleOpenChange(false)}
+          >
+            {cancelLabel}
+          </Button>
           <ConfirmButton
             {...gestureOptions}
             ref={confirmRef}

@@ -20,7 +20,7 @@ These terms are the shared vocabulary for code, docs and plans.
 
 **Surface**: where a confirmation appears. Inline is the default. A dialog is an optional surface that wraps an inline control, never the default.
 
-**Undo window**: an optional delay after confirming, before `onConfirm` runs. `undo="manual"` has no timer: it commits when a press or focus lands outside the control. The control shows "Undo" while it drains. Undoing cancels. Leaving the control and coming back to it, by pointer or focus, pauses the window until you leave again, and a hidden tab pauses it until the tab is visible. Unmounting during the window, including closing the tab, discards the confirmation without calling either handler.
+**Undo window**: an optional delay after confirming, before `onConfirm` runs. `undo="manual"` has no timer: it commits when a press or focus lands outside the control. The control shows "Undo" while it drains. Undoing cancels. Leaving the control and coming back to it, by pointer or focus, pauses the window until you leave again, and a hidden tab pauses it until the tab is visible. Unmounting during the window, including closing the tab, discards the confirmation without calling either handler. ConfirmMenuItem is the exception: closing its menu during the window commits, since a menu closes as soon as people move on.
 
 **Pending**: the state while an async `onConfirm` is running. The control is disabled until it settles.
 
@@ -51,7 +51,7 @@ These terms are the shared vocabulary for code, docs and plans.
 ## Rules for registry code
 
 - Every control is built on the confirmation core (`components/ui/sureui/confirmation.ts`) and shares its contract: `onConfirm` (may return a promise), `onCancel`, `undo`, Button props, `data-state`. `ToolApproval` is the exception: it composes ConfirmButton and TypeToConfirm, and its callback is `onRespond` so it takes `addToolApprovalResponse` directly.
-- Options over opinions: behavior is a prop with a sensible default (e.g. `pauseUndoOnHover`, `announcements`). A fixed rule needs a documented reason.
+- Options over opinions: behavior is a prop with a sensible default (e.g. `pauseUndoOnHover`, `announcements`), but only options something needs: remove an option nobody uses rather than keep it. A fixed rule needs a documented reason.
 - Gesture rules live in the core. A control spreads `getTriggerProps(props)` on its trigger, which keeps consumer props and runs consumer handlers before the core's (through `composeHandlers`).
 - Undo timing lives in `startUndoWindow` in `confirmation.ts` (duration limits, pausing, remaining time, hidden tab). The core, `undoable.tsx` and `undo-toast.tsx` all use it; don't time an undo window anywhere else.
 - Timers decide timing. Animations are visual only and animate the CSS `scale` property (or `stroke-dashoffset` when the fill is an SVG shape, as in ConfirmSwitch), never `transform`.

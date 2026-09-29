@@ -567,6 +567,9 @@ describe("Undoable failures", () => {
     await act(async () => {})
     expect(onConfirmError).toHaveBeenCalledWith(error)
     expect(host(container).getAttribute("data-state")).toBe("idle")
+    expect(host(container).hasAttribute("data-error")).toBe(true)
+    await click(screen.getByRole("button", { name: "Delete" }))
+    expect(host(container).hasAttribute("data-error")).toBe(false)
   })
 
   it("onConfirmError gets a rejection without an unhandled rejection", async () => {

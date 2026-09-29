@@ -35,9 +35,9 @@ interface TypeToConfirmProps extends Omit<ConfirmationOptions, "onConfirm"> {
     undo?: string
     error?: string
   }
-  confirmLabel?: string
-  undoLabel?: string
-  errorLabel?: string
+  confirmLabel?: React.ReactNode
+  undoLabel?: React.ReactNode
+  errorLabel?: React.ReactNode
   variant?: ConfirmButtonProps["variant"]
   acknowledgements?: string[]
   choices?: ConfirmChoice[]
@@ -97,7 +97,7 @@ function TypeToConfirm(props: TypeToConfirmProps) {
     confirmLabel = "Confirm",
     undoLabel = "Undo",
     errorLabel,
-    variant = "destructive",
+    variant = "default",
     acknowledgements = [],
     choices = [],
     renderActions,
@@ -243,6 +243,7 @@ function TypeToConfirm(props: TypeToConfirmProps) {
 export {
   TypeToConfirm,
   ConfirmChoiceList,
+  defaultChoices,
   type ConfirmChoice,
   type ConfirmChoices,
   type TypeToConfirmProps,

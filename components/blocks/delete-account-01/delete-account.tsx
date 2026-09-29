@@ -107,6 +107,7 @@ function DeleteAccount({
             "I can't get any of this back.",
             "My subscription ends today.",
           ]}
+          variant="destructive"
           confirmLabel="Delete account"
           onConfirm={async () => {
             await request()

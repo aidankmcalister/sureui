@@ -42,14 +42,13 @@ With `onSave`, the dialog offers Save and stays open until it settles. Discard c
 
 ### In a dialog
 
-`useConfirmClose` asks before a Dialog, Sheet or Drawer with unsaved edits closes. It works with one already in your app and doesn't install one. If you don't have one yet, run `npx shadcn@latest add dialog`.
+The same hook asks before a Dialog, Sheet or Drawer with unsaved edits closes. It works with one already in your app and doesn't install one. If you don't have one yet, run `npx shadcn@latest add dialog`.
 
 <Example name="unsaved-changes/dialog" />
 
 ```tsx
-import { useConfirmClose } from "@/components/ui/sureui/unsaved-changes"
-
-const { rootProps, question, close } = useConfirmClose(dirty, {
+const { rootProps, question, close } = useUnsavedChanges({
+  when: dirty,
   onDiscard: resetForm,
 })
 
@@ -61,7 +60,7 @@ const { rootProps, question, close } = useConfirmClose(dirty, {
 </Dialog>
 ```
 
-Spread `rootProps` on the root. While `dirty` is `true`, Escape, a click outside or the × button keeps it open and sets `question`: Keep editing and Discard changes, plus Save with `onSave`. Render it in place of your footer buttons, so the dialog keeps its size. While `dirty` is `false`, it closes straight away and `question` is `null`. `close()` closes without asking. Call it after saving, or from a Cancel button after resetting the form.
+Spread `rootProps` on the root. While `when` is `true`, Escape, a click outside or the × button keeps it open and sets `question`: Keep editing and Discard changes, plus Save with `onSave`. Render it in place of your footer buttons, so the dialog keeps its size. While `when` is `false`, it closes straight away and `question` is `null`. `close()` closes without asking. Call it after saving, or from a Cancel button after resetting the form.
 
 ## API reference
 
@@ -71,7 +70,8 @@ Spread `rootProps` on the root. While `dirty` is `true`, Escape, a click outside
 | --- | --- | --- |
 | `when` | `boolean` | required |
 | `onSave` | `() => void \| Promise<unknown>` | — |
-| `onDiscard` | `() => void` | — |
+| `onDiscard` | `() => void \| Promise<unknown>` | — |
+| `onConfirmError` | `(error: unknown) => void` | — |
 | `beforeUnload` | `boolean` | `true` |
 | `title` | `string` | `"Discard unsaved changes?"` |
 | `saveTitle` | `string` | `"Save changes before leaving?"` |
@@ -79,44 +79,20 @@ Spread `rootProps` on the root. While `dirty` is `true`, Escape, a click outside
 | `keepLabel` | `string` | `"Keep editing"` |
 | `discardLabel` | `string` | `"Discard changes"` |
 | `saveLabel` | `string` | `"Save"` |
+| `open` | `boolean` | — |
+| `onOpenChange` | `(open: boolean) => void` | — |
 
-`beforeUnload={false}` leaves reloads and closed tabs alone, for when your router already prompts.
+`beforeUnload={false}` leaves reloads and closed tabs alone, for when your router already prompts. `open` and `onOpenChange` control the dialog that `rootProps` goes on.
+
+If `onSave` or `onDiscard` returns a promise, its button stays pending until it settles, and nothing closes unless it succeeds. If it fails, the buttons stay and the error goes to `onConfirmError`, as on [Confirm Button](/docs/confirm-button#errors).
 
 | Name | Type | Description |
 | --- | --- | --- |
-| `confirmLeave` | `() => Promise<boolean>` | Opens the dialog while `when` is true. Resolves `true` once the changes are saved or discarded, and `false` on Keep editing, Escape or unmount. Called again while the dialog is open, it returns the same promise. |
-| `dialog` | `ReactElement` | The dialog. Render it once. |
-
-### useConfirmClose(dirty, options)
-
-Returns `{ rootProps, question, close }`: props for the dialog root, the buttons to render while asking (otherwise `null`), and a function that closes without asking. Discard changes is a [Confirm Button](/docs/confirm-button), so it takes the gesture options too.
-
-| Prop | Type | Default |
-| --- | --- | --- |
-| `dirty` | `boolean` | required |
-| `onDiscard` | `() => void \| Promise<unknown>` | — |
-| `onConfirmError` | `(error: unknown) => void` | — |
-| `open` | `boolean` | — |
-| `defaultOpen` | `boolean` | `false` |
-| `onOpenChange` | `(open: boolean) => void` | — |
-| `title` | `string` | `"Discard changes?"` |
-| `discardLabel` | `ReactNode` | `"Discard changes"` |
-| `keepLabel` | `ReactNode` | `"Keep editing"` |
-| `onSave` | `() => void \| Promise<unknown>` | — |
-| `saveLabel` | `ReactNode` | `"Save"` |
-| `errorLabel` | `ReactNode` | — |
-| `variant` | [`Button`](https://ui.shadcn.com/docs/components/base/button) `variant` | `"destructive"` |
-| `gesture` | `"click" \| "click-again" \| "hold"` | `"click"` |
-| `timeout` | `number` | `3000` |
-| `cancelOnBlur` | `boolean` | `true` |
-| `duration` | `number` | `1200` |
-| `confirmOnRelease` | `boolean` | `false` |
-| `cancelHoldOnLeave` | `boolean` | `true` |
-| `holdFallback` | `"click-again" \| "none"` | `"click-again"` |
-| `armDelay` | `number` | `0` |
-| `announcements` | `{ armed?, hold?, fallback?, ready?, undo?, error? }` | — |
-
-If `onDiscard` returns a promise, Discard changes stays pending until it settles, and the dialog closes only if it succeeds. If it fails, the buttons stay and the error goes to `onConfirmError`, as on [Confirm Button](/docs/confirm-button).
+| `confirmLeave` | `() => Promise<boolean>` | Opens the confirm dialog while `when` is true. Resolves `true` once the changes are saved or discarded, and `false` on Keep editing, Escape or unmount. Called again while the dialog is open, it returns the same promise. |
+| `dialog` | `ReactElement` | The confirm dialog for `confirmLeave`. Render it once. |
+| `rootProps` | `{ open, onOpenChange }` | Props for your Dialog, Sheet or Drawer root. |
+| `question` | `ReactElement \| null` | The buttons to render in its footer while asking, otherwise `null`. |
+| `close` | `() => void` | Closes your dialog without asking. |
 
 ## Accessibility
 
@@ -124,4 +100,4 @@ If `onDiscard` returns a promise, Discard changes stays pending until it settles
 - Without `onSave`, Keep editing has focus when the dialog opens, so Enter doesn't throw anything away.
 - Focus starts on Keep editing, the choice that loses nothing. While Save is pending, the other buttons and Escape do nothing.
 - Browsers show their own text in the unload prompt, and only after someone has interacted with the page.
-- In a dialog, `useConfirmClose` announces `title` in a polite live region and moves focus to Keep editing. Keep editing returns focus to where it was, and while it's asking, Escape and outside clicks do nothing more.
+- In a dialog, the question announces `title`, or `saveTitle` with `onSave`, in a polite live region and moves focus to Keep editing. Keep editing returns focus to where it was, and while it's asking, Escape and outside clicks do nothing more.

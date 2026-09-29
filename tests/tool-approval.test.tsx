@@ -144,6 +144,90 @@ describe("ToolApproval", () => {
     })
   })
 
+  it("armDelay ignores an approve that lands right after it appears", async () => {
+    const onRespond = vi.fn()
+    render(
+      <ToolApproval
+        risk="low"
+        undo={false}
+        armDelay={500}
+        part={requested}
+        onRespond={onRespond}
+      />
+    )
+    const approve = screen.getByRole("button", { name: "Approve" })
+    await click(approve)
+    expect(onRespond).not.toHaveBeenCalled()
+    await act(async () => vi.advanceTimersByTime(500))
+    await click(approve)
+    expect(onRespond).toHaveBeenCalledWith({ id: "approval_1", approved: true })
+  })
+
+  it("critical: locks Approve while the response is being sent", async () => {
+    const onRespond = vi.fn()
+    render(
+      <ToolApproval
+        risk="critical"
+        phrase="acme-prod"
+        part={requested}
+        onRespond={onRespond}
+      />
+    )
+    const input = screen.getByRole("textbox")
+    fireEvent.change(input, { target: { value: "acme-prod" } })
+    await click(screen.getByRole("button", { name: "Approve" }))
+    fireEvent.change(input, { target: { value: "acme-prod" } })
+    const approve = screen.getByRole("button", { name: "Approve" })
+    expect((approve as HTMLButtonElement).disabled).toBe(true)
+    expect(
+      (screen.getByRole("button", { name: "Deny" }) as HTMLButtonElement)
+        .disabled
+    ).toBe(true)
+    expect(onRespond).toHaveBeenCalledOnce()
+  })
+
+  it("onConfirmError takes a failed approval and shows errorLabel", async () => {
+    const error = new Error("offline")
+    const onRespond = vi.fn(() => Promise.reject(error))
+    const onConfirmError = vi.fn()
+    render(
+      <ToolApproval
+        part={requested}
+        errorLabel="Retry"
+        onRespond={onRespond}
+        onConfirmError={onConfirmError}
+      />
+    )
+    const approve = screen.getByRole("button", { name: "Approve" })
+    await click(approve)
+    await click(approve)
+    await act(async () => {})
+    expect(onConfirmError).toHaveBeenCalledWith(error)
+    expect(screen.getByRole("button", { name: "Retry" })).toBe(approve)
+    expect(approve.hasAttribute("data-error")).toBe(true)
+    expect(
+      (screen.getByRole("button", { name: "Deny" }) as HTMLButtonElement)
+        .disabled
+    ).toBe(false)
+  })
+
+  it("onConfirmError takes a failed denial", async () => {
+    const error = new Error("offline")
+    const onConfirmError = vi.fn()
+    render(
+      <ToolApproval
+        part={requested}
+        onRespond={() => Promise.reject(error)}
+        onConfirmError={onConfirmError}
+      />
+    )
+    const deny = screen.getByRole("button", { name: "Deny" })
+    await click(deny)
+    await act(async () => {})
+    expect(onConfirmError).toHaveBeenCalledWith(error)
+    expect((deny as HTMLButtonElement).disabled).toBe(false)
+  })
+
   it("shows the outcome once answered", () => {
     const { rerender } = render(
       <ToolApproval
@@ -362,6 +446,32 @@ describe("ToolApprovalBatch", () => {
     await act(async () => {})
     process.off("unhandledRejection", rejection)
     expect(rejection).toHaveBeenCalledTimes(2)
+  })
+
+  it("onConfirmError takes a failed batch approval", async () => {
+    const error = new Error("offline")
+    const onConfirmError = vi.fn()
+    render(
+      <ToolApprovalBatch
+        parts={[call("a", "medium"), call("b", "medium")]}
+        armDelay={500}
+        errorLabel="Retry"
+        onRespond={({ id }) =>
+          id === "b" ? Promise.reject(error) : Promise.resolve()
+        }
+        onConfirmError={onConfirmError}
+      />
+    )
+    const approve = screen.getByRole("button", { name: "Approve all" })
+    await click(approve)
+    expect(approve.getAttribute("data-state")).toBe("idle")
+    await act(async () => vi.advanceTimersByTime(500))
+    await click(approve)
+    await act(async () => vi.advanceTimersByTime(500))
+    await click(approve)
+    await act(async () => {})
+    expect(onConfirmError).toHaveBeenCalledWith(error)
+    expect(screen.getByRole("button", { name: "Retry" })).toBeTruthy()
   })
 
   it("starts the gesture over when a new call arrives", async () => {

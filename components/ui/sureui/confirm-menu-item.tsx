@@ -8,6 +8,8 @@ import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import {
   isPromise,
   useConfirmation,
+  useConfirmationLabels,
+  type ConfirmationAnnouncements,
   type ConfirmationOptions,
   type ConfirmationState,
   type GestureOptions,
@@ -20,20 +22,10 @@ interface ConfirmMenuItemProps
     GestureOptions {
   menu?: "dropdown" | "context"
   confirmLabel?: React.ReactNode
-  releaseLabel?: React.ReactNode
   undoLabel?: React.ReactNode
   errorLabel?: React.ReactNode
   closeOnConfirm?: boolean
-  closeOnUndo?: boolean
-  commitUndoOnClose?: boolean
-  announcements?: {
-    hold?: string
-    ready?: string
-    armed?: string
-    fallback?: string
-    undo?: string
-    error?: string
-  }
+  announcements?: ConfirmationAnnouncements
 }
 
 function ConfirmMenuItem(props: ConfirmMenuItemProps) {
@@ -47,20 +39,14 @@ function ConfirmMenuItem(props: ConfirmMenuItemProps) {
     gesture = "click-again",
     timeout,
     duration,
-    confirmOnRelease,
-    cancelOnBlur,
-    cancelHoldOnLeave,
     holdFallback = "click-again",
     armDelay,
     disabled,
     menu = "dropdown",
     confirmLabel,
-    releaseLabel,
-    undoLabel = "Undo",
+    undoLabel,
     errorLabel,
     closeOnConfirm = true,
-    closeOnUndo = true,
-    commitUndoOnClose = true,
     announcements,
     className,
     children,
@@ -70,11 +56,7 @@ function ConfirmMenuItem(props: ConfirmMenuItemProps) {
   const [closing, setClosing] = React.useState(false)
   const closingRef = React.useRef(false)
   const stateRef = React.useRef<ConfirmationState>("idle")
-  const latestRef = React.useRef({
-    onConfirm,
-    onConfirmError,
-    commitUndoOnClose,
-  })
+  const latestRef = React.useRef({ onConfirm, onConfirmError })
 
   function handleConfirm() {
     stateRef.current = "pending"
@@ -94,7 +76,7 @@ function ConfirmMenuItem(props: ConfirmMenuItemProps) {
   function handleCancel() {
     const fromUndo = stateRef.current === "undo"
     onCancel?.()
-    if (fromUndo && closeOnUndo) setClosing(true)
+    if (fromUndo) setClosing(true)
   }
 
   const { state, failed, fillRef, getTriggerProps } =
@@ -108,19 +90,15 @@ function ConfirmMenuItem(props: ConfirmMenuItemProps) {
       gesture,
       timeout,
       duration,
-      confirmOnRelease,
-      cancelOnBlur,
-      cancelHoldOnLeave,
       holdFallback,
       armDelay,
       disabled,
     })
   const labelId = React.useId()
-  const hintId = React.useId()
 
   React.useEffect(() => {
     stateRef.current = state
-    latestRef.current = { onConfirm, onConfirmError, commitUndoOnClose }
+    latestRef.current = { onConfirm, onConfirmError }
   })
 
   React.useEffect(() => {
@@ -133,7 +111,7 @@ function ConfirmMenuItem(props: ConfirmMenuItemProps) {
   React.useEffect(
     () => () => {
       const latest = latestRef.current
-      if (stateRef.current !== "undo" || !latest.commitUndoOnClose) return
+      if (stateRef.current !== "undo") return
       if (!latest.onConfirmError) return void latest.onConfirm()
       try {
         const result = latest.onConfirm()
@@ -148,38 +126,21 @@ function ConfirmMenuItem(props: ConfirmMenuItemProps) {
   const triggerProps = getTriggerProps(rest)
   const Item = menu === "context" ? ContextMenuItem : DropdownMenuItem
 
-  const hasReleaseLabel = gesture === "hold" && releaseLabel != null
-  const showError = failed && state === "idle" && errorLabel != null
-  const shown =
-    state === "armed" ||
-    state === "undo" ||
-    (state === "ready" && hasReleaseLabel)
-      ? state
-      : showError
-        ? "error"
-        : "idle"
-  const labels = [
-    { state: "idle", node: children },
-    ...(gesture === "click-again" ||
-    (gesture === "hold" && (confirmLabel != null || holdFallback !== "none"))
-      ? [
-          {
-            state: "armed",
-            node:
-              confirmLabel ??
-              (gesture === "hold" ? "Confirm" : "Click again to confirm"),
-          },
-        ]
-      : []),
-    ...(hasReleaseLabel ? [{ state: "ready", node: releaseLabel }] : []),
-    ...(undo ? [{ state: "undo", node: undoLabel }] : []),
-    ...(errorLabel != null ? [{ state: "error", node: errorLabel }] : []),
-  ]
-
-  const holdDescribedBy =
-    gesture === "hold"
-      ? [hintId, describedBy].filter(Boolean).join(" ")
-      : describedBy
+  const { shown, labels, ariaLabel, ariaDescribedBy, hint, announcement } =
+    useConfirmationLabels({
+      state,
+      failed,
+      gesture,
+      holdFallback,
+      undo,
+      label: children,
+      confirmLabel,
+      undoLabel,
+      errorLabel,
+      announcements,
+      ariaLabel: rest["aria-label"],
+      describedBy,
+    })
   const named = rest["aria-label"] != null || rest["aria-labelledby"] != null
 
   return (
@@ -193,17 +154,9 @@ function ConfirmMenuItem(props: ConfirmMenuItemProps) {
         triggerProps.onClick?.(event)
       }}
       closeOnClick={closing}
-      aria-label={
-        rest["aria-label"] && shown === "undo" && typeof undoLabel === "string"
-          ? undoLabel
-          : rest["aria-label"] &&
-              shown === "error" &&
-              typeof errorLabel === "string"
-            ? errorLabel
-            : rest["aria-label"]
-      }
+      aria-label={ariaLabel}
       aria-labelledby={named ? rest["aria-labelledby"] : labelId}
-      aria-describedby={holdDescribedBy}
+      aria-describedby={ariaDescribedBy}
       data-state={state}
       data-error={failed || undefined}
       className={cn(
@@ -231,32 +184,13 @@ function ConfirmMenuItem(props: ConfirmMenuItemProps) {
           </span>
         ))}
       </span>
-      {gesture === "hold" && (
-        <span id={hintId} className="sr-only">
-          {announcements?.hold ??
-            (holdFallback === "none"
-              ? "Press and hold to confirm"
-              : "Press and hold, or activate twice, to confirm")}
+      {hint && (
+        <span id={hint.id} className="sr-only">
+          {hint.text}
         </span>
       )}
       <span aria-live="polite" className="sr-only">
-        {state === "ready"
-          ? (announcements?.ready ?? "Release to confirm")
-          : state === "armed" && gesture === "hold"
-            ? (announcements?.fallback ?? "Activate again to confirm")
-            : state === "armed"
-              ? (announcements?.armed ??
-                (typeof confirmLabel === "string"
-                  ? confirmLabel
-                  : "Click again to confirm"))
-              : state === "undo"
-                ? (announcements?.undo ?? "Done. Undo is available.")
-                : showError
-                  ? (announcements?.error ??
-                    (typeof errorLabel === "string"
-                      ? errorLabel
-                      : "Failed. Activate again to retry."))
-                  : ""}
+        {announcement}
       </span>
     </Item>
   )

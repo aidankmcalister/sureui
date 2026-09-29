@@ -11,6 +11,7 @@ export default function TypeToConfirmCaseAndSpaces() {
       phrase="delete my account"
       caseSensitive={false}
       trim
+      variant="destructive"
       confirmLabel="Delete account"
       onConfirm={deleteAccount}
       className="w-full max-w-sm"

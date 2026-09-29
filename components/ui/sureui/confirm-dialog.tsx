@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/sureui/confirmation"
 import {
   ConfirmChoiceList,
+  defaultChoices,
   TypeToConfirm,
   type ConfirmChoice,
   type ConfirmChoices,
@@ -38,12 +39,12 @@ interface ConfirmDialogOptions
     Pick<ConfirmationOptions, "onCancel" | "onConfirmError">,
     Omit<GestureOptions, "disabled"> {
   onConfirm: (choices: ConfirmChoices) => void | Promise<unknown>
-  title: string
+  title: React.ReactNode
   description?: React.ReactNode
   consequences?: React.ReactNode
-  cancelLabel?: string
-  confirmLabel?: string
-  errorLabel?: string
+  cancelLabel?: React.ReactNode
+  confirmLabel?: React.ReactNode
+  errorLabel?: React.ReactNode
   variant?: ConfirmButtonProps["variant"]
   initialFocus?: "cancel" | "confirm" | "none"
   alternative?: ConfirmDialogAlternative
@@ -54,7 +55,6 @@ interface ConfirmDialogOptions
   choices?: ConfirmChoice[]
   announcements?: {
     hold?: string
-    ready?: string
     armed?: string
     fallback?: string
     match?: string
@@ -207,7 +207,7 @@ function ConfirmBody({
   phrase,
   caseSensitive,
   trim,
-  acknowledgements,
+  acknowledgements = [],
   choices = [],
   announcements,
   pending,
@@ -221,11 +221,12 @@ function ConfirmBody({
   cancelRef: React.Ref<HTMLButtonElement>
   confirmRef: React.Ref<HTMLButtonElement>
 }) {
-  const [picked, setPicked] = React.useState<ConfirmChoices>(() =>
-    Object.fromEntries(
-      choices.map((choice) => [choice.name, choice.defaultChecked ?? false])
-    )
-  )
+  const [picked, setPicked] = React.useState(() => defaultChoices(choices))
+  const [acknowledged, setAcknowledged] = React.useState<ConfirmChoices>({})
+  const acknowledgementChoices = acknowledgements.map((label, index) => ({
+    name: `acknowledgement-${index}`,
+    label,
+  }))
 
   const cancel = (
     <AlertDialogCancel ref={cancelRef} disabled={!!pending}>
@@ -287,8 +288,14 @@ function ConfirmBody({
         />
       ) : (
         <>
-          {choices.length > 0 && (
+          {acknowledgements.length + choices.length > 0 && (
             <div className="grid gap-4">
+              <ConfirmChoiceList
+                choices={acknowledgementChoices}
+                value={acknowledged}
+                disabled={!!pending}
+                onChange={setAcknowledged}
+              />
               <ConfirmChoiceList
                 choices={choices}
                 value={picked}
@@ -306,7 +313,10 @@ function ConfirmBody({
               announcements={announcements}
               errorLabel={errorLabel}
               variant={variant}
-              disabled={blocked}
+              disabled={
+                blocked ||
+                !acknowledgementChoices.every(({ name }) => acknowledged[name])
+              }
               onConfirm={() => onConfirm(picked)}
               onConfirmError={onConfirmError}
             >

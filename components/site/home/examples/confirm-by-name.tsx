@@ -20,6 +20,7 @@ export function ConfirmByName() {
         acknowledgements={[
           "I understand its issues and pull requests are deleted too.",
         ]}
+        variant="destructive"
         confirmLabel="Delete repository"
         onConfirm={() => setDeleted(true)}
         className="w-full"

@@ -61,7 +61,7 @@ With `onConfirmError`, a failed `onConfirm` keeps the popover open and the error
 
 ### Initial focus
 
-Focus starts on the confirm button, so a keyboard user can confirm a quick action with one more key. `initialFocus="cancel"` starts on Cancel instead, and `"none"` focuses the popover itself. For an action that deletes data or can't be undone, the WAI-ARIA [dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) advises focusing the least destructive action. Without `showCancel`, `"cancel"` falls back to the confirm button.
+Focus starts on the confirm button, so a keyboard user can confirm a quick action with one more key. `initialFocus="cancel"` starts on Cancel instead, and `"none"` focuses the popover itself. For an action that deletes data or can't be undone, the WAI-ARIA [dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) advises focusing the least destructive action.
 
 <Example name="confirm-popover/initial-focus" />
 
@@ -78,11 +78,10 @@ It has no `undo`, since it closes when the action commits. Use [Undo Toast](/doc
 | `onConfirm` | `() => void \| Promise<unknown>` | required |
 | `onCancel` | `() => void` | — |
 | `onConfirmError` | `(error: unknown) => void` | — |
-| `title` | `string` | — |
-| `confirmLabel` | `string` | `"Confirm"` |
-| `errorLabel` | `string` | — |
-| `cancelLabel` | `string` | `"Cancel"` |
-| `showCancel` | `boolean` | `true` |
+| `title` | `ReactNode` | — |
+| `confirmLabel` | `ReactNode` | `"Confirm"` |
+| `errorLabel` | `ReactNode` | — |
+| `cancelLabel` | `ReactNode` | `"Cancel"` |
 | `initialFocus` | `"confirm" \| "cancel" \| "none"` | `"confirm"` |
 | `variant` | [`Button`](https://ui.shadcn.com/docs/components/base/button) `variant` | `"default"` |
 | `side` | `"top" \| "bottom" \| "left" \| "right" \| "inline-start" \| "inline-end"` | `"bottom"` |
@@ -92,12 +91,9 @@ It has no `undo`, since it closes when the action commits. Use [Undo Toast](/doc
 | `gesture` | `"click" \| "click-again" \| "hold"` | `"click"` |
 | `armDelay` | `number` | `0` |
 | `timeout` | `number` | `3000` |
-| `cancelOnBlur` | `boolean` | `true` |
 | `duration` | `number` | `1200` |
-| `confirmOnRelease` | `boolean` | `false` |
-| `cancelHoldOnLeave` | `boolean` | `true` |
 | `holdFallback` | `"click-again" \| "none"` | `"click-again"` |
-| `announcements` | `{ armed?, hold?, fallback?, ready?, error? }` | — |
+| `announcements` | `{ armed?, hold?, fallback?, error? }` | — |
 
 ## Accessibility
 

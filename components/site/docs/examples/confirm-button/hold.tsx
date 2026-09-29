@@ -11,7 +11,6 @@ export default function ConfirmButtonHold() {
     <ConfirmButton
       gesture="hold"
       duration={control("duration", 1200)}
-      confirmOnRelease={control("confirmOnRelease", false)}
       onConfirm={revokeKey}
     >
       Hold to revoke

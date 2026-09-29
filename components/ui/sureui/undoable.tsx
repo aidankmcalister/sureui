@@ -151,6 +151,7 @@ function useUndoable({
   const [collapsed, setCollapsed] = React.useState<Collapsed | null>(null)
   const [fill, setFill] = React.useState<Fill | null>(null)
   const [paused, setPaused] = React.useState(false)
+  const [failed, setFailed] = React.useState(false)
   const hostRef = React.useRef<HTMLDivElement>(null)
   const labelRef = React.useRef<HTMLSpanElement>(null)
   const undoRef = React.useRef<HTMLButtonElement>(null)
@@ -218,6 +219,7 @@ function useUndoable({
   const fail = React.useCallback(
     (error: unknown) => {
       restore()
+      setFailed(true)
       const { onConfirmError } = optionsRef.current
       if (!onConfirmError) throw error
       onConfirmError(error)
@@ -267,6 +269,7 @@ function useUndoable({
     const host = hostRef.current
     if (!host || busyRef.current) return
     busyRef.current = true
+    setFailed(false)
     const { onConfirm: run, undo: duration } = optionsRef.current
     const active = document.activeElement
     const hadFocus = active instanceof Element && host.contains(active)
@@ -376,6 +379,7 @@ function useUndoable({
 
   return {
     state,
+    failed,
     columns: collapsed?.columns ?? null,
     remove,
     cancel,
@@ -406,6 +410,7 @@ function Undoable(props: UndoableProps) {
   } = props
   const {
     state,
+    failed,
     columns,
     remove,
     cancel,
@@ -487,6 +492,7 @@ function Undoable(props: UndoableProps) {
     props: {
       ...getHostProps(rest),
       "data-slot": "undoable",
+      "data-error": failed || undefined,
       children: content,
     },
   })

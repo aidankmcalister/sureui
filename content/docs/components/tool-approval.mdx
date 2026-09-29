@@ -78,6 +78,18 @@ Approve unlocks once `phrase` is typed, like a project or repository name.
 
 Deny is one click at every level.
 
+### Arm delay
+
+`armDelay` ignores Approve for that many milliseconds after it appears and after it arms, so a click meant for something that was there a moment ago doesn't approve the call.
+
+<Example name="tool-approval/arm-delay" />
+
+### Errors
+
+If `onRespond` throws or rejects, the buttons unlock so you can answer again. With `onConfirmError`, the error goes to your handler, and `errorLabel` replaces the Approve label until the next attempt.
+
+<Example name="tool-approval/errors" />
+
 ### Batch
 
 `ToolApprovalBatch` answers every pending call at once. Its Approve uses the gesture of the riskiest call, and it calls `onRespond` once per call. Pass `risk` as a function to grade each part. Parts that aren't `approval-requested` are skipped.
@@ -114,13 +126,16 @@ Pass `scopes` to let people choose how long an answer holds: once, this session 
 | `onRespond` | `({ id, approved, reason?, scope? }) => void \| PromiseLike<unknown>` | required |
 | `risk` | `"low" \| "medium" \| "high" \| "critical"` | `"medium"` |
 | `phrase` | `string` | required with `"critical"` |
-| `approveLabel` | `string` | `"Approve"`, or `"Hold to approve"` for `"high"` |
-| `denyLabel` | `string` | `"Deny"` |
+| `approveLabel` | `ReactNode` | `"Approve"`, or `"Hold to approve"` for `"high"` |
+| `denyLabel` | `ReactNode` | `"Deny"` |
 | `approvedLabel` | `ReactNode` | `"Approved"` |
 | `deniedLabel` | `ReactNode` | `"Denied"` |
+| `errorLabel` | `ReactNode` | — |
+| `onConfirmError` | `(error: unknown) => void` | — |
 | `undo` | `boolean \| number \| "manual"` | `true` |
 | `timeout` | `number` | `3000` |
 | `duration` | `number` | `1200` |
+| `armDelay` | `number` | `0` |
 | `scopes` | `("once" \| "session" \| "always")[]` | — |
 | `scopeLabels` | `{ group?, once?, session?, always? }` | `{ group: "Remember", once: "Once", session: "This session", always: "Always" }` |
 | `className` | `string` | — |
@@ -137,13 +152,16 @@ Takes the same props as `ToolApproval`, with `parts` in place of `part`.
 | `onRespond` | `({ id, approved, reason?, scope? }) => void \| PromiseLike<unknown>` | required |
 | `risk` | `ToolApprovalRisk \| (part) => ToolApprovalRisk` | `"medium"` |
 | `phrase` | `string` | `"approve all"` |
-| `approveLabel` | `string` | `"Approve all"`, or `"Hold to approve all"` for `"high"` |
-| `denyLabel` | `string` | `"Deny all"` |
+| `approveLabel` | `ReactNode` | `"Approve all"`, or `"Hold to approve all"` for `"high"` |
+| `denyLabel` | `ReactNode` | `"Deny all"` |
 | `approvedLabel` | `ReactNode` | `"Approved"` |
 | `deniedLabel` | `ReactNode` | `"Denied"` |
+| `errorLabel` | `ReactNode` | — |
+| `onConfirmError` | `(error: unknown) => void` | — |
 | `undo` | `boolean \| number \| "manual"` | `true` |
 | `timeout` | `number` | `3000` |
 | `duration` | `number` | `1200` |
+| `armDelay` | `number` | `0` |
 | `scopes` | `("once" \| "session" \| "always")[]` | — |
 | `scopeLabels` | `{ group?, once?, session?, always? }` | `{ group: "Remember", once: "Once", session: "This session", always: "Always" }` |
 | `className` | `string` | — |

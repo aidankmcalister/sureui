@@ -7,6 +7,11 @@ import { RadioGroup } from "@base-ui/react/radio-group"
 import { cn } from "@/lib/utils"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { ConfirmButton } from "@/components/ui/sureui/confirm-button"
+import {
+  isPromise,
+  type ConfirmationOptions,
+  type GestureOptions,
+} from "@/components/ui/sureui/confirmation"
 import { TypeToConfirm } from "@/components/ui/sureui/type-to-confirm"
 
 type ToolApprovalRisk = "low" | "medium" | "high" | "critical"
@@ -26,23 +31,24 @@ interface ToolApprovalResponse {
   id: string
   approved: boolean
   reason?: string
-  scope?: "once" | "session" | "always"
+  scope?: ToolApprovalScope
 }
 
 type ToolApprovalScopeLabels = Partial<
   Record<ToolApprovalScope, React.ReactNode>
 > & { group?: string }
 
-interface ToolApprovalOptions {
+interface ToolApprovalOptions
+  extends
+    Pick<ConfirmationOptions, "undo" | "onConfirmError">,
+    Pick<GestureOptions, "timeout" | "duration" | "armDelay"> {
   onRespond: (response: ToolApprovalResponse) => void | PromiseLike<unknown>
-  approveLabel?: string
-  denyLabel?: string
+  approveLabel?: React.ReactNode
+  denyLabel?: React.ReactNode
+  errorLabel?: React.ReactNode
   approvedLabel?: React.ReactNode
   deniedLabel?: React.ReactNode
-  undo?: boolean | number | "manual"
-  timeout?: number
-  duration?: number
-  scopes?: ("once" | "session" | "always")[]
+  scopes?: ToolApprovalScope[]
   scopeLabels?: ToolApprovalScopeLabels
   className?: string
 }
@@ -71,22 +77,17 @@ interface ToolApprovalBatchProps<
   phrase?: string
 }
 
-type ApprovalActionsProps = {
+type ApprovalActionsProps = Omit<
+  ToolApprovalOptions,
+  "onRespond" | "approvedLabel" | "deniedLabel"
+> & {
   slot: string
   risk: ToolApprovalRisk
   phrase: string
-  approveLabel: string
-  denyLabel: string
-  undo: boolean | number | "manual"
-  timeout?: number
-  duration?: number
-  scopes?: ToolApprovalScope[]
-  scopeLabels?: ToolApprovalScopeLabels
   scope?: ToolApprovalScope
   onScopeChange: (scope: ToolApprovalScope) => void
   disabled: boolean
   onAnswer: (approved: boolean) => void | Promise<unknown>
-  className?: string
 }
 
 const answered = new Set([
@@ -147,9 +148,12 @@ function ApprovalActions({
   phrase,
   approveLabel,
   denyLabel,
+  errorLabel,
+  onConfirmError,
   undo,
   timeout,
   duration,
+  armDelay,
   scopes,
   scopeLabels,
   scope,
@@ -186,12 +190,22 @@ function ApprovalActions({
       </RadioGroup>
     ) : null
 
+  function deny() {
+    if (!onConfirmError) return onAnswer(false)
+    try {
+      const result = onAnswer(false)
+      if (isPromise(result)) result.then(undefined, onConfirmError)
+    } catch (error) {
+      onConfirmError(error)
+    }
+  }
+
   const denyButton = (
     <Button
       type="button"
       variant="outline"
       disabled={undoing || disabled}
-      onClick={() => onAnswer(false)}
+      onClick={deny}
     >
       {denyLabel}
     </Button>
@@ -202,12 +216,20 @@ function ApprovalActions({
       <div data-slot={slot} data-state="requested" className={className}>
         <TypeToConfirm
           phrase={phrase}
+          variant="destructive"
           confirmLabel={approveLabel}
+          errorLabel={errorLabel}
           onConfirm={() => onAnswer(true)}
+          onConfirmError={onConfirmError}
           renderActions={(approveButton) => (
             <div className="flex flex-wrap gap-2">
               {scopeGroup}
-              {approveButton}
+              {disabled
+                ? React.cloneElement(
+                    approveButton as React.ReactElement<{ disabled?: boolean }>,
+                    { disabled: true }
+                  )
+                : approveButton}
               {denyButton}
             </div>
           )}
@@ -231,14 +253,20 @@ function ApprovalActions({
         undo={risk === "low" ? undo : undefined}
         timeout={timeout}
         duration={duration}
+        armDelay={armDelay}
         disabled={disabled}
+        errorLabel={errorLabel}
         onClick={(event) => {
           if (risk === "low" && event.currentTarget.dataset.state === "idle") {
             setUndoing(true)
           }
         }}
         onCancel={() => setUndoing(false)}
-        onConfirm={() => onAnswer(true)}
+        onConfirm={() => {
+          setUndoing(false)
+          return onAnswer(true)
+        }}
+        onConfirmError={onConfirmError}
       >
         {approveLabel}
       </ConfirmButton>
@@ -255,11 +283,14 @@ function ToolApproval(props: ToolApprovalProps) {
     phrase,
     approveLabel = risk === "high" ? "Hold to approve" : "Approve",
     denyLabel = "Deny",
+    errorLabel,
+    onConfirmError,
     approvedLabel = "Approved",
     deniedLabel = "Denied",
     undo = true,
     timeout,
     duration,
+    armDelay,
     scopes,
     scopeLabels,
     className,
@@ -315,9 +346,12 @@ function ToolApproval(props: ToolApprovalProps) {
       phrase={phrase ?? ""}
       approveLabel={approveLabel}
       denyLabel={denyLabel}
+      errorLabel={errorLabel}
+      onConfirmError={onConfirmError}
       undo={undo}
       timeout={timeout}
       duration={duration}
+      armDelay={armDelay}
       scopes={scopes}
       scopeLabels={scopeLabels}
       scope={scope}
@@ -339,11 +373,14 @@ function ToolApprovalBatch<P extends ToolApprovalPart>(
     phrase = "approve all",
     approveLabel,
     denyLabel = "Deny all",
+    errorLabel,
+    onConfirmError,
     approvedLabel = "Approved",
     deniedLabel = "Denied",
     undo = true,
     timeout,
     duration,
+    armDelay,
     scopes,
     scopeLabels,
     className,
@@ -419,7 +456,7 @@ function ToolApprovalBatch<P extends ToolApprovalPart>(
 
   return (
     <ApprovalActions
-      key={ids.join(" ")}
+      key={requested.map((part) => part.approval!.id).join(" ")}
       slot="tool-approval-batch"
       risk={level}
       phrase={phrase}
@@ -428,9 +465,12 @@ function ToolApprovalBatch<P extends ToolApprovalPart>(
         (level === "high" ? "Hold to approve all" : "Approve all")
       }
       denyLabel={denyLabel}
+      errorLabel={errorLabel}
+      onConfirmError={onConfirmError}
       undo={undo}
       timeout={timeout}
       duration={duration}
+      armDelay={armDelay}
       scopes={scopes}
       scopeLabels={scopeLabels}
       scope={scope}

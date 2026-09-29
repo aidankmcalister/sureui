@@ -19,7 +19,7 @@ interface ConsequencesListOptions {
   lessLabel?: string
 }
 
-interface Consequence extends ConsequencesListOptions {
+interface Consequence {
   label: React.ReactNode
   count?: number
   names?: string[]
@@ -140,22 +140,18 @@ function ConsequencesItem(props: ConsequencesItemProps) {
     names = [],
     icon,
     description,
-    limit,
-    expandable,
-    moreLabel,
-    lessLabel,
     className,
     ...rest
   } = props
   const context = React.useContext(ConsequencesContext)
   const [expanded, setExpanded] = React.useState(false)
   const namesId = React.useId()
-  const max = Math.max(0, limit ?? context.limit)
-  const canExpand = (expandable ?? context.expandable) && names.length > max
+  const max = Math.max(0, context.limit)
+  const canExpand = context.expandable && names.length > max
   const shown = expanded ? names : names.slice(0, max)
   const hidden =
     names.length > 0 ? Math.max(count ?? 0, names.length) - shown.length : 0
-  const more = moreLabel ?? context.moreLabel
+  const more = context.moreLabel
 
   const total = count ?? (names.length > 0 ? names.length : undefined)
   const hasNames = shown.length > 0 || hidden > 0
@@ -228,7 +224,7 @@ function ConsequencesItem(props: ConsequencesItemProps) {
                 className="rounded-sm py-1 font-medium text-foreground underline-offset-4 outline-none hover:underline focus-visible:ring-[3px] focus-visible:ring-ring/50"
                 onClick={() => setExpanded((open) => !open)}
               >
-                {expanded ? (lessLabel ?? context.lessLabel) : more(hidden)}
+                {expanded ? context.lessLabel : more(hidden)}
               </button>
             </>
           )}

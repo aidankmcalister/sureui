@@ -15,7 +15,6 @@ export default function TypeToConfirmLabelsAndActions() {
           Type <strong>acme-prod</strong> to move it to the Globex team
         </>
       }
-      variant="default"
       confirmLabel="Transfer project"
       onConfirm={transferProject}
       renderActions={(confirmButton) => (

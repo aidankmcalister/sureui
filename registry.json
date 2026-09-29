@@ -262,7 +262,7 @@
       "name": "unsaved-changes",
       "type": "registry:ui",
       "title": "Unsaved Changes",
-      "description": "useUnsavedChanges asks before someone leaves a page with unsaved changes: the browser's prompt on reload or close, and an awaitable confirmLeave() with Keep editing, Discard changes and an optional Save. useConfirmClose asks in a Dialog, Sheet or Drawer's footer before it closes with unsaved edits.",
+      "description": "useUnsavedChanges asks before unsaved changes are lost: the browser's prompt on reload or close, an awaitable confirmLeave() for leaving a page, and Keep editing, Discard changes and an optional Save in a Dialog, Sheet or Drawer's footer before it closes.",
       "registryDependencies": [
         "alert-dialog",
         "button",

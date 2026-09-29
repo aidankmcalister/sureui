@@ -112,19 +112,14 @@ describe("ConfirmMenuItem", () => {
     )
   })
 
-  it("hold: confirmOnRelease keeps the menu open while held, confirms on release and closes", async () => {
-    const { item, onConfirm, onOpenChange } = renderMenu({
-      gesture: "hold",
-      confirmOnRelease: true,
-    })
+  it("hold: keeps the menu open while held, confirms when filled and closes", async () => {
+    const { item, onConfirm, onOpenChange } = renderMenu({ gesture: "hold" })
     expect(item.getAttribute("aria-describedby")).toBeTruthy()
     fireEvent.pointerDown(item, { button: 0 })
     expect(item.getAttribute("data-state")).toBe("holding")
-    await act(async () => vi.advanceTimersByTime(1200))
-    expect(item.getAttribute("data-state")).toBe("ready")
+    await act(async () => vi.advanceTimersByTime(1199))
     expect(closed(onOpenChange)).toBe(false)
-    await act(async () => fireEvent.pointerUp(item))
-    await click(item)
+    await act(async () => vi.advanceTimersByTime(1))
     expect(onConfirm).toHaveBeenCalledOnce()
     expect(closed(onOpenChange)).toBe(true)
   })
@@ -193,22 +188,6 @@ describe("ConfirmMenuItem", () => {
     expect(onConfirm).toHaveBeenCalledOnce()
   })
 
-  it("undo: commitUndoOnClose={false} drops the action when the menu closes", async () => {
-    const onCancel = vi.fn()
-    const { item, onConfirm } = renderMenu({
-      gesture: "click",
-      undo: true,
-      commitUndoOnClose: false,
-      onCancel,
-    })
-    await click(item)
-    await act(async () => fireEvent.keyDown(item, { key: "Escape" }))
-    await act(async () => vi.advanceTimersByTime(10000))
-    expect(screen.queryByRole("menu")).toBeNull()
-    expect(onConfirm).not.toHaveBeenCalled()
-    expect(onCancel).not.toHaveBeenCalled()
-  })
-
   it("pending: stays open and disabled until the promise settles, then closes", async () => {
     let resolve!: () => void
     const onConfirm = vi.fn(() => new Promise<void>((done) => (resolve = done)))
@@ -230,18 +209,6 @@ describe("ConfirmMenuItem", () => {
     await click(item)
     await click(item)
     expect(onConfirm).toHaveBeenCalledOnce()
-    expect(closed(onOpenChange)).toBe(false)
-  })
-
-  it("closeOnUndo={false} keeps the menu open after Undo", async () => {
-    const { item, onOpenChange } = renderMenu({
-      gesture: "click",
-      undo: true,
-      closeOnUndo: false,
-    })
-    await click(item)
-    await click(item)
-    expect(item.getAttribute("data-state")).toBe("idle")
     expect(closed(onOpenChange)).toBe(false)
   })
 
@@ -327,7 +294,7 @@ describe("ConfirmMenuItem options", () => {
     expect(onConfirm).toHaveBeenCalledOnce()
   })
 
-  it("commitUndoOnClose passes a rejection to onConfirmError", async () => {
+  it("closing the menu during undo passes a rejection to onConfirmError", async () => {
     const onConfirmError = vi.fn()
     const onRejection = vi.fn()
     process.on("unhandledRejection", onRejection)

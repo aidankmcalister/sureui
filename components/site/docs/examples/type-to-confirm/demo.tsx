@@ -9,6 +9,7 @@ export default function TypeToConfirmDemo() {
   return (
     <TypeToConfirm
       phrase="acme-prod"
+      variant="destructive"
       confirmLabel="Delete project"
       onConfirm={deleteProject}
       className="w-full max-w-sm"

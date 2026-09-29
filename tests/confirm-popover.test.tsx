@@ -119,13 +119,6 @@ describe("ConfirmPopover", () => {
     await closed()
   })
 
-  it("showCancel={false} leaves only the confirm button", async () => {
-    const { trigger } = renderPopover({ showCancel: false })
-    await open(trigger)
-    expect(screen.queryByRole("button", { name: "Cancel" })).toBeNull()
-    expect(confirmButton()).toBeTruthy()
-  })
-
   it("uses confirmLabel, cancelLabel and variant", async () => {
     const { trigger } = renderPopover({
       confirmLabel: "Delete",
@@ -164,15 +157,6 @@ describe("ConfirmPopover", () => {
     const { trigger } = renderPopover({ initialFocus: "none" })
     const popup = await open(trigger)
     await waitFor(() => expect(document.activeElement).toBe(popup))
-  })
-
-  it("initialFocus: cancel without showCancel falls back to confirm", async () => {
-    const { trigger } = renderPopover({
-      initialFocus: "cancel",
-      showCancel: false,
-    })
-    await open(trigger)
-    await waitFor(() => expect(document.activeElement).toBe(confirmButton()))
   })
 
   it("returns focus to the trigger after confirming", async () => {
@@ -277,21 +261,6 @@ describe("ConfirmPopover", () => {
     expect(screen.getByRole("dialog")).toBeTruthy()
     expect(onConfirm).not.toHaveBeenCalled()
     expect(onCancel).not.toHaveBeenCalled()
-  })
-
-  it("gesture=hold: confirmOnRelease confirms on release and closes", async () => {
-    const { trigger, onConfirm } = renderPopover({
-      gesture: "hold",
-      confirmOnRelease: true,
-    })
-    await open(trigger)
-    const confirm = confirmButton()
-    fireEvent.pointerDown(confirm, { button: 0 })
-    await act(async () => vi.advanceTimersByTimeAsync(1200))
-    expect(confirm.getAttribute("data-state")).toBe("ready")
-    await act(async () => fireEvent.pointerUp(confirm))
-    expect(onConfirm).toHaveBeenCalledOnce()
-    await closed()
   })
 
   it("gesture=hold: releasing early keeps it open", async () => {

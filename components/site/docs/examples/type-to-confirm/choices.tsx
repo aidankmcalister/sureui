@@ -17,6 +17,7 @@ export default function TypeToConfirmChoices() {
         },
         { name: "notify", label: "Email the database owners" },
       ]}
+      variant="destructive"
       confirmLabel="Delete database"
       onConfirm={deleteDatabase}
       className="w-full max-w-sm"

@@ -9,7 +9,7 @@ import { playFill, startUndoWindow } from "@/components/ui/sureui/confirmation"
 interface UndoToastOptions {
   description?: React.ReactNode
   duration?: number | "manual"
-  undoLabel?: string
+  undoLabel?: React.ReactNode
   pauseUndoOnHover?: boolean
   pauseUndoOnFocus?: boolean
 }

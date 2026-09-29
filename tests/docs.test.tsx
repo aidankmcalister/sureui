@@ -20,10 +20,7 @@ import type {
 import type { TypeToConfirmProps } from "@/components/ui/sureui/type-to-confirm"
 import type { UndoToastOptions } from "@/components/ui/sureui/undo-toast"
 import type { UndoableProps } from "@/components/ui/sureui/undoable"
-import type {
-  ConfirmCloseOptions,
-  UnsavedChangesOptions,
-} from "@/components/ui/sureui/unsaved-changes"
+import type { UnsavedChangesOptions } from "@/components/ui/sureui/unsaved-changes"
 import { docsSource, pages } from "@/lib/site/docs"
 import { exampleFile, exampleNames } from "@/lib/site/examples"
 
@@ -37,14 +34,10 @@ const confirmButton = {
   pauseUndoOnFocus: true,
   gesture: true,
   confirmLabel: true,
-  releaseLabel: true,
   undoLabel: true,
   announcements: true,
   timeout: true,
   duration: true,
-  confirmOnRelease: true,
-  cancelOnBlur: true,
-  cancelHoldOnLeave: true,
   armDelay: true,
   onConfirmError: true,
   errorLabel: true,
@@ -60,21 +53,15 @@ const confirmMenuItem = {
   gesture: true,
   menu: true,
   confirmLabel: true,
-  releaseLabel: true,
   undoLabel: true,
   announcements: true,
   timeout: true,
   duration: true,
-  confirmOnRelease: true,
-  cancelOnBlur: true,
-  cancelHoldOnLeave: true,
   holdFallback: true,
   closeOnConfirm: true,
-  closeOnUndo: true,
   armDelay: true,
   onConfirmError: true,
   errorLabel: true,
-  commitUndoOnClose: true,
 } satisfies Record<
   Exclude<
     keyof ConfirmMenuItemProps,
@@ -123,10 +110,7 @@ const confirmDialog = {
   choices: true,
   children: true,
   timeout: true,
-  cancelOnBlur: true,
   duration: true,
-  confirmOnRelease: true,
-  cancelHoldOnLeave: true,
   holdFallback: true,
   caseSensitive: true,
   trim: true,
@@ -143,16 +127,12 @@ const confirmPopover = {
   description: true,
   confirmLabel: true,
   cancelLabel: true,
-  showCancel: true,
   initialFocus: true,
   variant: true,
   gesture: true,
   children: true,
   timeout: true,
-  cancelOnBlur: true,
   duration: true,
-  confirmOnRelease: true,
-  cancelHoldOnLeave: true,
   holdFallback: true,
   announcements: true,
   side: true,
@@ -163,31 +143,6 @@ const confirmPopover = {
   errorLabel: true,
   onOpenChange: true,
 } satisfies Record<keyof ConfirmPopoverProps, true>
-const confirmClose = {
-  dirty: true,
-  title: true,
-  discardLabel: true,
-  keepLabel: true,
-  onSave: true,
-  saveLabel: true,
-  variant: true,
-  open: true,
-  defaultOpen: true,
-  onOpenChange: true,
-  onDiscard: true,
-  onConfirmError: true,
-  errorLabel: true,
-  armDelay: true,
-  gesture: true,
-  timeout: true,
-  cancelOnBlur: true,
-  duration: true,
-  confirmOnRelease: true,
-  cancelHoldOnLeave: true,
-  holdFallback: true,
-  announcements: true,
-} satisfies Record<keyof ConfirmCloseOptions | "dirty", true>
-
 const consequences = {
   subject: true,
   subjectDescription: true,
@@ -213,10 +168,6 @@ const consequencesItem = {
   names: true,
   icon: true,
   description: true,
-  limit: true,
-  expandable: true,
-  moreLabel: true,
-  lessLabel: true,
 } satisfies Record<
   Exclude<keyof ConsequencesItemProps, keyof React.ComponentProps<"li">>,
   true
@@ -263,6 +214,9 @@ const unsavedChanges = {
   keepLabel: true,
   discardLabel: true,
   saveLabel: true,
+  onConfirmError: true,
+  open: true,
+  onOpenChange: true,
 } satisfies Record<keyof UnsavedChangesOptions, true>
 
 const toolApproval = {
@@ -277,6 +231,9 @@ const toolApproval = {
   undo: true,
   timeout: true,
   duration: true,
+  armDelay: true,
+  errorLabel: true,
+  onConfirmError: true,
   scopes: true,
   scopeLabels: true,
   className: true,
@@ -294,6 +251,9 @@ const toolApprovalBatch = {
   undo: true,
   timeout: true,
   duration: true,
+  armDelay: true,
+  errorLabel: true,
+  onConfirmError: true,
   scopes: true,
   scopeLabels: true,
   className: true,
@@ -323,7 +283,6 @@ const documented = {
   TypeToConfirm: typeToConfirm,
   ConfirmDialog: confirmDialog,
   ConfirmPopover: confirmPopover,
-  "useConfirmClose(dirty, options)": confirmClose,
   Consequences: consequences,
   ConsequencesItem: consequencesItem,
   "undoToast(message, options)": undoToast,

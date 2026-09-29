@@ -3,20 +3,17 @@
 import * as React from "react"
 
 import { Button } from "@/components/ui/button"
-import {
-  ConfirmButton,
-  type ConfirmButtonProps,
-} from "@/components/ui/sureui/confirm-button"
+import { ConfirmButton } from "@/components/ui/sureui/confirm-button"
 import { useConfirm } from "@/components/ui/sureui/confirm-dialog"
-import {
-  type ConfirmationOptions,
-  type GestureOptions,
-} from "@/components/ui/sureui/confirmation"
+import { type ConfirmationOptions } from "@/components/ui/sureui/confirmation"
 
-interface UnsavedChangesOptions {
+interface UnsavedChangesOptions extends Pick<
+  ConfirmationOptions,
+  "onConfirmError"
+> {
   when: boolean
   onSave?: () => void | Promise<unknown>
-  onDiscard?: () => void
+  onDiscard?: () => void | Promise<unknown>
   beforeUnload?: boolean
   title?: string
   saveTitle?: string
@@ -24,13 +21,34 @@ interface UnsavedChangesOptions {
   keepLabel?: string
   discardLabel?: string
   saveLabel?: string
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
 function useUnsavedChanges(options: UnsavedChangesOptions) {
-  const { when, beforeUnload = true } = options
+  const {
+    when,
+    onSave,
+    onDiscard,
+    onConfirmError,
+    beforeUnload = true,
+    title = "Discard unsaved changes?",
+    saveTitle = "Save changes before leaving?",
+    keepLabel = "Keep editing",
+    discardLabel = "Discard changes",
+    saveLabel = "Save",
+    open: openProp,
+    onOpenChange,
+  } = options
   const { confirm, dialog } = useConfirm()
   const optionsRef = React.useRef(options)
   const pendingRef = React.useRef<Promise<boolean> | null>(null)
+  const [uncontrolledOpen, setUncontrolledOpen] = React.useState(false)
+  const [asking, setAsking] = React.useState(false)
+  const returnFocus = React.useRef<HTMLElement | null>(null)
+  const keepRef = React.useRef<HTMLButtonElement>(null)
+  const keeping = React.useRef(false)
+  const open = openProp ?? uncontrolledOpen
 
   React.useEffect(() => {
     optionsRef.current = options
@@ -46,10 +64,20 @@ function useUnsavedChanges(options: UnsavedChangesOptions) {
     return () => window.removeEventListener("beforeunload", onBeforeUnload)
   }, [when, beforeUnload])
 
+  if (asking && !when) setAsking(false)
+
+  React.useEffect(() => {
+    if (asking) return keepRef.current?.focus()
+    if (keeping.current) returnFocus.current?.focus()
+    keeping.current = false
+    returnFocus.current = null
+  }, [asking])
+
   const ask = React.useCallback(async () => {
     const {
       onSave,
       onDiscard,
+      onConfirmError,
       title = "Discard unsaved changes?",
       saveTitle = "Save changes before leaving?",
       description = "Your changes haven't been saved.",
@@ -65,6 +93,8 @@ function useUnsavedChanges(options: UnsavedChangesOptions) {
         cancelLabel: keepLabel,
         confirmLabel: discardLabel,
         variant: "destructive",
+        onConfirm: onDiscard,
+        onConfirmError,
       })
 
     let discarding = false
@@ -75,6 +105,7 @@ function useUnsavedChanges(options: UnsavedChangesOptions) {
         cancelLabel: keepLabel,
         confirmLabel: saveLabel,
         onConfirm: onSave,
+        onConfirmError,
         alternative: {
           label: discardLabel,
           onSelect: () => {
@@ -86,9 +117,7 @@ function useUnsavedChanges(options: UnsavedChangesOptions) {
       if (!discarding) return false
     }
 
-    const discarded = await discard()
-    if (discarded) onDiscard?.()
-    return discarded
+    return discard()
   }, [confirm])
 
   const confirmLeave = React.useCallback(() => {
@@ -99,57 +128,6 @@ function useUnsavedChanges(options: UnsavedChangesOptions) {
     return pendingRef.current
   }, [ask])
 
-  return { confirmLeave, dialog }
-}
-
-interface ConfirmCloseOptions
-  extends
-    Pick<ConfirmationOptions, "onConfirmError">,
-    Omit<GestureOptions, "disabled"> {
-  title?: string
-  discardLabel?: React.ReactNode
-  keepLabel?: React.ReactNode
-  errorLabel?: React.ReactNode
-  variant?: ConfirmButtonProps["variant"]
-  announcements?: ConfirmButtonProps["announcements"]
-  open?: boolean
-  defaultOpen?: boolean
-  onOpenChange?: (open: boolean) => void
-  onDiscard?: () => void | Promise<unknown>
-  onSave?: () => void | Promise<unknown>
-  saveLabel?: React.ReactNode
-}
-
-function useConfirmClose(dirty: boolean, options: ConfirmCloseOptions = {}) {
-  const {
-    title = "Discard changes?",
-    discardLabel = "Discard changes",
-    keepLabel = "Keep editing",
-    variant = "destructive",
-    open: openProp,
-    defaultOpen = false,
-    onOpenChange,
-    onDiscard,
-    onSave,
-    saveLabel = "Save",
-    ...buttonOptions
-  } = options
-  const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen)
-  const [asking, setAsking] = React.useState(false)
-  const returnFocus = React.useRef<HTMLElement | null>(null)
-  const keepRef = React.useRef<HTMLButtonElement>(null)
-  const keeping = React.useRef(false)
-  const open = openProp ?? uncontrolledOpen
-
-  if (asking && !dirty) setAsking(false)
-
-  React.useEffect(() => {
-    if (asking) return keepRef.current?.focus()
-    if (keeping.current) returnFocus.current?.focus()
-    keeping.current = false
-    returnFocus.current = null
-  }, [asking])
-
   function setOpen(next: boolean) {
     if (!next) {
       setAsking(false)
@@ -159,39 +137,25 @@ function useConfirmClose(dirty: boolean, options: ConfirmCloseOptions = {}) {
     onOpenChange?.(next)
   }
 
-  function ask() {
-    if (asking) return
-    const active = document.activeElement
-    returnFocus.current = active instanceof HTMLElement ? active : null
-    setAsking(true)
-  }
-
-  async function discard() {
-    await onDiscard?.()
-    setOpen(false)
-  }
-
-  async function save() {
-    await onSave?.()
-    setOpen(false)
-  }
-
   const rootProps: {
     open: boolean
     onOpenChange: (open: boolean, eventDetails: { cancel: () => void }) => void
   } = {
     open,
     onOpenChange(next, eventDetails) {
-      if (next || !dirty) return setOpen(next)
+      if (next || !when) return setOpen(next)
       eventDetails.cancel()
-      ask()
+      if (asking) return
+      const active = document.activeElement
+      returnFocus.current = active instanceof HTMLElement ? active : null
+      setAsking(true)
     },
   }
 
   const question = asking ? (
-    <React.Fragment key="confirm-close">
+    <React.Fragment key="unsaved-changes">
       <span role="status" className="sr-only">
-        {title}
+        {onSave ? saveTitle : title}
       </span>
       <Button
         ref={keepRef}
@@ -203,19 +167,37 @@ function useConfirmClose(dirty: boolean, options: ConfirmCloseOptions = {}) {
       >
         {keepLabel}
       </Button>
-      <ConfirmButton {...buttonOptions} variant={variant} onConfirm={discard}>
+      <ConfirmButton
+        variant="destructive"
+        onConfirm={async () => {
+          await onDiscard?.()
+          setOpen(false)
+        }}
+        onConfirmError={onConfirmError}
+      >
         {discardLabel}
       </ConfirmButton>
-      {onSave && <ConfirmButton onConfirm={save}>{saveLabel}</ConfirmButton>}
+      {onSave && (
+        <ConfirmButton
+          onConfirm={async () => {
+            await onSave()
+            setOpen(false)
+          }}
+          onConfirmError={onConfirmError}
+        >
+          {saveLabel}
+        </ConfirmButton>
+      )}
     </React.Fragment>
   ) : null
 
-  return { rootProps, question, close: () => setOpen(false) }
+  return {
+    confirmLeave,
+    dialog,
+    rootProps,
+    question,
+    close: () => setOpen(false),
+  }
 }
 
-export {
-  useUnsavedChanges,
-  useConfirmClose,
-  type UnsavedChangesOptions,
-  type ConfirmCloseOptions,
-}
+export { useUnsavedChanges, type UnsavedChangesOptions }

@@ -19,7 +19,7 @@ export default function Hold() {
     <ConfirmButton
       gesture="hold"
       duration={control("duration", 1200)}
-      confirmOnRelease={control("confirmOnRelease", false)}
+      disabled={control("disabled", false)}
       onConfirm={revokeKey}
     >
       Hold to revoke
@@ -33,7 +33,7 @@ describe("example source", () => {
   it("finds the controls and whether the example logs", () => {
     expect(example.controls).toEqual([
       { name: "duration", value: 1200 },
-      { name: "confirmOnRelease", value: false },
+      { name: "disabled", value: false },
     ])
     expect(example.log).toBe(true)
   })
@@ -43,7 +43,7 @@ describe("example source", () => {
     expect(text).toMatch(/^"use client"\n\nimport /)
     expect(text).not.toMatch(/useActions|useControl|control\(/)
     expect(text).toContain("duration={1200}")
-    expect(text).not.toContain("confirmOnRelease")
+    expect(text).not.toContain("disabled")
     expect(text).toContain("onConfirm={revokeKey}")
     expect(text).toMatch(/^export default function Hold\(\) \{\n {2}return \(/m)
   })
@@ -52,10 +52,10 @@ describe("example source", () => {
     const text = renderExample(example, {
       ...defaultValues(example.controls),
       duration: 2500,
-      confirmOnRelease: true,
+      disabled: true,
     })
     expect(text).toContain("duration={2500}")
-    expect(text).toMatch(/^ {6}confirmOnRelease$/m)
+    expect(text).toMatch(/^ {6}disabled$/m)
   })
 
   it("puts a value toggle in place when it isn't a JSX prop", () => {

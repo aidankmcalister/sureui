@@ -128,11 +128,11 @@ describe("Consequences", () => {
     expect(screen.getByRole("button", { name: "Fewer" })).toBeTruthy()
   })
 
-  it("composes ConsequencesItem children, which inherit limit and can override it", () => {
+  it("composes ConsequencesItem children, which use the list's limit", () => {
     render(
       <Consequences title="This deletes" limit={1} expandable={false}>
         <ConsequencesItem label="projects" names={projects} />
-        <ConsequencesItem label="domains" names={projects} limit={3} />
+        <ConsequencesItem label="domains" names={projects} />
         <ConsequencesItem
           label="API keys"
           count={4}
@@ -141,9 +141,7 @@ describe("Consequences", () => {
       </Consequences>
     )
     expect(itemText(/projects/)?.textContent).toContain("acme-web and 2 more")
-    expect(itemText(/domains/)?.textContent).toContain(
-      "acme-web, acme-api, docs"
-    )
+    expect(itemText(/domains/)?.textContent).toContain("acme-web and 2 more")
     expect(
       screen.getByText("Requests that use them start failing.")
     ).toBeTruthy()

@@ -24,6 +24,7 @@ export default function TypeToConfirmConsequences() {
           ]}
         />
       }
+      variant="destructive"
       confirmLabel="Delete organization"
       onConfirm={deleteOrganization}
       className="w-full max-w-sm"

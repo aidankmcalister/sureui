@@ -34,7 +34,7 @@ The first click arms the item and the second confirms. The menu stays open until
 
 ### Undo
 
-With `undo`, the item turns into Undo. Closing the menu during the window commits the action unless `commitUndoOnClose={false}`.
+With `undo`, the item turns into Undo, and pressing it cancels and closes the menu. Closing the menu during the window commits the action, since the item unmounts with the menu.
 
 With `undo="manual"`, Undo stays until people move to another item, press outside it or close the menu.
 
@@ -65,23 +65,17 @@ Extends the shadcn [`DropdownMenuItem`](https://ui.shadcn.com/docs/components/ba
 | `gesture` | `"click" \| "click-again" \| "hold"` | `"click-again"` |
 | `menu` | `"dropdown" \| "context"` | `"dropdown"` |
 | `closeOnConfirm` | `boolean` | `true` |
-| `closeOnUndo` | `boolean` | `true` |
-| `commitUndoOnClose` | `boolean` | `true` |
 | `undo` | `boolean \| number \| "manual"` | — |
 | `pauseUndoOnHover` | `boolean` | `true` |
 | `pauseUndoOnFocus` | `boolean` | `true` |
 | `confirmLabel` | `ReactNode` | `"Click again to confirm"`, or `"Confirm"` for a hold |
-| `releaseLabel` | `ReactNode` | — |
 | `undoLabel` | `ReactNode` | `"Undo"` |
 | `errorLabel` | `ReactNode` | — |
 | `armDelay` | `number` | `0` |
 | `timeout` | `number` | `3000` |
-| `cancelOnBlur` | `boolean` | `true` |
 | `duration` | `number` | `1200` |
-| `confirmOnRelease` | `boolean` | `false` |
-| `cancelHoldOnLeave` | `boolean` | `true` |
 | `holdFallback` | `"click-again" \| "none"` | `"click-again"` |
-| `announcements` | `{ armed?, hold?, fallback?, ready?, undo?, error? }` | — |
+| `announcements` | `{ armed?, hold?, fallback?, undo?, error? }` | — |
 
 ### Data attributes
 
@@ -89,7 +83,7 @@ The item sets the same `data-state` values and `data-error` as [Confirm Button](
 
 ## Accessibility
 
-- Moving the highlight to another item disarms it, unless `cancelOnBlur={false}`.
+- Moving the highlight to another item disarms it.
 - Key repeat is ignored, so holding Enter can't arm and confirm at once.
 - Each state change is announced in a polite live region. Change the text with `announcements`.
 

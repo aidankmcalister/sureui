@@ -47,7 +47,7 @@ Press and hold until the fill completes, and it confirms. Letting go early cance
 
 <Example name="confirm-button/hold" />
 
-Moving off the button or losing focus also cancels. Set `confirmOnRelease` to wait for people to let go after the fill, so they can still back out.
+Moving off the button or losing focus also cancels.
 
 ### Pending
 
@@ -69,7 +69,7 @@ The error label is announced in the polite live region. Change the text with `an
 
 ### Labels
 
-`confirmLabel` shows while armed and `undoLabel` during the undo window. With `confirmOnRelease`, `releaseLabel` shows while a finished hold waits for release.
+`confirmLabel` shows while armed and `undoLabel` during the undo window.
 
 <Example name="confirm-button/labels" />
 
@@ -90,17 +90,13 @@ Extends the shadcn [`Button`](https://ui.shadcn.com/docs/components/base/button)
 | `pauseUndoOnHover` | `boolean` | `true` |
 | `pauseUndoOnFocus` | `boolean` | `true` |
 | `confirmLabel` | `ReactNode` | `"Click again to confirm"`, or `"Confirm"` for a hold |
-| `releaseLabel` | `ReactNode` | — |
 | `undoLabel` | `ReactNode` | `"Undo"` |
 | `errorLabel` | `ReactNode` | — |
 | `armDelay` | `number` | `0` |
 | `timeout` | `number` | `3000` |
-| `cancelOnBlur` | `boolean` | `true` |
 | `duration` | `number` | `1200` |
-| `confirmOnRelease` | `boolean` | `false` |
-| `cancelHoldOnLeave` | `boolean` | `true` |
 | `holdFallback` | `"click-again" \| "none"` | `"click-again"` |
-| `announcements` | `{ armed?, hold?, fallback?, ready?, undo?, error? }` | — |
+| `announcements` | `{ armed?, hold?, fallback?, undo?, error? }` | — |
 
 ### Data attributes
 
@@ -111,7 +107,6 @@ The button sets `data-state`, so you can style around it. After `onConfirm` fail
 | `idle` | Waiting for input. |
 | `armed` | Clicked once with `click-again`, or a hold that fell back to a second activation. |
 | `holding` | Being held with `gesture="hold"`. |
-| `ready` | With `confirmOnRelease`, the fill is complete and letting go confirms. |
 | `undo` | The undo window is open. |
 | `pending` | `onConfirm` returned a promise that hasn't settled. |
 

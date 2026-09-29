@@ -16,6 +16,7 @@ import { TypeToConfirm } from "@/components/ui/sureui/type-to-confirm"
 
 <TypeToConfirm
   phrase="acme-prod"
+  variant="destructive"
   confirmLabel="Delete project"
   onConfirm={deleteProject}
 />
@@ -77,10 +78,10 @@ Renders a `form`.
 | `choices` | `{ name: string, label: ReactNode, defaultChecked?: boolean }[]` | `[]` |
 | `consequences` | `ReactNode` | — |
 | `label` | `ReactNode \| ReactNode[]` | `"Type {phrase} to confirm"` |
-| `confirmLabel` | `string` | `"Confirm"` |
-| `undoLabel` | `string` | `"Undo"` |
-| `errorLabel` | `string` | — |
-| `variant` | [`Button`](https://ui.shadcn.com/docs/components/base/button) `variant` | `"destructive"` |
+| `confirmLabel` | `ReactNode` | `"Confirm"` |
+| `undoLabel` | `ReactNode` | `"Undo"` |
+| `errorLabel` | `ReactNode` | — |
+| `variant` | [`Button`](https://ui.shadcn.com/docs/components/base/button) `variant` | `"default"` |
 | `undo` | `boolean \| number \| "manual"` | — |
 | `pauseUndoOnHover` | `boolean` | `true` |
 | `pauseUndoOnFocus` | `boolean` | `true` |

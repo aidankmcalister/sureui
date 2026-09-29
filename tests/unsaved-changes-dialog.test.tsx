@@ -10,8 +10,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import {
-  useConfirmClose,
-  type ConfirmCloseOptions,
+  useUnsavedChanges,
+  type UnsavedChangesOptions,
 } from "@/components/ui/sureui/unsaved-changes"
 
 function EditDialog({
@@ -19,10 +19,11 @@ function EditDialog({
   options,
 }: {
   initiallyDirty?: boolean
-  options?: ConfirmCloseOptions
+  options?: Partial<UnsavedChangesOptions>
 }) {
   const [name, setName] = React.useState(initiallyDirty ? "Ada" : "")
-  const { rootProps, question, close } = useConfirmClose(name !== "", {
+  const { rootProps, question, close } = useUnsavedChanges({
+    when: name !== "",
     onDiscard: () => setName(""),
     ...options,
   })
@@ -84,7 +85,7 @@ const attempts = {
     ),
 }
 
-describe("useConfirmClose", () => {
+describe("useUnsavedChanges in a dialog", () => {
   it.each(Object.entries(attempts))(
     "%s closes straight away when nothing changed",
     async (_, attempt) => {
@@ -102,7 +103,9 @@ describe("useConfirmClose", () => {
       await attempt()
       const ask = await screen.findByRole("button", { name: "Keep editing" })
       expect(editor.contains(ask)).toBe(true)
-      expect(screen.getByRole("status").textContent).toBe("Discard changes?")
+      expect(screen.getByRole("status").textContent).toBe(
+        "Discard unsaved changes?"
+      )
       expect(screen.getAllByRole("dialog")).toHaveLength(1)
     }
   )
@@ -157,8 +160,9 @@ describe("useConfirmClose", () => {
     const onSubmit = vi.fn((event: React.FormEvent) => event.preventDefault())
     function FormDialog() {
       const [name, setName] = React.useState("Ada")
-      const { rootProps, question } = useConfirmClose(name !== "Ada", {
-        defaultOpen: true,
+      const { rootProps, question } = useUnsavedChanges({
+        when: name !== "Ada",
+        open: true,
       })
       return (
         <Dialog {...rootProps}>
@@ -260,7 +264,8 @@ describe("useConfirmClose", () => {
   it("works with open controlled by the caller", async () => {
     function Controlled() {
       const [open, setOpen] = React.useState(true)
-      const { rootProps, question } = useConfirmClose(true, {
+      const { rootProps, question } = useUnsavedChanges({
+        when: true,
         open,
         onOpenChange: setOpen,
       })
@@ -295,7 +300,6 @@ describe("useConfirmClose", () => {
       options: {
         onDiscard: () => Promise.reject(new Error("offline")),
         onConfirmError,
-        errorLabel: "Try again",
       },
     })
     await attempts.Escape()
@@ -311,7 +315,7 @@ describe("useConfirmClose", () => {
       )
     )
     expect(
-      await screen.findByRole("button", { name: "Try again" })
+      await screen.findByRole("button", { name: "Discard changes" })
     ).toBeTruthy()
     expect(screen.getByRole("dialog", { name: "Edit profile" })).toBeTruthy()
   })

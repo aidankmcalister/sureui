@@ -13,6 +13,7 @@ export default function TypeToConfirmAcknowledgements() {
         "I understand every backup of orders-db is deleted too.",
         "I understand apps connected to it stop working.",
       ]}
+      variant="destructive"
       confirmLabel="Delete database"
       onConfirm={deleteDatabase}
       className="w-full max-w-sm"
