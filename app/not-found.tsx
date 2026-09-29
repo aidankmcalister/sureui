@@ -3,12 +3,14 @@ import Link from "next/link"
 
 import { Band, PageLead, PageTitle } from "@/components/site/layout/frame"
 import { siteButton } from "@/components/site/ui/button"
+import { TrackNotFound } from "@/components/site/layout/track-not-found"
 
 export const metadata: Metadata = { title: "Page not found" }
 
 export default function NotFound() {
   return (
     <main className="flex flex-1 flex-col">
+      <TrackNotFound />
       <Band
         grow
         className="grid content-center gap-6 px-3 py-14 sm:px-6 sm:py-16 lg:py-20"

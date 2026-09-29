@@ -1,6 +1,8 @@
 import fs from "node:fs"
 import path from "node:path"
 
+import type { SearchEntry } from "@/lib/site/search"
+
 const contentDir = path.join(process.cwd(), "content/docs")
 const indexSlug = "introduction"
 
@@ -41,6 +43,16 @@ function parse(source: string) {
   return { meta, body: body.trim() }
 }
 
+function expand(folder: string, pages: string[]) {
+  const rest = fs
+    .readdirSync(path.join(contentDir, folder))
+    .filter((file) => file.endsWith(".mdx"))
+    .map((file) => file.slice(0, -".mdx".length))
+    .filter((slug) => !pages.includes(slug))
+    .sort()
+  return pages.flatMap((slug) => (slug === "..." ? rest : [slug]))
+}
+
 const sources = new Map<
   string,
   { file: string; source: string; body: string }
@@ -53,7 +65,7 @@ export const sections: Section[] = readJson<{ sections: string[] }>(
   return {
     folder,
     title,
-    pages: pages.map((slug) => {
+    pages: expand(folder, pages).map((slug) => {
       const file = path.join(contentDir, folder, `${slug}.mdx`)
       const source = fs.readFileSync(file, "utf8")
       const { meta, body } = parse(source)
@@ -71,10 +83,6 @@ export const sections: Section[] = readJson<{ sections: string[] }>(
 })
 
 export const pages = sections.flatMap((section) => section.pages)
-
-export function getPage(slug: string) {
-  return pages.find((page) => page.slug === slug)
-}
 
 export function pageAt(href: string) {
   return pages.find((page) => page.href === href)
@@ -121,4 +129,16 @@ export function headings(slug: string): Heading[] {
       const text = line.replace(/^###? /, "").replace(/`/g, "")
       return { depth: line.startsWith("### ") ? 3 : 2, text, id: slugify(text) }
     })
+}
+
+export function searchEntries(): SearchEntry[] {
+  return pages.flatMap((page) => [
+    { href: page.href, title: page.title, text: page.description },
+    ...headings(page.slug).map((heading) => ({
+      href: `${page.href}#${heading.id}`,
+      title: heading.text,
+      page: page.title,
+      text: "",
+    })),
+  ])
 }

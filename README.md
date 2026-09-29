@@ -33,26 +33,10 @@ The [blocks](https://sureui.com/blocks) are full screens built from these compon
 
 ## Install
 
-Add the registry to your `components.json`:
-
-```json
-{
-  "registries": {
-    "@sureui": "https://sureui.com/r/{name}.json"
-  }
-}
-```
-
-Then add the items you need. Each one installs on its own into `components/ui/sureui/`:
+`@sureui` is in the shadcn registry index, so there's nothing to configure. Add the items you need. Each one installs on its own into `components/ui/sureui/`:
 
 ```bash
 npx shadcn@latest add @sureui/confirm-button
-```
-
-Components also install straight from GitHub, with no registry entry. Blocks need the entry, because they depend on other `@sureui` items:
-
-```bash
-npx shadcn@latest add aidankmcalister/sureui/confirm-button
 ```
 
 > [!NOTE]

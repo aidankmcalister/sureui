@@ -1,17 +1,4 @@
 {
   "title": "Components",
-  "pages": [
-    "confirm-button",
-    "confirm-menu-item",
-    "confirm-switch",
-    "type-to-confirm",
-    "bulk-confirm",
-    "confirm-dialog",
-    "confirm-popover",
-    "consequences",
-    "undo-toast",
-    "undoable",
-    "unsaved-changes",
-    "tool-approval"
-  ]
+  "pages": ["confirm-button", "..."]
 }

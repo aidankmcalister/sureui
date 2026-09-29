@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs"
 import { basename, dirname, join } from "node:path"
 import { describe, expect, it } from "vitest"
 
+import { pages } from "@/lib/site/docs"
 import { components } from "@/lib/site/registry"
 import registry from "@/registry.json"
 
@@ -139,16 +140,14 @@ describe("hand-written item lists", () => {
     "content/docs/getting-started/introduction.mdx",
     "utf8"
   )
-  const nav = JSON.parse(
-    readFileSync("content/docs/components/meta.json", "utf8")
-  ) as { pages: string[] }
+  const nav = pages.map((page) => page.slug)
 
   it.each(components)(
     "$name is in the README, introduction and docs nav",
     ({ name, exports }) => {
       expect(readme).toContain(`| \`${exports[0]}\``)
       expect(introduction).toContain(`](/docs/${name})`)
-      expect(nav.pages).toContain(name)
+      expect(nav).toContain(name)
     }
   )
 })

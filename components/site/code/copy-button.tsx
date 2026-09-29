@@ -4,8 +4,15 @@ import * as React from "react"
 import { CheckIcon, CopyIcon } from "lucide-react"
 
 import { SiteButton } from "@/components/site/ui/button"
+import { trackCall, type TrackCall } from "@/lib/site/analytics"
 
-export function CopyButton({ value }: { value: string }) {
+export function CopyButton({
+  value,
+  track,
+}: {
+  value: string
+  track?: TrackCall
+}) {
   const [copied, setCopied] = React.useState(false)
 
   React.useEffect(() => {
@@ -22,6 +29,7 @@ export function CopyButton({ value }: { value: string }) {
       onClick={async () => {
         await navigator.clipboard.writeText(value)
         setCopied(true)
+        trackCall(track)
       }}
     >
       {copied ? <CheckIcon /> : <CopyIcon />}

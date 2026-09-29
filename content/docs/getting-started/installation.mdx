@@ -9,31 +9,13 @@ SureUI installs into a shadcn/ui project on Base UI, the shadcn default. Project
 
 <Install args="init" />
 
-## Add the registry
-
-Add `@sureui` to the registries in your `components.json`:
-
-```json
-{
-  "registries": {
-    "@sureui": "https://sureui.com/r/{name}.json"
-  }
-}
-```
-
 ## Add components
 
-Each item includes the confirmation core, so install only the ones you use:
+`@sureui` is in the shadcn registry index, so the CLI finds it without any setup. Each item includes the confirmation core, so install only the ones you use:
 
 <Install args="add @sureui/confirm-button" />
 
-Each component page lists its own command.
-
-Components also install straight from GitHub, with no registry entry:
-
-<Install args="add aidankmcalister/sureui/confirm-button" />
-
-Blocks need the registry entry, because they depend on other `@sureui` items.
+Each component page lists its own command, and blocks install the same way.
 
 ## Use them in a client component
 

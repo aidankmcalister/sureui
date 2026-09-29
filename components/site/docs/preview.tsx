@@ -16,6 +16,7 @@ import {
   ResetScope,
   ResetTrigger,
 } from "@/components/site/ui/reset"
+import { track } from "@/lib/site/analytics"
 import { defaultValues, type Control } from "@/lib/site/example-source"
 
 export { useControl } from "@/components/site/docs/controls"
@@ -121,12 +122,14 @@ function Stage({ children }: { children: React.ReactNode }) {
 }
 
 export function Preview({
+  name,
   code,
   controls = [],
   appear,
   log,
   children,
 }: {
+  name: string
   code: React.ReactNode
   controls?: Control[]
   appear?: string
@@ -136,16 +139,31 @@ export function Preview({
   const [values, setValues] = React.useState(() => defaultValues(controls))
   const [line, setLine] = React.useState<Line | null>(null)
   const nextId = React.useRef(0)
+  const controlTimer = React.useRef<ReturnType<typeof setTimeout>>(undefined)
 
-  const push = React.useCallback<Log>((message) => {
-    setLine({ id: nextId.current++, message })
-  }, [])
+  const push = React.useCallback<Log>(
+    (message) => {
+      setLine({ id: nextId.current++, message })
+      track("example-action", { example: name, action: message.split("(")[0] })
+    },
+    [name]
+  )
 
   return (
     <div className="border border-(--rule) bg-(--well) text-foreground">
-      <ResetScope onReset={() => setLine(null)}>
+      <ResetScope
+        onReset={() => {
+          setLine(null)
+          track("example-reset", { example: name })
+        }}
+      >
         <ControlScope values={values}>
-          <SiteTabs defaultValue="preview">
+          <SiteTabs
+            defaultValue="preview"
+            onValueChange={(tab) => {
+              if (tab === "code") track("code-tab", { example: name })
+            }}
+          >
             <div className="flex min-h-10 flex-wrap items-center gap-x-4 border-b border-(--rule) pr-1.5 pl-2">
               <SiteTabsList className="h-10">
                 <SiteTab value="preview">Preview</SiteTab>
@@ -157,6 +175,21 @@ export function Preview({
                     controls={controls}
                     values={values}
                     onChange={(next) => {
+                      const control = Object.keys(next).find(
+                        (key) => next[key] !== values[key]
+                      )
+                      clearTimeout(controlTimer.current)
+                      if (control) {
+                        controlTimer.current = setTimeout(
+                          () =>
+                            track("example-control", {
+                              example: name,
+                              control,
+                              value: String(next[control]),
+                            }),
+                          1000
+                        )
+                      }
                       setValues(next)
                       setLine(null)
                     }}

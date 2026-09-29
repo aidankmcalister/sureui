@@ -11,9 +11,11 @@ import {
 } from "@/lib/site/example-source"
 
 export function ExampleCode({
+  name,
   lines,
   example,
 }: {
+  name: string
   lines: Token[][]
   example: ExampleSource
 }) {
@@ -22,6 +24,7 @@ export function ExampleCode({
   return (
     <CodeView
       framed={false}
+      name={name}
       copy={renderExample(example, values)}
       lines={lines
         .filter((_, index) => lineShown(example, index, values))

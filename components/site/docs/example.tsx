@@ -17,11 +17,16 @@ export async function Example({
 
   return (
     <Preview
+      name={name}
       log={example.log}
       controls={example.controls}
       appear={appear}
       code={
-        <ExampleCode lines={highlight(example.template)} example={example} />
+        <ExampleCode
+          name={name}
+          lines={highlight(example.template)}
+          example={example}
+        />
       }
     >
       <Component />

@@ -10,7 +10,8 @@ import {
 import { GitHubIcon } from "@/components/site/layout/github-icon"
 import { SiteLink } from "@/components/site/layout/site-link"
 import { githubUrl } from "@/lib/site/config"
-import { sections } from "@/lib/site/docs"
+import { searchEntries, sections } from "@/lib/site/docs"
+import { Search } from "@/components/site/layout/search"
 import { SiteMenu } from "@/components/site/layout/site-menu"
 import { ThemeToggle } from "@/components/site/layout/theme-toggle"
 import { siteButton } from "@/components/site/ui/button"
@@ -58,7 +59,8 @@ export function Header() {
             <Label className="text-inherit">{link.label}</Label>
           </Link>
         ))}
-        <div className="-mr-1 -ml-2 flex items-center">
+        <div className="-mr-1 -ml-2 flex items-center gap-1 lg:ml-0">
+          <Search entries={searchEntries()} />
           <SiteLink
             href={githubUrl}
             aria-label="GitHub"

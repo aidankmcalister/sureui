@@ -15,6 +15,7 @@ export function CodeView({
   lines,
   copy,
   label = "tsx",
+  name = label,
   framed = true,
   collapsible = false,
   defaultOpen = true,
@@ -23,6 +24,7 @@ export function CodeView({
   lines: Token[][]
   copy: string
   label?: string
+  name?: string
   framed?: boolean
   collapsible?: boolean
   defaultOpen?: boolean
@@ -81,7 +83,10 @@ export function CodeView({
           {body}
         </details>
         <div className="absolute top-0 right-1.5 flex h-10 items-center">
-          <CopyButton value={copy} />
+          <CopyButton
+            value={copy}
+            track={{ event: "copy-code", data: { label: name } }}
+          />
         </div>
       </div>
     )
@@ -96,7 +101,10 @@ export function CodeView({
     >
       <div className="flex h-10 items-center justify-between border-b border-(--rule) pr-1.5 pl-4">
         {labelNode}
-        <CopyButton value={copy} />
+        <CopyButton
+          value={copy}
+          track={{ event: "copy-code", data: { label: name } }}
+        />
       </div>
       {body}
     </div>

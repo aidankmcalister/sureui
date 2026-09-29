@@ -66,7 +66,10 @@ export function InstallCommand({ args }: { args: string }) {
             ))}
           </SiteTabsList>
         </SiteTabs>
-        <CopyButton value={command} />
+        <CopyButton
+          value={command}
+          track={{ event: "copy-install", data: { args, runner } }}
+        />
       </div>
       <p className="overflow-x-auto px-4 py-3 font-mono text-[13px] leading-6 whitespace-nowrap text-(--code-foreground)">
         <span className="text-(--code-keyword)">{runners[runner]}</span>{" "}
