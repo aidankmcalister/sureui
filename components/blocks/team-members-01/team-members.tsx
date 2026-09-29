@@ -35,8 +35,8 @@ type TeamMembersProps = {
 const sampleMembers: Member[] = [
   {
     id: "mem_1",
-    name: "Ada Lovelace",
-    email: "ada@acme.com",
+    name: "John Doe",
+    email: "john@acme.com",
     role: "Owner",
     you: true,
   },

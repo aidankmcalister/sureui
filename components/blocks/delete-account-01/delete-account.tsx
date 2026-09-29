@@ -41,7 +41,7 @@ function request() {
 }
 
 function DeleteAccount({
-  email = "ada@example.com",
+  email = "john@example.com",
   className,
 }: DeleteAccountProps) {
   const [exportState, setExportState] = React.useState<

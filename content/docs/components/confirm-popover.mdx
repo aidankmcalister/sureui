@@ -59,6 +59,8 @@ Add a `title` to show a heading above the description.
 
 With `onConfirmError`, a failed `onConfirm` keeps the popover open and the error goes to your handler. `errorLabel` replaces the confirm label until the next activation, which tries again.
 
+<Example name="confirm-popover/errors" />
+
 ### Initial focus
 
 Focus starts on the confirm button, so a keyboard user can confirm a quick action with one more key. `initialFocus="cancel"` starts on Cancel instead, and `"none"` focuses the popover itself. For an action that deletes data or can't be undone, the WAI-ARIA [dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) advises focusing the least destructive action.

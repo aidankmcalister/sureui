@@ -46,7 +46,10 @@ export function figureNumber(index: number) {
   return String(index + 1).padStart(2, "0")
 }
 
-const sources = new Map<string, { source: string; body: string }>()
+const sources = new Map<
+  string,
+  { file: string; source: string; body: string }
+>()
 
 export const sections: Section[] = readJson<{ sections: string[] }>(
   "meta.json"
@@ -56,12 +59,10 @@ export const sections: Section[] = readJson<{ sections: string[] }>(
     folder,
     title,
     pages: pages.map((slug, index) => {
-      const source = fs.readFileSync(
-        path.join(contentDir, folder, `${slug}.mdx`),
-        "utf8"
-      )
+      const file = path.join(contentDir, folder, `${slug}.mdx`)
+      const source = fs.readFileSync(file, "utf8")
       const { meta, body } = parse(source)
-      sources.set(slug, { source, body })
+      sources.set(slug, { file, source, body })
       return {
         slug,
         href: slug === indexSlug ? "/docs" : `/docs/${slug}`,
@@ -91,12 +92,19 @@ export function staticParams() {
     .map((page) => ({ slug: page.slug }))
 }
 
+function read(slug: string) {
+  const cached = sources.get(slug)
+  if (!cached || process.env.NODE_ENV !== "development") return cached
+  const source = fs.readFileSync(cached.file, "utf8")
+  return { ...cached, source, body: parse(source).body }
+}
+
 export function docsSource(slug: string) {
-  return sources.get(slug)?.source ?? ""
+  return read(slug)?.source ?? ""
 }
 
 export function docsBody(slug: string) {
-  return sources.get(slug)?.body ?? ""
+  return read(slug)?.body ?? ""
 }
 
 export function slugify(text: string) {

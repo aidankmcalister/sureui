@@ -74,9 +74,13 @@ Keep `"cancel"` for anything that deletes data or can't be undone. The WAI-ARIA 
 
 `armDelay` ignores the confirm button for that many milliseconds after the dialog opens, so a double click on the trigger can't pass through to it. It works as on [Confirm Popover](/docs/confirm-popover#arm-delay).
 
+<Example name="confirm-dialog/arm-delay" />
+
 ### Errors
 
 With `onConfirmError`, a failed `onConfirm` keeps the dialog open and the error goes to your handler. `errorLabel` replaces the confirm label until the next activation, which tries again.
+
+<Example name="confirm-dialog/errors" />
 
 ### Consequences
 

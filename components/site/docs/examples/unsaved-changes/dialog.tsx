@@ -16,7 +16,7 @@ import { useActions } from "@/components/site/docs/preview"
 
 export default function UnsavedChangesDialog() {
   const { saveProfile } = useActions()
-  const [saved, setSaved] = React.useState("Ada Lovelace")
+  const [saved, setSaved] = React.useState("John Doe")
   const [name, setName] = React.useState(saved)
   const { rootProps, question, close } = useUnsavedChanges({
     when: name !== saved,

@@ -129,7 +129,7 @@ describe("api-keys-01", () => {
 
 describe("delete-account-01", () => {
   it("lists what goes and offers an export before the form", () => {
-    render(<DeleteAccount email="ada@example.com" />)
+    render(<DeleteAccount email="john@example.com" />)
     const exportButton = screen.getByRole("button", { name: "Export data" })
     const deleteButton = screen.getByRole("button", { name: "Delete account" })
     expect(
@@ -147,10 +147,10 @@ describe("delete-account-01", () => {
   })
 
   it("unlocks only after the email and every acknowledgement", async () => {
-    render(<DeleteAccount email="ada@example.com" />)
+    render(<DeleteAccount email="john@example.com" />)
     const confirm = screen.getByRole("button", { name: "Delete account" })
     fireEvent.change(screen.getByRole("textbox"), {
-      target: { value: " Ada@Example.com " },
+      target: { value: " John@Example.com " },
     })
     const [first, second] = screen.getAllByRole("checkbox")
     fireEvent.click(first)
@@ -162,7 +162,7 @@ describe("delete-account-01", () => {
   })
 
   it("starts an export without touching the account", async () => {
-    render(<DeleteAccount email="ada@example.com" />)
+    render(<DeleteAccount email="john@example.com" />)
     fireEvent.click(screen.getByRole("button", { name: "Export data" }))
     await screen.findByRole("button", { name: "Export requested" }, settled)
     expect(screen.getByRole("button", { name: "Delete account" })).toBeTruthy()

@@ -41,13 +41,13 @@ export function DocsToc({ headings }: { headings: Heading[] }) {
               href={`#${heading.id}`}
               aria-current={active === heading.id ? "location" : undefined}
               className={cn(
-                "-ml-px block border-l border-transparent py-1 pl-3 text-[13px] leading-5 text-(--ink-muted) hover:text-(--ink)",
+                "-ml-px block border-l border-transparent py-1 pl-3 text-[13px] leading-5 wrap-break-word text-(--ink-muted) hover:text-(--ink)",
                 heading.depth === 3 && "pl-6",
                 active === heading.id &&
                   "border-(--mark) font-medium text-(--ink)"
               )}
             >
-              {heading.text}
+              {heading.text.replace(/\(.*\)$/, "")}
             </a>
           </li>
         ))}

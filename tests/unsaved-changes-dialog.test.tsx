@@ -21,7 +21,7 @@ function EditDialog({
   initiallyDirty?: boolean
   options?: Partial<UnsavedChangesOptions>
 }) {
-  const [name, setName] = React.useState(initiallyDirty ? "Ada" : "")
+  const [name, setName] = React.useState(initiallyDirty ? "John" : "")
   const { rootProps, question, close } = useUnsavedChanges({
     when: name !== "",
     onDiscard: () => setName(""),
@@ -99,7 +99,7 @@ describe("useUnsavedChanges in a dialog", () => {
     "%s asks before closing with unsaved edits",
     async (_, attempt) => {
       const editor = await openEditor({})
-      await type("Ada")
+      await type("John")
       await attempt()
       const ask = await screen.findByRole("button", { name: "Keep editing" })
       expect(editor.contains(ask)).toBe(true)
@@ -133,7 +133,7 @@ describe("useUnsavedChanges in a dialog", () => {
     await act(async () => fireEvent.click(keep))
     expect(questionShown()).toBeNull()
     expect(screen.getByRole("dialog", { name: "Edit profile" })).toBe(editor)
-    expect(input).toHaveProperty("value", "Ada")
+    expect(input).toHaveProperty("value", "John")
     await waitFor(() => expect(document.activeElement).toBe(input))
   })
 
@@ -152,16 +152,16 @@ describe("useUnsavedChanges in a dialog", () => {
     await screen.findByRole("button", { name: "Keep editing" })
     await type("")
     expect(questionShown()).toBeNull()
-    await type("Grace")
+    await type("Jane")
     expect(questionShown()).toBeNull()
   })
 
   it("Keep editing never submits a form whose footer it replaces", async () => {
     const onSubmit = vi.fn((event: React.FormEvent) => event.preventDefault())
     function FormDialog() {
-      const [name, setName] = React.useState("Ada")
+      const [name, setName] = React.useState("John")
       const { rootProps, question } = useUnsavedChanges({
-        when: name !== "Ada",
+        when: name !== "John",
         open: true,
       })
       return (
@@ -187,7 +187,7 @@ describe("useUnsavedChanges in a dialog", () => {
     }
     render(<FormDialog />)
     await screen.findByRole("dialog", { name: "Edit profile" })
-    await type("Ada L")
+    await type("John D")
     await attempts.Escape()
     const keep = await screen.findByRole("button", { name: "Keep editing" })
     await act(async () => fireEvent.click(keep))
