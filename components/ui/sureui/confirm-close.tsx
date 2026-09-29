@@ -12,39 +12,34 @@ import {
   type GestureOptions,
 } from "@/components/ui/sureui/confirmation"
 
-type ConfirmCloseOptions = Pick<ConfirmationOptions, "onConfirmError"> &
-  Omit<GestureOptions, "disabled"> & {
-    title?: string
-    confirmLabel?: React.ReactNode
-    cancelLabel?: React.ReactNode
-    errorLabel?: React.ReactNode
-    variant?: ConfirmButtonProps["variant"]
-    announcements?: ConfirmButtonProps["announcements"]
-    open?: boolean
-    defaultOpen?: boolean
-    onOpenChange?: (open: boolean) => void
-    onDiscard?: () => void | Promise<unknown>
-  }
-
-type ConfirmCloseRootProps = {
-  open: boolean
-  onOpenChange: (open: boolean, eventDetails: { cancel: () => void }) => void
+interface ConfirmCloseOptions
+  extends
+    Pick<ConfirmationOptions, "onConfirmError">,
+    Omit<GestureOptions, "disabled"> {
+  title?: string
+  discardLabel?: React.ReactNode
+  keepLabel?: React.ReactNode
+  errorLabel?: React.ReactNode
+  variant?: ConfirmButtonProps["variant"]
+  announcements?: ConfirmButtonProps["announcements"]
+  open?: boolean
+  defaultOpen?: boolean
+  onOpenChange?: (open: boolean) => void
+  onDiscard?: () => void | Promise<unknown>
 }
 
-function useConfirmClose(
-  dirty: boolean,
-  {
+function useConfirmClose(dirty: boolean, options: ConfirmCloseOptions = {}) {
+  const {
     title = "Discard changes?",
-    confirmLabel = "Discard changes",
-    cancelLabel = "Keep editing",
+    discardLabel = "Discard changes",
+    keepLabel = "Keep editing",
     variant = "destructive",
     open: openProp,
     defaultOpen = false,
     onOpenChange,
     onDiscard,
-    ...options
-  }: ConfirmCloseOptions = {}
-) {
+    ...buttonOptions
+  } = options
   const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen)
   const [asking, setAsking] = React.useState(false)
   const returnFocus = React.useRef<HTMLElement | null>(null)
@@ -82,7 +77,10 @@ function useConfirmClose(
     setOpen(false)
   }
 
-  const rootProps: ConfirmCloseRootProps = {
+  const rootProps: {
+    open: boolean
+    onOpenChange: (open: boolean, eventDetails: { cancel: () => void }) => void
+  } = {
     open,
     onOpenChange(next, eventDetails) {
       if (next || !dirty) return setOpen(next)
@@ -104,10 +102,10 @@ function useConfirmClose(
           setAsking(false)
         }}
       >
-        {cancelLabel}
+        {keepLabel}
       </Button>
-      <ConfirmButton {...options} variant={variant} onConfirm={discard}>
-        {confirmLabel}
+      <ConfirmButton {...buttonOptions} variant={variant} onConfirm={discard}>
+        {discardLabel}
       </ConfirmButton>
     </React.Fragment>
   ) : null
@@ -115,4 +113,4 @@ function useConfirmClose(
   return { rootProps, question, close: () => setOpen(false) }
 }
 
-export { useConfirmClose, type ConfirmCloseOptions, type ConfirmCloseRootProps }
+export { useConfirmClose, type ConfirmCloseOptions }

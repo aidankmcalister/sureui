@@ -21,8 +21,8 @@ export default function ConfirmCloseWording() {
   const [draft, setDraft] = React.useState("")
   const { rootProps, question } = useConfirmClose(draft.trim() !== "", {
     title: "Delete this reply?",
-    confirmLabel: "Delete reply",
-    cancelLabel: "Keep writing",
+    discardLabel: "Delete reply",
+    keepLabel: "Keep writing",
     onDiscard: () => {
       setDraft("")
       log("Deleted the reply")

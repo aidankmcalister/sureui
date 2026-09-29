@@ -47,7 +47,6 @@ export function figureNumber(index: number) {
 }
 
 const sources = new Map<string, { source: string; body: string }>()
-let count = 0
 
 export const sections: Section[] = readJson<{ sections: string[] }>(
   "meta.json"
@@ -56,7 +55,7 @@ export const sections: Section[] = readJson<{ sections: string[] }>(
   return {
     folder,
     title,
-    pages: pages.map((slug) => {
+    pages: pages.map((slug, index) => {
       const source = fs.readFileSync(
         path.join(contentDir, folder, `${slug}.mdx`),
         "utf8"
@@ -70,7 +69,7 @@ export const sections: Section[] = readJson<{ sections: string[] }>(
         description: meta.description,
         group: title,
         section: folder,
-        sheet: figureNumber(count++),
+        sheet: figureNumber(index),
       }
     }),
   }

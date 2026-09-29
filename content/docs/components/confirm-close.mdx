@@ -9,6 +9,8 @@ description: Asks "Discard changes?" before a dialog with unsaved edits closes.
 
 <Install args="add @sureui/confirm-close" />
 
+It works with a Dialog, Sheet or Drawer already in your app and doesn't install one. If you don't have one yet, add it with `npx shadcn@latest add dialog`.
+
 ## Usage
 
 ```tsx
@@ -39,7 +41,7 @@ For leaving a page rather than closing a dialog, use [Unsaved Changes](/docs/uns
 
 ### Wording
 
-`confirmLabel` and `cancelLabel` change the buttons, and `title` changes what screen readers announce.
+`discardLabel` and `keepLabel` change the buttons, and `title` changes what screen readers announce.
 
 <Example name="confirm-close/wording" />
 
@@ -58,8 +60,8 @@ Returns `{ rootProps, question, close }`: props for the dialog root, the buttons
 | `defaultOpen` | `boolean` | `false` |
 | `onOpenChange` | `(open: boolean) => void` | — |
 | `title` | `string` | `"Discard changes?"` |
-| `confirmLabel` | `ReactNode` | `"Discard changes"` |
-| `cancelLabel` | `ReactNode` | `"Keep editing"` |
+| `discardLabel` | `ReactNode` | `"Discard changes"` |
+| `keepLabel` | `ReactNode` | `"Keep editing"` |
 | `errorLabel` | `ReactNode` | — |
 | `variant` | [`Button`](https://ui.shadcn.com/docs/components/base/button) `variant` | `"destructive"` |
 | `gesture` | `"click" \| "click-again" \| "hold"` | `"click"` |

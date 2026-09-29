@@ -13,7 +13,7 @@ type ToolApprovalRisk = "low" | "medium" | "high" | "critical"
 
 type ToolApprovalScope = "once" | "session" | "always"
 
-type ToolApprovalPart = {
+interface ToolApprovalPart {
   state: string
   approval?: {
     id: string
@@ -22,18 +22,18 @@ type ToolApprovalPart = {
   }
 }
 
-type ToolApprovalResponse = {
+interface ToolApprovalResponse {
   id: string
   approved: boolean
   reason?: string
-  scope?: ToolApprovalScope
+  scope?: "once" | "session" | "always"
 }
 
 type ToolApprovalScopeLabels = Partial<
   Record<ToolApprovalScope, React.ReactNode>
 > & { group?: string }
 
-type ToolApprovalOptions = {
+interface ToolApprovalOptions {
   onRespond: (response: ToolApprovalResponse) => void | PromiseLike<unknown>
   approveLabel?: string
   denyLabel?: string
@@ -42,24 +42,34 @@ type ToolApprovalOptions = {
   undo?: boolean | number | "manual"
   timeout?: number
   duration?: number
-  scopes?: ToolApprovalScope[]
+  scopes?: ("once" | "session" | "always")[]
   scopeLabels?: ToolApprovalScopeLabels
   className?: string
 }
 
-type ToolApprovalProps = ToolApprovalOptions & {
+interface ToolApprovalBaseProps extends ToolApprovalOptions {
   part: ToolApprovalPart
-} & (
-    | { risk?: Exclude<ToolApprovalRisk, "critical">; phrase?: never }
-    | { risk: "critical"; phrase: string }
+}
+
+type ToolApprovalProps = ToolApprovalBaseProps &
+  (
+    | {
+        risk?: "low" | "medium" | "high"
+        phrase?: never
+      }
+    | {
+        risk: "critical"
+        phrase: string
+      }
   )
 
-type ToolApprovalBatchProps<P extends ToolApprovalPart = ToolApprovalPart> =
-  ToolApprovalOptions & {
-    parts: P[]
-    risk?: ToolApprovalRisk | ((part: P) => ToolApprovalRisk)
-    phrase?: string
-  }
+interface ToolApprovalBatchProps<
+  P extends ToolApprovalPart = ToolApprovalPart,
+> extends ToolApprovalOptions {
+  parts: P[]
+  risk?: ToolApprovalRisk | ((part: P) => ToolApprovalRisk)
+  phrase?: string
+}
 
 type ApprovalActionsProps = {
   slot: string
@@ -237,22 +247,23 @@ function ApprovalActions({
   )
 }
 
-function ToolApproval({
-  part,
-  onRespond,
-  risk = "medium",
-  phrase,
-  approveLabel = risk === "high" ? "Hold to approve" : "Approve",
-  denyLabel = "Deny",
-  approvedLabel = "Approved",
-  deniedLabel = "Denied",
-  undo = true,
-  timeout,
-  duration,
-  scopes,
-  scopeLabels,
-  className,
-}: ToolApprovalProps) {
+function ToolApproval(props: ToolApprovalProps) {
+  const {
+    part,
+    onRespond,
+    risk = "medium",
+    phrase,
+    approveLabel = risk === "high" ? "Hold to approve" : "Approve",
+    denyLabel = "Deny",
+    approvedLabel = "Approved",
+    deniedLabel = "Denied",
+    undo = true,
+    timeout,
+    duration,
+    scopes,
+    scopeLabels,
+    className,
+  } = props
   const [responding, setResponding] = React.useState(false)
   const [scope, setScope] = React.useState(scopes?.[0])
   const respondedRef = React.useRef(false)
@@ -318,22 +329,25 @@ function ToolApproval({
   )
 }
 
-function ToolApprovalBatch<P extends ToolApprovalPart>({
-  parts,
-  onRespond,
-  risk = "medium",
-  phrase = "approve all",
-  approveLabel,
-  denyLabel = "Deny all",
-  approvedLabel = "Approved",
-  deniedLabel = "Denied",
-  undo = true,
-  timeout,
-  duration,
-  scopes,
-  scopeLabels,
-  className,
-}: ToolApprovalBatchProps<P>) {
+function ToolApprovalBatch<P extends ToolApprovalPart>(
+  props: ToolApprovalBatchProps<P>
+) {
+  const {
+    parts,
+    onRespond,
+    risk = "medium",
+    phrase = "approve all",
+    approveLabel,
+    denyLabel = "Deny all",
+    approvedLabel = "Approved",
+    deniedLabel = "Denied",
+    undo = true,
+    timeout,
+    duration,
+    scopes,
+    scopeLabels,
+    className,
+  } = props
   const [sent, setSent] = React.useState<ReadonlySet<string>>(() => new Set())
   const [scope, setScope] = React.useState(scopes?.[0])
 

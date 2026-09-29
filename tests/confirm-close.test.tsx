@@ -206,8 +206,8 @@ describe("useConfirmClose", () => {
       initiallyDirty: true,
       options: {
         title: "Throw away your edits?",
-        confirmLabel: "Throw away",
-        cancelLabel: "Back",
+        discardLabel: "Throw away",
+        keepLabel: "Back",
         onOpenChange,
       },
     })

@@ -10,49 +10,52 @@ import {
   type GestureOptions,
 } from "@/components/ui/sureui/confirmation"
 
-type ConfirmButtonProps = React.ComponentProps<typeof Button> &
-  ConfirmationOptions &
-  GestureOptions & {
-    confirmLabel?: React.ReactNode
-    releaseLabel?: React.ReactNode
-    undoLabel?: React.ReactNode
-    errorLabel?: React.ReactNode
-    announcements?: {
-      hold?: string
-      ready?: string
-      armed?: string
-      fallback?: string
-      undo?: string
-      error?: string
-    }
+interface ConfirmButtonProps
+  extends
+    React.ComponentProps<typeof Button>,
+    ConfirmationOptions,
+    GestureOptions {
+  confirmLabel?: React.ReactNode
+  releaseLabel?: React.ReactNode
+  undoLabel?: React.ReactNode
+  errorLabel?: React.ReactNode
+  announcements?: {
+    hold?: string
+    ready?: string
+    armed?: string
+    fallback?: string
+    undo?: string
+    error?: string
   }
+}
 
-function ConfirmButton({
-  onConfirm,
-  onCancel,
-  onConfirmError,
-  undo,
-  pauseUndoOnHover,
-  pauseUndoOnFocus,
-  gesture = "click",
-  timeout,
-  duration,
-  confirmOnRelease,
-  cancelOnBlur,
-  cancelHoldOnLeave,
-  holdFallback = "click-again",
-  armDelay,
-  disabled,
-  confirmLabel,
-  releaseLabel,
-  undoLabel = "Undo",
-  errorLabel,
-  announcements,
-  className,
-  children,
-  "aria-describedby": describedBy,
-  ...props
-}: ConfirmButtonProps) {
+function ConfirmButton(props: ConfirmButtonProps) {
+  const {
+    onConfirm,
+    onCancel,
+    onConfirmError,
+    undo,
+    pauseUndoOnHover,
+    pauseUndoOnFocus,
+    gesture = "click",
+    timeout,
+    duration,
+    confirmOnRelease,
+    cancelOnBlur,
+    cancelHoldOnLeave,
+    holdFallback = "click-again",
+    armDelay,
+    disabled,
+    confirmLabel,
+    releaseLabel,
+    undoLabel = "Undo",
+    errorLabel,
+    announcements,
+    className,
+    children,
+    "aria-describedby": describedBy,
+    ...rest
+  } = props
   const { state, failed, fillRef, getTriggerProps } =
     useConfirmation<HTMLButtonElement>({
       onConfirm,
@@ -109,17 +112,17 @@ function ConfirmButton({
   return (
     <>
       <Button
-        {...getTriggerProps(props)}
+        {...getTriggerProps(rest)}
         aria-label={
-          props["aria-label"] &&
+          rest["aria-label"] &&
           shown === "undo" &&
           typeof undoLabel === "string"
             ? undoLabel
-            : props["aria-label"] &&
+            : rest["aria-label"] &&
                 shown === "error" &&
                 typeof errorLabel === "string"
               ? errorLabel
-              : props["aria-label"]
+              : rest["aria-label"]
         }
         aria-describedby={holdDescribedBy}
         data-state={state}
@@ -130,7 +133,7 @@ function ConfirmButton({
           className
         )}
         focusableWhenDisabled={
-          props.focusableWhenDisabled || state === "pending"
+          rest.focusableWhenDisabled || state === "pending"
         }
       >
         <span

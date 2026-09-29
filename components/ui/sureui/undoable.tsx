@@ -7,35 +7,32 @@ import { Button } from "@/components/ui/button"
 import {
   isPromise,
   composeHandlers,
-  type ConfirmationOptions,
-} from "@/components/ui/sureui/confirmation"
-import { useFill, type Fill } from "@/components/ui/sureui/fill"
-import {
   startUndoWindow,
+  useFill,
+  type ConfirmationOptions,
+  type Fill,
   type UndoWindow,
-} from "@/components/ui/sureui/undo-window"
+} from "@/components/ui/sureui/confirmation"
 
 type UndoableState = "idle" | "undo" | "pending" | "removed"
 
-type UndoableRenderProps = {
+interface UndoableRenderProps {
   remove: () => void
   state: UndoableState
 }
 
-type UndoableProps = Omit<
-  useRender.ComponentProps<"div", { state: UndoableState }>,
-  "children"
-> &
-  ConfirmationOptions & {
-    children?:
-      React.ReactNode | ((props: UndoableRenderProps) => React.ReactNode)
-    label?: React.ReactNode
-    undoLabel?: React.ReactNode
-    focusAfterRemove?: (row: HTMLElement) => HTMLElement | null
-    announcements?: {
-      undo?: string
-    }
+interface UndoableProps
+  extends
+    Omit<useRender.ComponentProps<"div", { state: UndoableState }>, "children">,
+    ConfirmationOptions {
+  children?: React.ReactNode | ((props: UndoableRenderProps) => React.ReactNode)
+  label?: React.ReactNode
+  undoLabel?: React.ReactNode
+  focusAfterRemove?: (row: HTMLElement) => HTMLElement | null
+  announcements?: {
+    undo?: string
   }
+}
 
 type HostProps = {
   style?: React.CSSProperties
@@ -390,22 +387,23 @@ function useUndoable({
   }
 }
 
-function Undoable({
-  onConfirm,
-  onCancel,
-  onConfirmError,
-  undo,
-  pauseUndoOnHover,
-  pauseUndoOnFocus,
-  label = "Deleted",
-  undoLabel = "Undo",
-  focusAfterRemove,
-  announcements,
-  render,
-  ref,
-  children,
-  ...props
-}: UndoableProps) {
+function Undoable(props: UndoableProps) {
+  const {
+    onConfirm,
+    onCancel,
+    onConfirmError,
+    undo,
+    pauseUndoOnHover,
+    pauseUndoOnFocus,
+    label = "Deleted",
+    undoLabel = "Undo",
+    focusAfterRemove,
+    announcements,
+    render,
+    ref,
+    children,
+    ...rest
+  } = props
   const {
     state,
     columns,
@@ -487,7 +485,7 @@ function Undoable({
     ref: ref ? [ref, hostRef] : hostRef,
     state: { state },
     props: {
-      ...getHostProps(props),
+      ...getHostProps(rest),
       "data-slot": "undoable",
       children: content,
     },

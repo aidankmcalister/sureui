@@ -4,15 +4,14 @@ import * as React from "react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
-import { playFill } from "@/components/ui/sureui/fill"
-import { startUndoWindow } from "@/components/ui/sureui/undo-window"
+import { playFill, startUndoWindow } from "@/components/ui/sureui/confirmation"
 
-type UndoToastOptions = {
+interface UndoToastOptions {
   description?: React.ReactNode
   duration?: number | "manual"
   undoLabel?: string
-  pauseOnHover?: boolean
-  pauseOnFocus?: boolean
+  pauseUndoOnHover?: boolean
+  pauseUndoOnFocus?: boolean
 }
 
 function Countdown({
@@ -29,16 +28,14 @@ function Countdown({
   )
 }
 
-function undoToast(
-  message: React.ReactNode,
-  {
+function undoToast(message: React.ReactNode, options: UndoToastOptions = {}) {
+  const {
     description,
     duration,
     undoLabel = "Undo",
-    pauseOnHover = true,
-    pauseOnFocus = true,
-  }: UndoToastOptions = {}
-) {
+    pauseUndoOnHover = true,
+    pauseUndoOnFocus = true,
+  } = options
   return new Promise<boolean>((resolve) => {
     let settled = false
     let animation: Animation | null = null
@@ -91,16 +88,17 @@ function undoToast(
         }
       }
 
-      if (pauseOnHover) {
+      if (pauseUndoOnHover) {
         toaster.addEventListener("pointerenter", onPointerEnter)
         toaster.addEventListener("pointerleave", onPointerLeave)
       }
-      if (pauseOnFocus) {
+      if (pauseUndoOnFocus) {
         toaster.addEventListener("focusin", onFocusIn)
         toaster.addEventListener("focusout", onFocusOut)
       }
-      if (pauseOnHover && toaster.matches(":hover")) countdown.pause("hover")
-      if (pauseOnFocus && toaster.contains(document.activeElement)) {
+      if (pauseUndoOnHover && toaster.matches(":hover"))
+        countdown.pause("hover")
+      if (pauseUndoOnFocus && toaster.contains(document.activeElement)) {
         countdown.pause("focus")
       }
 

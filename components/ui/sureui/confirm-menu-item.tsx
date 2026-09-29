@@ -13,60 +13,60 @@ import {
   type GestureOptions,
 } from "@/components/ui/sureui/confirmation"
 
-type ConfirmMenuItemProps = Omit<
-  React.ComponentProps<typeof DropdownMenuItem>,
-  "closeOnClick"
-> &
-  ConfirmationOptions &
-  GestureOptions & {
-    menu?: "dropdown" | "context"
-    confirmLabel?: React.ReactNode
-    releaseLabel?: React.ReactNode
-    undoLabel?: React.ReactNode
-    errorLabel?: React.ReactNode
-    closeOnConfirm?: boolean
-    closeOnUndo?: boolean
-    commitUndoOnClose?: boolean
-    announcements?: {
-      hold?: string
-      ready?: string
-      armed?: string
-      fallback?: string
-      undo?: string
-      error?: string
-    }
+interface ConfirmMenuItemProps
+  extends
+    Omit<React.ComponentProps<typeof DropdownMenuItem>, "closeOnClick">,
+    ConfirmationOptions,
+    GestureOptions {
+  menu?: "dropdown" | "context"
+  confirmLabel?: React.ReactNode
+  releaseLabel?: React.ReactNode
+  undoLabel?: React.ReactNode
+  errorLabel?: React.ReactNode
+  closeOnConfirm?: boolean
+  closeOnUndo?: boolean
+  commitUndoOnClose?: boolean
+  announcements?: {
+    hold?: string
+    ready?: string
+    armed?: string
+    fallback?: string
+    undo?: string
+    error?: string
   }
+}
 
-function ConfirmMenuItem({
-  onConfirm,
-  onCancel,
-  onConfirmError,
-  undo,
-  pauseUndoOnHover,
-  pauseUndoOnFocus,
-  gesture = "click-again",
-  timeout,
-  duration,
-  confirmOnRelease,
-  cancelOnBlur,
-  cancelHoldOnLeave,
-  holdFallback = "click-again",
-  armDelay,
-  disabled,
-  menu = "dropdown",
-  confirmLabel,
-  releaseLabel,
-  undoLabel = "Undo",
-  errorLabel,
-  closeOnConfirm = true,
-  closeOnUndo = true,
-  commitUndoOnClose = true,
-  announcements,
-  className,
-  children,
-  "aria-describedby": describedBy,
-  ...props
-}: ConfirmMenuItemProps) {
+function ConfirmMenuItem(props: ConfirmMenuItemProps) {
+  const {
+    onConfirm,
+    onCancel,
+    onConfirmError,
+    undo,
+    pauseUndoOnHover,
+    pauseUndoOnFocus,
+    gesture = "click-again",
+    timeout,
+    duration,
+    confirmOnRelease,
+    cancelOnBlur,
+    cancelHoldOnLeave,
+    holdFallback = "click-again",
+    armDelay,
+    disabled,
+    menu = "dropdown",
+    confirmLabel,
+    releaseLabel,
+    undoLabel = "Undo",
+    errorLabel,
+    closeOnConfirm = true,
+    closeOnUndo = true,
+    commitUndoOnClose = true,
+    announcements,
+    className,
+    children,
+    "aria-describedby": describedBy,
+    ...rest
+  } = props
   const [closing, setClosing] = React.useState(false)
   const closingRef = React.useRef(false)
   const stateRef = React.useRef<ConfirmationState>("idle")
@@ -145,7 +145,7 @@ function ConfirmMenuItem({
     []
   )
 
-  const triggerProps = getTriggerProps(props)
+  const triggerProps = getTriggerProps(rest)
   const Item = menu === "context" ? ContextMenuItem : DropdownMenuItem
 
   const hasReleaseLabel = gesture === "hold" && releaseLabel != null
@@ -180,7 +180,7 @@ function ConfirmMenuItem({
     gesture === "hold"
       ? [hintId, describedBy].filter(Boolean).join(" ")
       : describedBy
-  const named = props["aria-label"] != null || props["aria-labelledby"] != null
+  const named = rest["aria-label"] != null || rest["aria-labelledby"] != null
 
   return (
     <Item
@@ -194,15 +194,15 @@ function ConfirmMenuItem({
       }}
       closeOnClick={closing}
       aria-label={
-        props["aria-label"] && shown === "undo" && typeof undoLabel === "string"
+        rest["aria-label"] && shown === "undo" && typeof undoLabel === "string"
           ? undoLabel
-          : props["aria-label"] &&
+          : rest["aria-label"] &&
               shown === "error" &&
               typeof errorLabel === "string"
             ? errorLabel
-            : props["aria-label"]
+            : rest["aria-label"]
       }
-      aria-labelledby={named ? props["aria-labelledby"] : labelId}
+      aria-labelledby={named ? rest["aria-labelledby"] : labelId}
       aria-describedby={holdDescribedBy}
       data-state={state}
       data-error={failed || undefined}

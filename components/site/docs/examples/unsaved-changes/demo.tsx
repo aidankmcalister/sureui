@@ -11,10 +11,11 @@ import { useLog } from "@/components/site/docs/preview"
 export default function UnsavedChangesDemo() {
   const log = useLog()
   const [page, setPage] = React.useState("General")
-  const [name, setName] = React.useState("Acme")
+  const [saved, setSaved] = React.useState("Acme")
+  const [name, setName] = React.useState(saved)
   const { confirmLeave, dialog } = useUnsavedChanges({
-    when: name !== "Acme",
-    onDiscard: () => setName("Acme"),
+    when: name !== saved,
+    onDiscard: () => setName(saved),
   })
 
   async function navigate(to: string) {
@@ -44,11 +45,22 @@ export default function UnsavedChangesDemo() {
       {page === "General" ? (
         <div className="grid gap-2">
           <Label htmlFor="team-name">Team name</Label>
-          <Input
-            id="team-name"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-          />
+          <div className="flex gap-2">
+            <Input
+              id="team-name"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+            />
+            <Button
+              disabled={name === saved}
+              onClick={() => {
+                setSaved(name)
+                log(`Saved the team name as ${name}`)
+              }}
+            >
+              Save
+            </Button>
+          </div>
         </div>
       ) : (
         <p className="text-sm text-muted-foreground">Billing settings</p>

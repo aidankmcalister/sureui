@@ -164,8 +164,8 @@ const confirmPopover = {
 const confirmClose = {
   dirty: true,
   title: true,
-  confirmLabel: true,
-  cancelLabel: true,
+  discardLabel: true,
+  keepLabel: true,
   variant: true,
   open: true,
   defaultOpen: true,
@@ -223,8 +223,8 @@ const undoToast = {
   description: true,
   duration: true,
   undoLabel: true,
-  pauseOnHover: true,
-  pauseOnFocus: true,
+  pauseUndoOnHover: true,
+  pauseUndoOnFocus: true,
 } satisfies Record<keyof UndoToastOptions | "message", true>
 
 const undoable = {

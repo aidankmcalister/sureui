@@ -10,8 +10,8 @@ export default function UndoToastPausing() {
 
   async function markAllRead() {
     const marked = await undoToast("Marked 28 notifications as read", {
-      pauseOnHover: control("pauseOnHover", false),
-      pauseOnFocus: false,
+      pauseUndoOnHover: control("pauseUndoOnHover", false),
+      pauseUndoOnFocus: false,
     })
     log(marked ? "Marked 28 notifications as read" : "Undone, still unread")
   }

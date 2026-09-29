@@ -4,7 +4,7 @@ import * as React from "react"
 
 import { useConfirm } from "@/components/ui/sureui/confirm-dialog"
 
-type UnsavedChangesOptions = {
+interface UnsavedChangesOptions {
   when: boolean
   onSave?: () => void | Promise<unknown>
   onDiscard?: () => void

@@ -23,53 +23,53 @@ import {
 
 type PopoverContentProps = React.ComponentProps<typeof PopoverContent>
 
-type ConfirmPopoverProps = Pick<
-  ConfirmationOptions,
-  "onConfirm" | "onCancel" | "onConfirmError"
-> &
-  Omit<GestureOptions, "disabled"> & {
-    children: React.ReactElement
-    description: React.ReactNode
-    title?: string
-    confirmLabel?: string
-    errorLabel?: string
-    cancelLabel?: string
-    showCancel?: boolean
-    initialFocus?: "confirm" | "cancel" | "none"
-    variant?: ConfirmButtonProps["variant"]
-    side?: PopoverContentProps["side"]
-    align?: PopoverContentProps["align"]
-    open?: boolean
-    onOpenChange?: (open: boolean) => void
-    announcements?: {
-      hold?: string
-      ready?: string
-      armed?: string
-      fallback?: string
-      error?: string
-    }
+interface ConfirmPopoverProps
+  extends
+    Pick<ConfirmationOptions, "onConfirm" | "onCancel" | "onConfirmError">,
+    Omit<GestureOptions, "disabled"> {
+  children: React.ReactElement
+  description: React.ReactNode
+  title?: string
+  confirmLabel?: string
+  errorLabel?: string
+  cancelLabel?: string
+  showCancel?: boolean
+  initialFocus?: "confirm" | "cancel" | "none"
+  variant?: ConfirmButtonProps["variant"]
+  side?: PopoverContentProps["side"]
+  align?: PopoverContentProps["align"]
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  announcements?: {
+    hold?: string
+    ready?: string
+    armed?: string
+    fallback?: string
+    error?: string
   }
+}
 
-function ConfirmPopover({
-  children,
-  description,
-  title,
-  confirmLabel = "Confirm",
-  errorLabel,
-  cancelLabel = "Cancel",
-  showCancel = true,
-  initialFocus = "confirm",
-  variant = "default",
-  side = "bottom",
-  align = "center",
-  open: openProp,
-  onOpenChange,
-  onConfirm,
-  onCancel,
-  onConfirmError,
-  announcements,
-  ...gestureOptions
-}: ConfirmPopoverProps) {
+function ConfirmPopover(props: ConfirmPopoverProps) {
+  const {
+    children,
+    description,
+    title,
+    confirmLabel = "Confirm",
+    errorLabel,
+    cancelLabel = "Cancel",
+    showCancel = true,
+    initialFocus = "confirm",
+    variant = "default",
+    side = "bottom",
+    align = "center",
+    open: openProp,
+    onOpenChange,
+    onConfirm,
+    onCancel,
+    onConfirmError,
+    announcements,
+    ...gestureOptions
+  } = props
   const [uncontrolledOpen, setUncontrolledOpen] = React.useState(false)
   const [pending, setPending] = React.useState(false)
   const popupRef = React.useRef<HTMLDivElement>(null)

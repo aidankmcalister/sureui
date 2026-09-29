@@ -28,47 +28,50 @@ import {
   type ConfirmChoices,
 } from "@/components/ui/sureui/type-to-confirm"
 
-type ConfirmDialogAlternative = {
+interface ConfirmDialogAlternative {
   label: React.ReactNode
   onSelect: () => void | Promise<unknown>
 }
 
-type ConfirmDialogOptions = Pick<
-  ConfirmationOptions,
-  "onCancel" | "onConfirmError"
-> &
-  Omit<GestureOptions, "disabled"> & {
-    onConfirm: (choices: ConfirmChoices) => void | Promise<unknown>
-    title: string
-    description?: React.ReactNode
-    consequences?: React.ReactNode
-    cancelLabel?: string
-    confirmLabel?: string
-    errorLabel?: string
-    variant?: ConfirmButtonProps["variant"]
-    initialFocus?: "cancel" | "confirm" | "none"
-    alternative?: ConfirmDialogAlternative
-    phrase?: string | string[]
-    caseSensitive?: boolean
-    trim?: boolean
-    acknowledgements?: string[]
-    choices?: ConfirmChoice[]
-    announcements?: {
-      hold?: string
-      ready?: string
-      armed?: string
-      fallback?: string
-      match?: string
-      error?: string
-    }
+interface ConfirmDialogOptions
+  extends
+    Pick<ConfirmationOptions, "onCancel" | "onConfirmError">,
+    Omit<GestureOptions, "disabled"> {
+  onConfirm: (choices: ConfirmChoices) => void | Promise<unknown>
+  title: string
+  description?: React.ReactNode
+  consequences?: React.ReactNode
+  cancelLabel?: string
+  confirmLabel?: string
+  errorLabel?: string
+  variant?: ConfirmButtonProps["variant"]
+  initialFocus?: "cancel" | "confirm" | "none"
+  alternative?: ConfirmDialogAlternative
+  phrase?: string | string[]
+  caseSensitive?: boolean
+  trim?: boolean
+  acknowledgements?: string[]
+  choices?: ConfirmChoice[]
+  announcements?: {
+    hold?: string
+    ready?: string
+    armed?: string
+    fallback?: string
+    match?: string
+    error?: string
   }
+}
 
-type ConfirmDialogProps = ConfirmDialogOptions & {
+interface ConfirmDialogProps extends ConfirmDialogOptions {
   children: React.ReactElement
 }
 
-type ConfirmOptions = Omit<ConfirmDialogOptions, "onConfirm" | "onCancel"> &
-  Partial<Pick<ConfirmDialogOptions, "onConfirm">>
+interface ConfirmOptions extends Omit<
+  ConfirmDialogOptions,
+  "onConfirm" | "onCancel"
+> {
+  onConfirm?: ConfirmDialogOptions["onConfirm"]
+}
 
 type Pending = "confirm" | "alternative" | null
 
@@ -151,7 +154,8 @@ function useConfirmDialog() {
   return { confirm, request, render }
 }
 
-function ConfirmDialog({ children, onCancel, ...options }: ConfirmDialogProps) {
+function ConfirmDialog(props: ConfirmDialogProps) {
+  const { children, onCancel, ...options } = props
   const { render } = useConfirmDialog()
   return render(options, { trigger: children, onCancel })
 }
@@ -320,6 +324,5 @@ export {
   useConfirm,
   type ConfirmDialogAlternative,
   type ConfirmDialogProps,
-  type ConfirmDialogOptions,
   type ConfirmOptions,
 }

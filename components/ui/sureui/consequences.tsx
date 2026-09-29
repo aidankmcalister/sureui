@@ -12,14 +12,14 @@ function mutedText(variant?: ConsequencesVariant) {
     : "text-muted-foreground"
 }
 
-type ConsequencesListOptions = {
+interface ConsequencesListOptions {
   limit?: number
   expandable?: boolean
   moreLabel?: (hidden: number) => string
   lessLabel?: string
 }
 
-type Consequence = ConsequencesListOptions & {
+interface Consequence extends ConsequencesListOptions {
   label: React.ReactNode
   count?: number
   names?: string[]
@@ -27,18 +27,18 @@ type Consequence = ConsequencesListOptions & {
   description?: React.ReactNode
 }
 
-type ConsequencesItemProps = Omit<React.ComponentProps<"li">, "children"> &
-  Consequence
+interface ConsequencesItemProps
+  extends Omit<React.ComponentProps<"li">, "children">, Consequence {}
 
-type ConsequencesProps = Omit<React.ComponentProps<"div">, "title"> &
-  ConsequencesListOptions & {
-    subject?: React.ReactNode
-    subjectDescription?: React.ReactNode
-    title?: React.ReactNode
-    items?: Consequence[]
-    variant?: ConsequencesVariant
-    children?: React.ReactNode
-  }
+interface ConsequencesProps
+  extends Omit<React.ComponentProps<"div">, "title">, ConsequencesListOptions {
+  subject?: React.ReactNode
+  subjectDescription?: React.ReactNode
+  title?: React.ReactNode
+  items?: Consequence[]
+  variant?: "default" | "destructive"
+  children?: React.ReactNode
+}
 
 const defaults = {
   limit: 3,
@@ -51,20 +51,21 @@ const ConsequencesContext = React.createContext<
   Required<ConsequencesListOptions> & { variant: ConsequencesVariant }
 >({ ...defaults, variant: "default" })
 
-function Consequences({
-  subject,
-  subjectDescription,
-  title,
-  items,
-  variant = "default",
-  limit = defaults.limit,
-  expandable = defaults.expandable,
-  moreLabel = defaults.moreLabel,
-  lessLabel = defaults.lessLabel,
-  className,
-  children,
-  ...props
-}: ConsequencesProps) {
+function Consequences(props: ConsequencesProps) {
+  const {
+    subject,
+    subjectDescription,
+    title,
+    items,
+    variant = "default",
+    limit = defaults.limit,
+    expandable = defaults.expandable,
+    moreLabel = defaults.moreLabel,
+    lessLabel = defaults.lessLabel,
+    className,
+    children,
+    ...rest
+  } = props
   const titleId = React.useId()
 
   return (
@@ -80,7 +81,7 @@ function Consequences({
             "bg-destructive/3 ring-destructive/20 dark:bg-destructive/5",
           className
         )}
-        {...props}
+        {...rest}
       >
         {subject && (
           <div
@@ -132,19 +133,20 @@ function Consequences({
   )
 }
 
-function ConsequencesItem({
-  label,
-  count,
-  names = [],
-  icon,
-  description,
-  limit,
-  expandable,
-  moreLabel,
-  lessLabel,
-  className,
-  ...props
-}: ConsequencesItemProps) {
+function ConsequencesItem(props: ConsequencesItemProps) {
+  const {
+    label,
+    count,
+    names = [],
+    icon,
+    description,
+    limit,
+    expandable,
+    moreLabel,
+    lessLabel,
+    className,
+    ...rest
+  } = props
   const context = React.useContext(ConsequencesContext)
   const [expanded, setExpanded] = React.useState(false)
   const namesId = React.useId()
@@ -168,7 +170,7 @@ function ConsequencesItem({
           : "grid-cols-[minmax(0,1fr)_auto]",
         className
       )}
-      {...props}
+      {...rest}
     >
       {icon && (
         <span

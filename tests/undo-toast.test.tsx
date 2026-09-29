@@ -117,8 +117,8 @@ describe("undoToast pausing", () => {
     expect(state.value).toBeUndefined()
   })
 
-  it("keeps running on focus when pauseOnFocus is false", async () => {
-    const { state, undo } = await show({ pauseOnFocus: false })
+  it("keeps running on focus when pauseUndoOnFocus is false", async () => {
+    const { state, undo } = await show({ pauseUndoOnFocus: false })
     act(() => undo.focus())
     await advance(4999)
     expect(state.value).toBeUndefined()
@@ -140,8 +140,8 @@ describe("undoToast pausing", () => {
     expect(state.value).toBe(true)
   })
 
-  it("keeps running on hover when pauseOnHover is false", async () => {
-    const { state, undo } = await show({ pauseOnHover: false })
+  it("keeps running on hover when pauseUndoOnHover is false", async () => {
+    const { state, undo } = await show({ pauseUndoOnHover: false })
     fireEvent.pointerEnter(undo.closest("[data-sonner-toaster]")!)
     await advance(4999)
     expect(state.value).toBeUndefined()

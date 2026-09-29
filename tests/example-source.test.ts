@@ -60,11 +60,11 @@ describe("example source", () => {
 
   it("puts a value toggle in place when it isn't a JSX prop", () => {
     const toast = parseExample(
-      `const x = undoToast("Hi", {\n  pauseOnHover: control("pauseOnHover", false),\n})`
+      `const x = undoToast("Hi", {\n  pauseUndoOnHover: control("pauseUndoOnHover", false),\n})`
     )
-    expect(renderExample(toast)).toContain("pauseOnHover: false")
-    expect(renderExample(toast, { pauseOnHover: true })).toContain(
-      "pauseOnHover: true"
+    expect(renderExample(toast)).toContain("pauseUndoOnHover: false")
+    expect(renderExample(toast, { pauseUndoOnHover: true })).toContain(
+      "pauseUndoOnHover: true"
     )
   })
 })

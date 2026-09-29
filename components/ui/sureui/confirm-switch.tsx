@@ -10,35 +10,39 @@ import {
   type ConfirmationOptions,
 } from "@/components/ui/sureui/confirmation"
 
-type ConfirmSwitchProps = Omit<
-  React.ComponentProps<typeof Switch>,
-  "onCheckedChange" | "render" | "nativeButton"
-> &
-  Omit<ConfirmationOptions, "onConfirm"> & {
-    onConfirm: (checked: boolean) => void | Promise<unknown>
-    onCheckedChange?: (checked: boolean) => void
-    confirmWhen?: "on" | "off" | "both"
-    undoIndicator?: "thumb" | "ring"
-    announcements?: { undo?: string; error?: string }
-  }
+interface ConfirmSwitchProps
+  extends
+    Omit<
+      React.ComponentProps<typeof Switch>,
+      "onCheckedChange" | "render" | "nativeButton"
+    >,
+    Omit<ConfirmationOptions, "onConfirm"> {
+  onConfirm: (checked: boolean) => void | Promise<unknown>
+  onCheckedChange?: (checked: boolean) => void
+  confirmWhen?: "on" | "off" | "both"
+  undoIndicator?: "thumb" | "ring"
+  announcements?: { undo?: string; error?: string }
+}
 
-function ConfirmSwitch({
-  checked: checkedProp,
-  defaultChecked = false,
-  onCheckedChange,
-  onConfirm,
-  onCancel,
-  onConfirmError,
-  undo = true,
-  pauseUndoOnHover,
-  pauseUndoOnFocus,
-  confirmWhen = "both",
-  undoIndicator = "thumb",
-  announcements,
-  disabled,
-  className,
-  ...props
-}: ConfirmSwitchProps) {
+function ConfirmSwitch(props: ConfirmSwitchProps) {
+  const {
+    checked: checkedProp,
+    defaultChecked = false,
+    onCheckedChange,
+    onConfirm,
+    onCancel,
+    onConfirmError,
+    undo = true,
+    pauseUndoOnHover,
+    pauseUndoOnFocus,
+    confirmWhen = "both",
+    undoIndicator = "thumb",
+    announcements,
+    disabled,
+    size,
+    className,
+    ...rest
+  } = props
   const [uncontrolled, setUncontrolled] = React.useState(defaultChecked)
   const [target, setTarget] = React.useState(defaultChecked)
   const committed = checkedProp ?? uncontrolled
@@ -81,9 +85,10 @@ function ConfirmSwitch({
   return (
     <>
       <Switch
-        {...getTriggerProps(props)}
+        {...getTriggerProps(rest)}
         checked={shown}
         disabled={disabled}
+        size={size}
         data-state={state}
         data-error={failed || undefined}
         nativeButton
@@ -105,7 +110,7 @@ function ConfirmSwitch({
                   fill="none"
                   stroke="currentColor"
                   strokeWidth={1.5}
-                  className="[rx:999px]"
+                  rx={size === "sm" ? 9 : 11.2}
                 />
               </svg>
             ) : (

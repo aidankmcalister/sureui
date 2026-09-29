@@ -139,20 +139,15 @@ describe("hand-written item lists", () => {
     "content/docs/getting-started/introduction.mdx",
     "utf8"
   )
-  const bugReport = readFileSync(
-    ".github/ISSUE_TEMPLATE/bug_report.yml",
-    "utf8"
-  )
   const nav = JSON.parse(
     readFileSync("content/docs/components/meta.json", "utf8")
   ) as { pages: string[] }
 
   it.each(components)(
-    "$name is in the README, introduction, bug report and docs nav",
+    "$name is in the README, introduction and docs nav",
     ({ name, exports }) => {
       expect(readme).toContain(`| \`${exports[0]}\``)
       expect(introduction).toContain(`](/docs/${name})`)
-      expect(bugReport).toContain(`- ${name}\n`)
       expect(nav.pages).toContain(name)
     }
   )

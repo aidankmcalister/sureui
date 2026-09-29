@@ -41,7 +41,7 @@ With `duration: "manual"`, the toast stays until people press Undo or dismiss it
 
 ### Pausing
 
-The window pauses while the toast is hovered or focused, and while the tab is hidden. This one sets `pauseOnHover` and `pauseOnFocus` to `false`.
+The window pauses while the toast is hovered or focused, and while the tab is hidden. This one sets `pauseUndoOnHover` and `pauseUndoOnFocus` to `false`.
 
 <Example name="undo-toast/pausing" />
 
@@ -57,8 +57,8 @@ Returns a `Promise<boolean>`.
 | `description` | `ReactNode` | — |
 | `duration` | `number \| "manual"` | `5000` |
 | `undoLabel` | `string` | `"Undo"` |
-| `pauseOnHover` | `boolean` | `true` |
-| `pauseOnFocus` | `boolean` | `true` |
+| `pauseUndoOnHover` | `boolean` | `true` |
+| `pauseUndoOnFocus` | `boolean` | `true` |
 
 ## Accessibility
 

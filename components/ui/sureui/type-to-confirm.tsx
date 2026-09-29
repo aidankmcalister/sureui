@@ -15,7 +15,7 @@ import {
   type ConfirmationOptions,
 } from "@/components/ui/sureui/confirmation"
 
-type ConfirmChoice = {
+interface ConfirmChoice {
   name: string
   label: React.ReactNode
   defaultChecked?: boolean
@@ -23,7 +23,7 @@ type ConfirmChoice = {
 
 type ConfirmChoices = Record<string, boolean>
 
-type TypeToConfirmProps = Omit<ConfirmationOptions, "onConfirm"> & {
+interface TypeToConfirmProps extends Omit<ConfirmationOptions, "onConfirm"> {
   onConfirm: (choices: ConfirmChoices) => void | Promise<unknown>
   phrase: string | string[]
   caseSensitive?: boolean
@@ -80,28 +80,29 @@ function ConfirmChoiceList({
   ))
 }
 
-function TypeToConfirm({
-  onConfirm,
-  onCancel,
-  onConfirmError,
-  undo,
-  pauseUndoOnHover,
-  pauseUndoOnFocus,
-  phrase,
-  caseSensitive = true,
-  trim = false,
-  label,
-  consequences,
-  announcements,
-  confirmLabel = "Confirm",
-  undoLabel = "Undo",
-  errorLabel,
-  variant = "destructive",
-  acknowledgements = [],
-  choices = [],
-  renderActions,
-  className,
-}: TypeToConfirmProps) {
+function TypeToConfirm(props: TypeToConfirmProps) {
+  const {
+    onConfirm,
+    onCancel,
+    onConfirmError,
+    undo,
+    pauseUndoOnHover,
+    pauseUndoOnFocus,
+    phrase,
+    caseSensitive = true,
+    trim = false,
+    label,
+    consequences,
+    announcements,
+    confirmLabel = "Confirm",
+    undoLabel = "Undo",
+    errorLabel,
+    variant = "destructive",
+    acknowledgements = [],
+    choices = [],
+    renderActions,
+    className,
+  } = props
   const [values, setValues] = React.useState<string[]>([])
   const [checked, setChecked] = React.useState<number[]>([])
   const [picked, setPicked] = React.useState(() => defaultChoices(choices))

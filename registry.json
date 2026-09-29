@@ -13,16 +13,6 @@
       ],
       "files": [
         {
-          "path": "components/ui/sureui/fill.ts",
-          "type": "registry:lib",
-          "target": "@ui/sureui/fill.ts"
-        },
-        {
-          "path": "components/ui/sureui/undo-window.ts",
-          "type": "registry:lib",
-          "target": "@ui/sureui/undo-window.ts"
-        },
-        {
           "path": "components/ui/sureui/confirmation.ts",
           "type": "registry:lib",
           "target": "@ui/sureui/confirmation.ts"
@@ -49,16 +39,6 @@
       ],
       "files": [
         {
-          "path": "components/ui/sureui/fill.ts",
-          "type": "registry:lib",
-          "target": "@ui/sureui/fill.ts"
-        },
-        {
-          "path": "components/ui/sureui/undo-window.ts",
-          "type": "registry:lib",
-          "target": "@ui/sureui/undo-window.ts"
-        },
-        {
           "path": "components/ui/sureui/confirmation.ts",
           "type": "registry:lib",
           "target": "@ui/sureui/confirmation.ts"
@@ -83,16 +63,6 @@
         "switch"
       ],
       "files": [
-        {
-          "path": "components/ui/sureui/fill.ts",
-          "type": "registry:lib",
-          "target": "@ui/sureui/fill.ts"
-        },
-        {
-          "path": "components/ui/sureui/undo-window.ts",
-          "type": "registry:lib",
-          "target": "@ui/sureui/undo-window.ts"
-        },
         {
           "path": "components/ui/sureui/confirmation.ts",
           "type": "registry:lib",
@@ -121,16 +91,6 @@
         "label"
       ],
       "files": [
-        {
-          "path": "components/ui/sureui/fill.ts",
-          "type": "registry:lib",
-          "target": "@ui/sureui/fill.ts"
-        },
-        {
-          "path": "components/ui/sureui/undo-window.ts",
-          "type": "registry:lib",
-          "target": "@ui/sureui/undo-window.ts"
-        },
         {
           "path": "components/ui/sureui/confirmation.ts",
           "type": "registry:lib",
@@ -165,16 +125,6 @@
         "label"
       ],
       "files": [
-        {
-          "path": "components/ui/sureui/fill.ts",
-          "type": "registry:lib",
-          "target": "@ui/sureui/fill.ts"
-        },
-        {
-          "path": "components/ui/sureui/undo-window.ts",
-          "type": "registry:lib",
-          "target": "@ui/sureui/undo-window.ts"
-        },
         {
           "path": "components/ui/sureui/confirmation.ts",
           "type": "registry:lib",
@@ -211,16 +161,6 @@
         "button"
       ],
       "files": [
-        {
-          "path": "components/ui/sureui/fill.ts",
-          "type": "registry:lib",
-          "target": "@ui/sureui/fill.ts"
-        },
-        {
-          "path": "components/ui/sureui/undo-window.ts",
-          "type": "registry:lib",
-          "target": "@ui/sureui/undo-window.ts"
-        },
         {
           "path": "components/ui/sureui/confirmation.ts",
           "type": "registry:lib",
@@ -273,14 +213,9 @@
       ],
       "files": [
         {
-          "path": "components/ui/sureui/fill.ts",
+          "path": "components/ui/sureui/confirmation.ts",
           "type": "registry:lib",
-          "target": "@ui/sureui/fill.ts"
-        },
-        {
-          "path": "components/ui/sureui/undo-window.ts",
-          "type": "registry:lib",
-          "target": "@ui/sureui/undo-window.ts"
+          "target": "@ui/sureui/confirmation.ts"
         },
         {
           "path": "components/ui/sureui/undo-toast.tsx",
@@ -306,16 +241,6 @@
         "button"
       ],
       "files": [
-        {
-          "path": "components/ui/sureui/fill.ts",
-          "type": "registry:lib",
-          "target": "@ui/sureui/fill.ts"
-        },
-        {
-          "path": "components/ui/sureui/undo-window.ts",
-          "type": "registry:lib",
-          "target": "@ui/sureui/undo-window.ts"
-        },
         {
           "path": "components/ui/sureui/confirmation.ts",
           "type": "registry:lib",
@@ -346,16 +271,6 @@
         "label"
       ],
       "files": [
-        {
-          "path": "components/ui/sureui/fill.ts",
-          "type": "registry:lib",
-          "target": "@ui/sureui/fill.ts"
-        },
-        {
-          "path": "components/ui/sureui/undo-window.ts",
-          "type": "registry:lib",
-          "target": "@ui/sureui/undo-window.ts"
-        },
         {
           "path": "components/ui/sureui/confirmation.ts",
           "type": "registry:lib",
@@ -397,16 +312,6 @@
       ],
       "files": [
         {
-          "path": "components/ui/sureui/fill.ts",
-          "type": "registry:lib",
-          "target": "@ui/sureui/fill.ts"
-        },
-        {
-          "path": "components/ui/sureui/undo-window.ts",
-          "type": "registry:lib",
-          "target": "@ui/sureui/undo-window.ts"
-        },
-        {
           "path": "components/ui/sureui/confirmation.ts",
           "type": "registry:lib",
           "target": "@ui/sureui/confirmation.ts"
@@ -442,16 +347,6 @@
         "label"
       ],
       "files": [
-        {
-          "path": "components/ui/sureui/fill.ts",
-          "type": "registry:lib",
-          "target": "@ui/sureui/fill.ts"
-        },
-        {
-          "path": "components/ui/sureui/undo-window.ts",
-          "type": "registry:lib",
-          "target": "@ui/sureui/undo-window.ts"
-        },
         {
           "path": "components/ui/sureui/confirmation.ts",
           "type": "registry:lib",

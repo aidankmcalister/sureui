@@ -2,17 +2,189 @@
 
 import * as React from "react"
 
-import { useFill, type Fill } from "@/components/ui/sureui/fill"
-import {
-  startUndoWindow,
-  type UndoDuration,
-  type UndoWindow,
-} from "@/components/ui/sureui/undo-window"
+type Fill = {
+  from: number
+  to: number
+  duration: number
+  startedAt: number
+  easing?: string
+}
+
+function prefersReducedMotion() {
+  return (
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  )
+}
+
+function keyframes(element: Element, fill: Fill) {
+  if (element instanceof SVGElement)
+    return [
+      { strokeDashoffset: `${1 - fill.from}` },
+      { strokeDashoffset: `${1 - fill.to}` },
+    ]
+  return [{ scale: `${fill.from} 1` }, { scale: `${fill.to} 1` }]
+}
+
+function playFill(element: Element | null, fill: Fill) {
+  if (!element || typeof element.animate !== "function") return null
+  const animation = element.animate(keyframes(element, fill), {
+    duration: fill.duration,
+    easing: prefersReducedMotion() ? "step-end" : (fill.easing ?? "linear"),
+    fill: "forwards",
+  })
+  animation.currentTime = performance.now() - fill.startedAt
+  return animation
+}
+
+function useFill(
+  ref: React.RefObject<Element | null>,
+  fill: Fill | null,
+  paused: boolean
+) {
+  const animationRef = React.useRef<Animation | null>(null)
+
+  React.useEffect(() => {
+    if (!fill) return
+    const animation = playFill(ref.current, fill)
+    animationRef.current = animation
+    return () => {
+      animation?.cancel()
+      animationRef.current = null
+    }
+  }, [ref, fill])
+
+  React.useEffect(() => {
+    const animation = animationRef.current
+    if (paused) animation?.pause()
+    else if (animation?.playState === "paused") animation.play()
+  }, [paused, fill])
+}
+
+type UndoPauseReason = "hover" | "focus" | "hidden"
+
+type UndoDuration = boolean | number | "manual"
+
+type UndoWindowOptions = {
+  duration?: UndoDuration
+  onExpire: () => void
+  onPauseChange?: (paused: boolean) => void
+  within?: () => Element | null
+}
+
+type UndoWindow = {
+  duration: number
+  manual: boolean
+  elapsed: () => number
+  paused: () => boolean
+  pause: (reason: UndoPauseReason) => void
+  resume: (reason: UndoPauseReason) => void
+  cancel: () => void
+}
+
+function undoDuration(value: UndoDuration | undefined) {
+  if (typeof value !== "number" || !Number.isFinite(value)) return 5000
+  return Math.min(Math.max(value, 4000), 60000)
+}
+
+function startManualWindow({
+  onExpire,
+  within,
+}: UndoWindowOptions): UndoWindow {
+  let open = true
+
+  function stop() {
+    open = false
+    document.removeEventListener("pointerdown", onOutside, true)
+    document.removeEventListener("focusin", onOutside, true)
+  }
+
+  function onOutside(event: Event) {
+    const container = within?.()
+    const target = event.target
+    if (!open || !container || !(target instanceof Node)) return
+    if (container.contains(target)) return
+    stop()
+    onExpire()
+  }
+
+  if (within) {
+    document.addEventListener("pointerdown", onOutside, true)
+    document.addEventListener("focusin", onOutside, true)
+  }
+
+  return {
+    duration: Infinity,
+    manual: true,
+    elapsed: () => 0,
+    paused: () => false,
+    pause: () => {},
+    resume: () => {},
+    cancel: stop,
+  }
+}
+
+function startUndoWindow(options: UndoWindowOptions): UndoWindow {
+  const { duration, onExpire, onPauseChange } = options
+  if (duration === "manual") return startManualWindow(options)
+  const total = undoDuration(duration)
+  const pausedBy = new Set<UndoPauseReason>()
+  let open = true
+  let remaining = total
+  let startedAt = performance.now()
+  let timer = setTimeout(expire, remaining)
+
+  function stop() {
+    open = false
+    clearTimeout(timer)
+    document.removeEventListener("visibilitychange", onVisibilityChange)
+  }
+
+  function expire() {
+    stop()
+    onExpire()
+  }
+
+  function pause(reason: UndoPauseReason) {
+    if (!open || pausedBy.has(reason)) return
+    pausedBy.add(reason)
+    if (pausedBy.size > 1) return
+    clearTimeout(timer)
+    remaining -= performance.now() - startedAt
+    onPauseChange?.(true)
+  }
+
+  function resume(reason: UndoPauseReason) {
+    if (!open || !pausedBy.delete(reason) || pausedBy.size > 0) return
+    startedAt = performance.now()
+    timer = setTimeout(expire, remaining)
+    onPauseChange?.(false)
+  }
+
+  function onVisibilityChange() {
+    if (document.visibilityState === "hidden") pause("hidden")
+    else resume("hidden")
+  }
+
+  document.addEventListener("visibilitychange", onVisibilityChange)
+  onVisibilityChange()
+
+  return {
+    duration: total,
+    manual: false,
+    elapsed: () =>
+      total -
+      remaining +
+      (pausedBy.size > 0 ? 0 : performance.now() - startedAt),
+    paused: () => pausedBy.size > 0,
+    pause,
+    resume,
+    cancel: stop,
+  }
+}
 
 type ConfirmationState =
   "idle" | "armed" | "holding" | "ready" | "undo" | "pending"
-
-type Gesture = "click" | "click-again" | "hold"
 
 type PauseReason = "hover" | "focus"
 
@@ -21,17 +193,17 @@ type InlineUndo = {
   pausable: Set<PauseReason>
 }
 
-type ConfirmationOptions = {
+interface ConfirmationOptions {
   onConfirm: () => void | Promise<unknown>
   onCancel?: () => void
   onConfirmError?: (error: unknown) => void
-  undo?: UndoDuration
+  undo?: boolean | number | "manual"
   pauseUndoOnHover?: boolean
   pauseUndoOnFocus?: boolean
 }
 
-type GestureOptions = {
-  gesture?: Gesture
+interface GestureOptions {
+  gesture?: "click" | "click-again" | "hold"
   timeout?: number
   duration?: number
   confirmOnRelease?: boolean
@@ -525,9 +697,12 @@ export {
   useConfirmation,
   composeHandlers,
   isPromise,
+  playFill,
+  useFill,
+  startUndoWindow,
   type ConfirmationState,
   type ConfirmationOptions,
   type GestureOptions,
-  type Gesture,
-  type TriggerProps,
+  type Fill,
+  type UndoWindow,
 }
