@@ -5,7 +5,6 @@ import type { Button } from "@/components/ui/button"
 import type { DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import type { Switch } from "@/components/ui/switch"
 import type { ConfirmButtonProps } from "@/components/ui/sureui/confirm-button"
-import type { ConfirmCloseOptions } from "@/components/ui/sureui/confirm-close"
 import type { ConfirmDialogProps } from "@/components/ui/sureui/confirm-dialog"
 import type { ConfirmPopoverProps } from "@/components/ui/sureui/confirm-popover"
 import type { ConfirmMenuItemProps } from "@/components/ui/sureui/confirm-menu-item"
@@ -21,7 +20,10 @@ import type {
 import type { TypeToConfirmProps } from "@/components/ui/sureui/type-to-confirm"
 import type { UndoToastOptions } from "@/components/ui/sureui/undo-toast"
 import type { UndoableProps } from "@/components/ui/sureui/undoable"
-import type { UnsavedChangesOptions } from "@/components/ui/sureui/unsaved-changes"
+import type {
+  ConfirmCloseOptions,
+  UnsavedChangesOptions,
+} from "@/components/ui/sureui/unsaved-changes"
 import { docsSource, pages } from "@/lib/site/docs"
 import { exampleFile, exampleNames } from "@/lib/site/examples"
 
@@ -166,6 +168,8 @@ const confirmClose = {
   title: true,
   discardLabel: true,
   keepLabel: true,
+  onSave: true,
+  saveLabel: true,
   variant: true,
   open: true,
   defaultOpen: true,

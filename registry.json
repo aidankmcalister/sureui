@@ -262,7 +262,7 @@
       "name": "unsaved-changes",
       "type": "registry:ui",
       "title": "Unsaved Changes",
-      "description": "useUnsavedChanges({ when }) asks before someone leaves unsaved changes: the browser's prompt on reload or close, and an awaitable confirmLeave() that opens a dialog with Keep editing, Discard changes and an optional Save.",
+      "description": "useUnsavedChanges asks before someone leaves a page with unsaved changes: the browser's prompt on reload or close, and an awaitable confirmLeave() with Keep editing, Discard changes and an optional Save. useConfirmClose asks in a Dialog, Sheet or Drawer's footer before it closes with unsaved edits.",
       "registryDependencies": [
         "alert-dialog",
         "button",
@@ -300,36 +300,6 @@
       "categories": [
         "confirmation",
         "form"
-      ]
-    },
-    {
-      "name": "confirm-close",
-      "type": "registry:ui",
-      "title": "Confirm Close",
-      "description": "A hook that asks \"Discard changes?\" in the footer of a Dialog, Sheet or Drawer with unsaved edits when it is closed by Escape, an outside click or a close button. Returns props for the dialog root, the question to render in place of the footer buttons, and a close() that skips the question.",
-      "registryDependencies": [
-        "button"
-      ],
-      "files": [
-        {
-          "path": "components/ui/sureui/confirmation.ts",
-          "type": "registry:lib",
-          "target": "@ui/sureui/confirmation.ts"
-        },
-        {
-          "path": "components/ui/sureui/confirm-button.tsx",
-          "type": "registry:ui",
-          "target": "@ui/sureui/confirm-button.tsx"
-        },
-        {
-          "path": "components/ui/sureui/confirm-close.tsx",
-          "type": "registry:ui",
-          "target": "@ui/sureui/confirm-close.tsx"
-        }
-      ],
-      "categories": [
-        "confirmation",
-        "dialog"
       ]
     },
     {

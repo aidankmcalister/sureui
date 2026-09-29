@@ -14,10 +14,10 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useConfirmClose } from "@/components/ui/sureui/confirm-close"
+import { useConfirmClose } from "@/components/ui/sureui/unsaved-changes"
 import { useLog } from "@/components/site/docs/preview"
 
-export default function ConfirmCloseDemo() {
+export default function UnsavedChangesDialog() {
   const log = useLog()
   const [saved, setSaved] = React.useState("Ada Lovelace")
   const [name, setName] = React.useState(saved)

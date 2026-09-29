@@ -25,8 +25,7 @@ When every action opens an "Are you sure?" dialog, people stop reading and confi
 | `Consequences`      | Lists what a confirmation will remove, with counts and names                |
 | `undoToast`         | A toast with Undo that resolves once nobody undoes                          |
 | `Undoable`          | Collapses a removed row in place to a label and an Undo button              |
-| `useUnsavedChanges` | Asks before someone leaves a page with unsaved changes                      |
-| `useConfirmClose`   | Asks before a dialog with unsaved edits closes                              |
+| `useUnsavedChanges` | Asks before unsaved changes are lost, on a page or in a dialog              |
 | `ToolApproval`      | Approves or denies an AI SDK tool call with a gesture that matches its risk |
 
 The [blocks](https://sureui.com/blocks) are full screens built from these components, installed as app code you edit.

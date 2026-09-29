@@ -12,7 +12,7 @@ import {
 import {
   useConfirmClose,
   type ConfirmCloseOptions,
-} from "@/components/ui/sureui/confirm-close"
+} from "@/components/ui/sureui/unsaved-changes"
 
 function EditDialog({
   initiallyDirty = false,
@@ -190,6 +190,19 @@ describe("useConfirmClose", () => {
     expect(keep.isConnected).toBe(false)
     expect(onSubmit).not.toHaveBeenCalled()
     expect(screen.getByRole("dialog", { name: "Edit profile" })).toBeTruthy()
+  })
+
+  it("onSave adds Save, which saves and then closes", async () => {
+    const onSave = vi.fn()
+    const onDiscard = vi.fn()
+    await openEditor({ initiallyDirty: true, options: { onSave, onDiscard } })
+    await attempts.Escape()
+    await act(async () =>
+      fireEvent.click(await screen.findByRole("button", { name: "Save" }))
+    )
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
+    expect(onSave).toHaveBeenCalledOnce()
+    expect(onDiscard).not.toHaveBeenCalled()
   })
 
   it("close() closes without asking", async () => {
