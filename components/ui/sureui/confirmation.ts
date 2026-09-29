@@ -488,10 +488,8 @@ function useConfirmation<
       if (!isPressKey(event)) return
       const pressed = pressRef.current === "key"
       pressRef.current = "none"
-      if (state === "holding") {
-        if (fallback) armFallback()
-        else release()
-      } else if (state === "ready") confirm()
+      if (state === "holding") release()
+      else if (state === "ready") confirm()
       else if (fallbackArmed && pressed) confirm()
       else undoFromPress()
     },

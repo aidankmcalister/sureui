@@ -931,19 +931,14 @@ describe("ConfirmButton", () => {
     expect(button.getAttribute("data-state")).toBe("armed")
   })
 
-  it("hold fallback: Space let go early arms instead of cancelling", async () => {
+  it("hold: Space let go early cancels instead of arming", async () => {
     const { button, onConfirm, onCancel } = renderHold()
     fireEvent.keyDown(button, { key: " " })
     await act(async () => vi.advanceTimersByTime(500))
     await act(async () => fireEvent.keyUp(button, { key: " " }))
-    expect(button.getAttribute("data-state")).toBe("armed")
-    expect(screen.getByText("Activate again to confirm")).toBeTruthy()
-    await act(async () => vi.advanceTimersByTime(10000))
-    expect(button.getAttribute("data-state")).toBe("armed")
-    expect(onCancel).not.toHaveBeenCalled()
-    fireEvent.keyDown(button, { key: "Enter" })
-    await act(async () => fireEvent.keyUp(button, { key: "Enter" }))
-    expect(onConfirm).toHaveBeenCalledOnce()
+    expect(button.getAttribute("data-state")).toBe("idle")
+    expect(onCancel).toHaveBeenCalledOnce()
+    expect(onConfirm).not.toHaveBeenCalled()
   })
 
   it("hold fallback: a click with no press arms, and the next click confirms", async () => {

@@ -119,7 +119,7 @@ The button sets `data-state`, so you can style around it. After `onConfirm` fail
 
 - Key repeat is ignored, so holding Enter can't arm and confirm at once.
 - Each state change is announced in a polite live region. Replace the English text with `announcements`.
-- Screen reader and keyboard users can confirm a hold with two activations. Set `holdFallback="none"` to turn this off.
+- Keyboard users hold Space or Enter, and letting go early cancels. Screen readers send a click that can't be held, so a click with no press arms the button and a second one confirms. Set `holdFallback="none"` to turn this off.
 - With `prefers-reduced-motion`, fills jump to their end state instead of moving, and a pending button dims instead of pulsing.
 
 ### WCAG
