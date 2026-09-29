@@ -14,7 +14,7 @@ description: A list of what a confirmation will remove, with counts and names.
 ```tsx
 import { Consequences } from "@/components/ui/sureui/consequences"
 
-<Consequences
+;<Consequences
   title="Deleting acme-prod removes"
   items={[
     { label: "Deployments", count: 128 },
@@ -41,6 +41,12 @@ If you only have some of the names, pass the total as `count` and "and N more" i
 
 <Example name="consequences/subject" />
 
+### Changes
+
+For a change rather than a loss, give an item `from` and `to`. The row shows "Pro → Free" where the count would be, and screen readers hear "Plan, from Pro to Free". Leave out `from` to show only the new value.
+
+<Example name="consequences/changes" />
+
 ### Destructive
 
 `variant="destructive"` tints the whole list.
@@ -53,34 +59,37 @@ If you only have some of the names, pass the total as `count` and "and N more" i
 
 Each entry in `items` takes the props of `ConsequencesItem`.
 
-| Prop | Type | Default |
-| --- | --- | --- |
-| `...divProps` | `ComponentProps<"div">` | — |
-| `subject` | `ReactNode` | — |
-| `subjectDescription` | `ReactNode` | — |
-| `items` | `Consequence[]` | — |
-| `children` | `ReactNode` | — |
-| `title` | `ReactNode` | — |
-| `variant` | `"default" \| "destructive"` | `"default"` |
-| `limit` | `number` | `3` |
-| `expandable` | `boolean` | `true` |
-| `moreLabel` | `(hidden: number) => string` | `"and {hidden} more"` |
-| `lessLabel` | `string` | `"Show less"` |
+| Prop                 | Type                         | Default               |
+| -------------------- | ---------------------------- | --------------------- |
+| `...divProps`        | `ComponentProps<"div">`      | —                     |
+| `subject`            | `ReactNode`                  | —                     |
+| `subjectDescription` | `ReactNode`                  | —                     |
+| `items`              | `Consequence[]`              | —                     |
+| `children`           | `ReactNode`                  | —                     |
+| `title`              | `ReactNode`                  | —                     |
+| `variant`            | `"default" \| "destructive"` | `"default"`           |
+| `limit`              | `number`                     | `3`                   |
+| `expandable`         | `boolean`                    | `true`                |
+| `moreLabel`          | `(hidden: number) => string` | `"and {hidden} more"` |
+| `lessLabel`          | `string`                     | `"Show less"`         |
 
 ### ConsequencesItem
 
 It uses the `limit`, `expandable`, `moreLabel` and `lessLabel` set on `Consequences`.
 
-| Prop | Type | Default |
-| --- | --- | --- |
-| `...liProps` | `ComponentProps<"li">` | — |
-| `label` | `ReactNode` | required |
-| `count` | `number` | — |
-| `names` | `string[]` | `[]` |
-| `icon` | `ReactNode` | — |
-| `description` | `ReactNode` | — |
+| Prop          | Type                   | Default  |
+| ------------- | ---------------------- | -------- |
+| `...liProps`  | `ComponentProps<"li">` | —        |
+| `label`       | `ReactNode`            | required |
+| `count`       | `number`               | —        |
+| `from`        | `ReactNode`            | —        |
+| `to`          | `ReactNode`            | —        |
+| `names`       | `string[]`             | `[]`     |
+| `icon`        | `ReactNode`            | —        |
+| `description` | `ReactNode`            | —        |
 
 ## Accessibility
 
 - It renders a list, named by `title` when there is one.
 - The "and N more" button sets `aria-expanded` and doesn't submit a surrounding form.
+- A change row reads as "Plan, from Pro to Free": the arrow is hidden from screen readers.

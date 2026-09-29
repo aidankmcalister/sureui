@@ -15,7 +15,7 @@ description: A dropdown or context menu item that asks for a second click or a p
 import { DropdownMenuContent } from "@/components/ui/dropdown-menu"
 import { ConfirmMenuItem } from "@/components/ui/sureui/confirm-menu-item"
 
-<DropdownMenuContent>
+;<DropdownMenuContent>
   <ConfirmMenuItem variant="destructive" onConfirm={deleteFile}>
     Delete
   </ConfirmMenuItem>
@@ -58,26 +58,26 @@ Set `menu="context"` inside a `ContextMenuContent`.
 
 Extends the shadcn [`DropdownMenuItem`](https://ui.shadcn.com/docs/components/base/dropdown-menu), except `closeOnClick`. The table lists the props it adds.
 
-| Prop | Type | Default |
-| --- | --- | --- |
-| `...menuItemProps` | [`DropdownMenuItem`](https://ui.shadcn.com/docs/components/base/dropdown-menu) props | — |
-| `onConfirm` | `() => void \| Promise<unknown>` | required |
-| `onCancel` | `() => void` | — |
-| `onConfirmError` | `(error: unknown) => void` | — |
-| `gesture` | `"click" \| "click-again" \| "hold"` | `"click-again"` |
-| `menu` | `"dropdown" \| "context"` | `"dropdown"` |
-| `closeOnConfirm` | `boolean` | `true` |
-| `undo` | `boolean \| number \| "manual"` | — |
-| `pauseUndoOnHover` | `boolean` | `true` |
-| `pauseUndoOnFocus` | `boolean` | `true` |
-| `confirmLabel` | `ReactNode` | `"Click again to confirm"`, or `"Confirm"` for a hold |
-| `undoLabel` | `ReactNode` | `"Undo"` |
-| `errorLabel` | `ReactNode` | — |
-| `armDelay` | `number` | `0` |
-| `timeout` | `number` | `3000` |
-| `duration` | `number` | `1200` |
-| `holdFallback` | `"click-again" \| "none"` | `"click-again"` |
-| `announcements` | `{ armed?, hold?, fallback?, undo?, error? }` | — |
+| Prop               | Type                                                                                 | Default                                               |
+| ------------------ | ------------------------------------------------------------------------------------ | ----------------------------------------------------- |
+| `...menuItemProps` | [`DropdownMenuItem`](https://ui.shadcn.com/docs/components/base/dropdown-menu) props | —                                                     |
+| `onConfirm`        | `() => void \| Promise<unknown>`                                                     | required                                              |
+| `onCancel`         | `() => void`                                                                         | —                                                     |
+| `onConfirmError`   | `(error: unknown) => void`                                                           | —                                                     |
+| `gesture`          | `"click" \| "click-again" \| "hold"`                                                 | `"click-again"`                                       |
+| `menu`             | `"dropdown" \| "context"`                                                            | `"dropdown"`                                          |
+| `closeOnConfirm`   | `boolean`                                                                            | `true`                                                |
+| `undo`             | `boolean \| number \| "manual"`                                                      | —                                                     |
+| `pauseUndoOnHover` | `boolean`                                                                            | `true`                                                |
+| `pauseUndoOnFocus` | `boolean`                                                                            | `true`                                                |
+| `confirmLabel`     | `ReactNode`                                                                          | `"Click again to confirm"`, or `"Confirm"` for a hold |
+| `undoLabel`        | `ReactNode`                                                                          | `"Undo"`                                              |
+| `errorLabel`       | `ReactNode`                                                                          | —                                                     |
+| `armDelay`         | `number`                                                                             | `0`                                                   |
+| `timeout`          | `number`                                                                             | `3000`                                                |
+| `duration`         | `number`                                                                             | `1200`                                                |
+| `holdFallback`     | `"click-again" \| "none"`                                                            | `"click-again"`                                       |
+| `announcements`    | `{ armed?, hold?, fallback?, undo?, error? }`                                        | —                                                     |
 
 ### Data attributes
 
@@ -91,5 +91,5 @@ The item sets the same `data-state` values and `data-error` as [Confirm Button](
 
 ### WCAG
 
-- 2.2.1 Timing Adjustable: `undo="manual"` meets it, since Undo has no time limit.
-- 2.5.2 Pointer Cancellation: `gesture="hold"` meets it, because releasing early or moving off the item cancels.
+- [2.2.1 Timing Adjustable](https://www.w3.org/WAI/WCAG22/Understanding/timing-adjustable): `undo="manual"` meets it, since Undo has no time limit.
+- [2.5.2 Pointer Cancellation](https://www.w3.org/WAI/WCAG22/Understanding/pointer-cancellation): `gesture="hold"` meets it, because releasing early or moving off the item cancels.

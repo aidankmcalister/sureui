@@ -14,7 +14,7 @@ description: An inline form that unlocks its confirm button only after the exact
 ```tsx
 import { TypeToConfirm } from "@/components/ui/sureui/type-to-confirm"
 
-<TypeToConfirm
+;<TypeToConfirm
   phrase="acme-prod"
   variant="destructive"
   confirmLabel="Delete project"
@@ -66,28 +66,28 @@ The phrase must match exactly. `caseSensitive={false}` ignores case, and `trim` 
 
 Renders a `form`.
 
-| Prop | Type | Default |
-| --- | --- | --- |
-| `phrase` | `string \| string[]` | required |
-| `onConfirm` | `(choices: Record<string, boolean>) => void \| Promise<unknown>` | required |
-| `onCancel` | `() => void` | — |
-| `onConfirmError` | `(error: unknown) => void` | — |
-| `caseSensitive` | `boolean` | `true` |
-| `trim` | `boolean` | `false` |
-| `acknowledgements` | `string[]` | `[]` |
-| `choices` | `{ name: string, label: ReactNode, defaultChecked?: boolean }[]` | `[]` |
-| `consequences` | `ReactNode` | — |
-| `label` | `ReactNode \| ReactNode[]` | `"Type {phrase} to confirm"` |
-| `confirmLabel` | `ReactNode` | `"Confirm"` |
-| `undoLabel` | `ReactNode` | `"Undo"` |
-| `errorLabel` | `ReactNode` | — |
-| `variant` | [`Button`](https://ui.shadcn.com/docs/components/base/button) `variant` | `"default"` |
-| `undo` | `boolean \| number \| "manual"` | — |
-| `pauseUndoOnHover` | `boolean` | `true` |
-| `pauseUndoOnFocus` | `boolean` | `true` |
-| `renderActions` | `(confirmButton: ReactElement) => ReactNode` | — |
-| `className` | `string` | — |
-| `announcements` | `{ match?, undo?, error? }` | — |
+| Prop               | Type                                                                    | Default                      |
+| ------------------ | ----------------------------------------------------------------------- | ---------------------------- |
+| `phrase`           | `string \| string[]`                                                    | required                     |
+| `onConfirm`        | `(choices: Record<string, boolean>) => void \| Promise<unknown>`        | required                     |
+| `onCancel`         | `() => void`                                                            | —                            |
+| `onConfirmError`   | `(error: unknown) => void`                                              | —                            |
+| `caseSensitive`    | `boolean`                                                               | `true`                       |
+| `trim`             | `boolean`                                                               | `false`                      |
+| `acknowledgements` | `string[]`                                                              | `[]`                         |
+| `choices`          | `{ name: string, label: ReactNode, defaultChecked?: boolean }[]`        | `[]`                         |
+| `consequences`     | `ReactNode`                                                             | —                            |
+| `label`            | `ReactNode \| ReactNode[]`                                              | `"Type {phrase} to confirm"` |
+| `confirmLabel`     | `ReactNode`                                                             | `"Confirm"`                  |
+| `undoLabel`        | `ReactNode`                                                             | `"Undo"`                     |
+| `errorLabel`       | `ReactNode`                                                             | —                            |
+| `variant`          | [`Button`](https://ui.shadcn.com/docs/components/base/button) `variant` | `"default"`                  |
+| `undo`             | `boolean \| number \| "manual"`                                         | —                            |
+| `pauseUndoOnHover` | `boolean`                                                               | `true`                       |
+| `pauseUndoOnFocus` | `boolean`                                                               | `true`                       |
+| `renderActions`    | `(confirmButton: ReactElement) => ReactNode`                            | —                            |
+| `className`        | `string`                                                                | —                            |
+| `announcements`    | `{ match?, undo?, error? }`                                             | —                            |
 
 ## Accessibility
 
@@ -98,4 +98,4 @@ Renders a `form`.
 
 ### WCAG
 
-- 2.2.1 Timing Adjustable: `undo="manual"` meets it, since Undo has no time limit.
+- [2.2.1 Timing Adjustable](https://www.w3.org/WAI/WCAG22/Understanding/timing-adjustable): `undo="manual"` meets it, since Undo has no time limit.

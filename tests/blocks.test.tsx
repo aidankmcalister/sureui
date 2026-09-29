@@ -12,13 +12,16 @@ import { describe, expect, it, vi } from "vitest"
 import { AgentApproval } from "@/components/blocks/agent-approval-01/agent-approval"
 import { ApiKeys } from "@/components/blocks/api-keys-01/api-keys"
 import { BulkActions } from "@/components/blocks/bulk-actions-01/bulk-actions"
+import { CancelSubscription } from "@/components/blocks/cancel-subscription-01/cancel-subscription"
 import { DangerZone } from "@/components/blocks/danger-zone-01/danger-zone"
 import { DeleteAccount } from "@/components/blocks/delete-account-01/delete-account"
 import { FileManager } from "@/components/blocks/file-manager-01/file-manager"
 import { Inbox } from "@/components/blocks/inbox-01/inbox"
 import { Reauth } from "@/components/blocks/reauth-01/reauth"
 import { ScheduledDeletion } from "@/components/blocks/scheduled-deletion-01/scheduled-deletion"
+import { SettingsSaveBar } from "@/components/blocks/settings-save-bar-01/settings-save-bar"
 import { TeamMembers } from "@/components/blocks/team-members-01/team-members"
+import { TransferOwnership } from "@/components/blocks/transfer-ownership-01/transfer-ownership"
 import { blockPreviewNames } from "@/components/site/blocks/previews"
 import registry from "@/registry.json"
 
@@ -566,5 +569,130 @@ describe("reauth-01", () => {
     fireEvent.change(email, { target: { value: "ap@example.com" } })
     fireEvent.click(screen.getByRole("button", { name: "Save" }))
     expect(await screen.findByRole("dialog")).toBeTruthy()
+  })
+})
+
+describe("settings-save-bar-01", () => {
+  function bar() {
+    return screen.queryByRole("region", { name: "Unsaved changes" })
+  }
+
+  function rename(value: string) {
+    fireEvent.change(screen.getByLabelText("Team name"), {
+      target: { value },
+    })
+  }
+
+  it("shows the save bar only while something changed", async () => {
+    render(<SettingsSaveBar />)
+    expect(bar()).toBeNull()
+    rename("Acme Inc")
+    expect(bar()).toBeTruthy()
+    rename("Acme")
+    expect(bar()).toBeNull()
+  })
+
+  it("discards on the second click", async () => {
+    render(<SettingsSaveBar />)
+    rename("Acme Inc")
+    const discard = within(bar()!).getByRole("button", { name: /Discard/ })
+    fireEvent.click(discard)
+    expect(bar()).toBeTruthy()
+    fireEvent.click(discard)
+    await waitFor(() => expect(bar()).toBeNull(), settled)
+    expect((screen.getByLabelText("Team name") as HTMLInputElement).value).toBe(
+      "Acme"
+    )
+  })
+
+  it("saves and hides the bar", async () => {
+    render(<SettingsSaveBar />)
+    rename("Acme Inc")
+    fireEvent.click(within(bar()!).getByRole("button", { name: "Save" }))
+    await waitFor(() => expect(bar()).toBeNull(), settled)
+    expect((screen.getByLabelText("Team name") as HTMLInputElement).value).toBe(
+      "Acme Inc"
+    )
+  })
+
+  it("asks before leaving with unsaved changes", async () => {
+    render(<SettingsSaveBar />)
+    rename("Acme Inc")
+    fireEvent.click(screen.getByRole("button", { name: "Members" }))
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Keep editing" }, settled)
+    )
+    await waitFor(
+      () => expect(screen.getByLabelText("Team name")).toBeTruthy(),
+      settled
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Members" }))
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Discard changes" }, settled)
+    )
+    await screen.findByText("Discard unsaved changes?", undefined, settled)
+    fireEvent.click(screen.getByRole("button", { name: "Discard changes" }))
+    await screen.findByText(
+      "Invite people and choose what they can do.",
+      undefined,
+      settled
+    )
+  })
+})
+
+describe("transfer-ownership-01", () => {
+  it("transfers only after the project name is typed", async () => {
+    render(<TransferOwnership />)
+    fireEvent.click(screen.getAllByRole("button", { name: "Make owner" })[0])
+    const dialog = await screen.findByRole("alertdialog", undefined, settled)
+    expect(within(dialog).getByText("Billing moves to Leo Park")).toBeTruthy()
+    const confirm = within(dialog).getByRole("button", {
+      name: "Transfer ownership",
+    }) as HTMLButtonElement
+    expect(confirm.disabled).toBe(true)
+    fireEvent.change(within(dialog).getByRole("textbox"), {
+      target: { value: "acme-prod" },
+    })
+    fireEvent.click(confirm)
+    await screen.findByText(
+      "Leo Park owns acme-prod now. You're an admin.",
+      undefined,
+      settled
+    )
+    expect(screen.queryByRole("button", { name: "Make owner" })).toBeNull()
+  })
+})
+
+describe("cancel-subscription-01", () => {
+  async function openDialog() {
+    render(<CancelSubscription />)
+    fireEvent.click(screen.getByRole("button", { name: "Cancel subscription" }))
+    return screen.findByRole("alertdialog", undefined, settled)
+  }
+
+  it("cancels on the second click and offers to keep Pro", async () => {
+    const dialog = await openDialog()
+    expect(within(dialog).getByText("On October 29")).toBeTruthy()
+    expect(within(dialog).getByText("Free")).toBeTruthy()
+    const confirm = within(dialog).getByRole("button", {
+      name: /Cancel subscription/,
+    })
+    fireEvent.click(confirm)
+    expect(screen.queryByText("Canceled")).toBeNull()
+    fireEvent.click(confirm)
+    await screen.findByText("Canceled", undefined, settled)
+    fireEvent.click(screen.getByRole("button", { name: "Keep Pro" }))
+    await waitFor(
+      () => expect(screen.queryByText("Canceled")).toBeNull(),
+      settled
+    )
+  })
+
+  it("switches to Starter instead", async () => {
+    const dialog = await openDialog()
+    fireEvent.click(
+      within(dialog).getByRole("button", { name: "Switch to Starter instead" })
+    )
+    await screen.findByText("Starter plan", undefined, settled)
   })
 })

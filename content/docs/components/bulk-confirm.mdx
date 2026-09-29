@@ -14,7 +14,7 @@ description: A confirm for acting on many items at once that gets harder as the 
 ```tsx
 import { BulkConfirm } from "@/components/ui/sureui/bulk-confirm"
 
-<BulkConfirm
+;<BulkConfirm
   count={selected.length}
   label={(count) => `Delete ${count} issues`}
   onConfirm={deleteSelected}
@@ -35,18 +35,18 @@ Up to 10 items it's a [Confirm Button](/docs/confirm-button#undo) with undo. Up 
 
 ### BulkConfirm
 
-| Prop | Type | Default |
-| --- | --- | --- |
-| `count` | `number` | required |
-| `label` | `(count: number) => ReactNode` | required |
-| `onConfirm` | `() => void \| Promise<unknown>` | required |
-| `onCancel` | `() => void` | — |
-| `onConfirmError` | `(error: unknown) => void` | — |
-| `thresholds` | `{ undo?, clickAgain? }` | `{ undo: 10, clickAgain: 100 }` |
-| `errorLabel` | `ReactNode` | — |
-| `variant` | [`Button`](https://ui.shadcn.com/docs/components/base/button) `variant` | `"default"` |
-| `disabled` | `boolean` | `false` |
-| `className` | `string` | — |
+| Prop             | Type                                                                    | Default                         |
+| ---------------- | ----------------------------------------------------------------------- | ------------------------------- |
+| `count`          | `number`                                                                | required                        |
+| `label`          | `(count: number) => ReactNode`                                          | required                        |
+| `onConfirm`      | `() => void \| Promise<unknown>`                                        | required                        |
+| `onCancel`       | `() => void`                                                            | —                               |
+| `onConfirmError` | `(error: unknown) => void`                                              | —                               |
+| `thresholds`     | `{ undo?, clickAgain? }`                                                | `{ undo: 10, clickAgain: 100 }` |
+| `errorLabel`     | `ReactNode`                                                             | —                               |
+| `variant`        | [`Button`](https://ui.shadcn.com/docs/components/base/button) `variant` | `"default"`                     |
+| `disabled`       | `boolean`                                                               | `false`                         |
+| `className`      | `string`                                                                | —                               |
 
 When `count` crosses a threshold, the control switches and starts over, so a half-finished confirmation never carries across.
 
@@ -54,3 +54,7 @@ When `count` crosses a threshold, the control switches and starts over, so a hal
 
 - The label says the count, so screen readers hear "Delete 248 issues", not "Delete".
 - Each level has the accessibility of the control it uses: [Confirm Button](/docs/confirm-button#accessibility) for undo and click again, and [Type to Confirm](/docs/type-to-confirm#accessibility) for the typed count.
+
+### WCAG
+
+- [2.2.1 Timing Adjustable](https://www.w3.org/WAI/WCAG22/Understanding/timing-adjustable): the undo level uses a 5-second undo window, which pauses while the pointer or focus is on the button and while the tab is hidden. To skip it, set `thresholds.undo` to `0`, so every count asks for a second click instead.

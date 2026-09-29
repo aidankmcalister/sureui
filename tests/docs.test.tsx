@@ -185,6 +185,8 @@ const consequences = {
 const consequencesItem = {
   label: true,
   count: true,
+  from: true,
+  to: true,
   names: true,
   icon: true,
   description: true,

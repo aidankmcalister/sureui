@@ -1433,16 +1433,17 @@ describe("ConfirmButton slide", () => {
     expect(onCancel).toHaveBeenCalledOnce()
   })
 
-  it("ignores a plain mouse click", () => {
+  it("arms on a plain click and confirms on a second, without dragging", () => {
     const { button, onConfirm } = setup()
     fireEvent.pointerDown(button, { button: 0, pointerId: 1, clientX: 10 })
     fireEvent.pointerUp(button, { pointerId: 1, clientX: 10 })
     fireEvent.click(button)
+    expect(button.getAttribute("data-state")).toBe("armed")
+    expect(onConfirm).not.toHaveBeenCalled()
     fireEvent.pointerDown(button, { button: 0, pointerId: 1, clientX: 10 })
     fireEvent.pointerUp(button, { pointerId: 1, clientX: 10 })
     fireEvent.click(button)
-    expect(button.getAttribute("data-state")).toBe("idle")
-    expect(onConfirm).not.toHaveBeenCalled()
+    expect(onConfirm).toHaveBeenCalledOnce()
   })
 
   it("confirms with two activations from the keyboard", async () => {

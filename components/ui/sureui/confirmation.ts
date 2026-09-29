@@ -616,11 +616,6 @@ function useConfirmation<
         slidClickRef.current = false
         return
       }
-      if (isSlide) {
-        const press = pressRef.current
-        pressRef.current = "none"
-        if (press === "pointer" && state !== "undo") return
-      }
       if (isHold) return holdClick()
       if (repeatRef.current) return
       if (state === "undo") cancel()

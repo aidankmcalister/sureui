@@ -244,11 +244,13 @@ function ConfirmBody({
       disabled={!!pending}
       focusableWhenDisabled={pending === "alternative"}
       onClick={onAlternative}
+      className="sm:col-span-2"
     >
       {alternative.label}
     </Button>
   )
   const blocked = pending === "alternative"
+  const footer = alternative ? "sm:grid sm:grid-cols-2" : undefined
 
   return (
     <>
@@ -277,15 +279,15 @@ function ConfirmBody({
           variant={variant}
           onConfirm={onConfirm}
           renderActions={(confirmButton) => (
-            <AlertDialogFooter>
+            <AlertDialogFooter className={footer}>
               {cancel}
-              {other}
               {blocked
                 ? React.cloneElement(
                     confirmButton as React.ReactElement<{ disabled?: boolean }>,
                     { disabled: true }
                   )
                 : confirmButton}
+              {other}
             </AlertDialogFooter>
           )}
         />
@@ -307,9 +309,8 @@ function ConfirmBody({
               />
             </div>
           )}
-          <AlertDialogFooter>
+          <AlertDialogFooter className={footer}>
             {cancel}
-            {other}
             <ConfirmButton
               {...gestureOptions}
               ref={confirmRef}
@@ -325,6 +326,7 @@ function ConfirmBody({
             >
               {confirmLabel}
             </ConfirmButton>
+            {other}
           </AlertDialogFooter>
         </>
       )}

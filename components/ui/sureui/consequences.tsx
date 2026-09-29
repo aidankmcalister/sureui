@@ -22,6 +22,8 @@ interface ConsequencesListOptions {
 interface Consequence {
   label: React.ReactNode
   count?: number
+  from?: React.ReactNode
+  to?: React.ReactNode
   names?: string[]
   icon?: React.ReactNode
   description?: React.ReactNode
@@ -137,6 +139,8 @@ function ConsequencesItem(props: ConsequencesItemProps) {
   const {
     label,
     count,
+    from,
+    to,
     names = [],
     icon,
     description,
@@ -182,17 +186,39 @@ function ConsequencesItem(props: ConsequencesItemProps) {
       <span className={cn("leading-5", icon ? "col-start-2" : "col-start-1")}>
         {label}
       </span>
-      {total !== undefined && (
+      {to !== undefined ? (
         <span
-          data-slot="consequences-count"
+          data-slot="consequences-change"
           className={cn(
-            "row-start-1 text-right leading-5 font-medium tabular-nums",
+            "row-start-1 flex flex-wrap items-baseline justify-end gap-x-1.5 text-right leading-5",
             icon ? "col-start-3" : "col-start-2"
           )}
         >
-          <span className="sr-only">, </span>
-          {total}
+          {from !== undefined && (
+            <>
+              <span className="sr-only">, from </span>
+              <span className={mutedText(context.variant)}>{from}</span>
+              <span aria-hidden="true" className={mutedText(context.variant)}>
+                →
+              </span>
+            </>
+          )}
+          <span className="sr-only">{from !== undefined ? " to " : ", "}</span>
+          <span className="font-medium">{to}</span>
         </span>
+      ) : (
+        total !== undefined && (
+          <span
+            data-slot="consequences-count"
+            className={cn(
+              "row-start-1 text-right leading-5 font-medium tabular-nums",
+              icon ? "col-start-3" : "col-start-2"
+            )}
+          >
+            <span className="sr-only">, </span>
+            {total}
+          </span>
+        )
       )}
       {hasNames && <span className="sr-only">: </span>}
       {hasNames && (

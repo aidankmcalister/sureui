@@ -15,7 +15,7 @@ description: A popover anchored to its trigger with one line about the action an
 import { Button } from "@/components/ui/button"
 import { ConfirmPopover } from "@/components/ui/sureui/confirm-popover"
 
-<ConfirmPopover
+;<ConfirmPopover
   description="Open pull requests from this branch will close."
   confirmLabel="Delete branch"
   variant="destructive"
@@ -79,31 +79,31 @@ Focus starts on the confirm button, so a keyboard user can confirm a quick actio
 
 It has no `undo`, since it closes when the action commits. Use [Undo Toast](/docs/undo-toast) for a way back.
 
-| Prop | Type | Default |
-| --- | --- | --- |
-| `description` | `ReactNode` | required |
-| `children` | `ReactElement` | required |
-| `onConfirm` | `() => void \| Promise<unknown>` | required |
-| `onCancel` | `() => void` | — |
-| `onConfirmError` | `(error: unknown) => void` | — |
-| `title` | `ReactNode` | — |
-| `confirmLabel` | `ReactNode` | `"Confirm"` |
-| `errorLabel` | `ReactNode` | — |
-| `cancelLabel` | `ReactNode` | `"Cancel"` |
-| `initialFocus` | `"confirm" \| "cancel" \| "none"` | `"confirm"` |
-| `variant` | [`Button`](https://ui.shadcn.com/docs/components/base/button) `variant` | `"default"` |
-| `side` | `"top" \| "bottom" \| "left" \| "right" \| "inline-start" \| "inline-end"` | `"bottom"` |
-| `align` | `"start" \| "center" \| "end"` | `"center"` |
-| `open` | `boolean` | — |
-| `onOpenChange` | `(open: boolean) => void` | — |
-| `gesture` | `"click" \| "click-again" \| "hold" \| "slide"` | `"click"` |
-| `armDelay` | `number` | `0` |
-| `wait` | `number` | `0` |
-| `waitLabel` | `(seconds: number) => ReactNode` | ``(s) => `Wait ${s}s` `` |
-| `timeout` | `number` | `3000` |
-| `duration` | `number` | `1200` |
-| `holdFallback` | `"click-again" \| "none"` | `"click-again"` |
-| `announcements` | `{ armed?, hold?, slide?, fallback?, wait?, error? }` | — |
+| Prop             | Type                                                                       | Default                  |
+| ---------------- | -------------------------------------------------------------------------- | ------------------------ |
+| `description`    | `ReactNode`                                                                | required                 |
+| `children`       | `ReactElement`                                                             | required                 |
+| `onConfirm`      | `() => void \| Promise<unknown>`                                           | required                 |
+| `onCancel`       | `() => void`                                                               | —                        |
+| `onConfirmError` | `(error: unknown) => void`                                                 | —                        |
+| `title`          | `ReactNode`                                                                | —                        |
+| `confirmLabel`   | `ReactNode`                                                                | `"Confirm"`              |
+| `errorLabel`     | `ReactNode`                                                                | —                        |
+| `cancelLabel`    | `ReactNode`                                                                | `"Cancel"`               |
+| `initialFocus`   | `"confirm" \| "cancel" \| "none"`                                          | `"confirm"`              |
+| `variant`        | [`Button`](https://ui.shadcn.com/docs/components/base/button) `variant`    | `"default"`              |
+| `side`           | `"top" \| "bottom" \| "left" \| "right" \| "inline-start" \| "inline-end"` | `"bottom"`               |
+| `align`          | `"start" \| "center" \| "end"`                                             | `"center"`               |
+| `open`           | `boolean`                                                                  | —                        |
+| `onOpenChange`   | `(open: boolean) => void`                                                  | —                        |
+| `gesture`        | `"click" \| "click-again" \| "hold" \| "slide"`                            | `"click"`                |
+| `armDelay`       | `number`                                                                   | `0`                      |
+| `wait`           | `number`                                                                   | `0`                      |
+| `waitLabel`      | `(seconds: number) => ReactNode`                                           | ``(s) => `Wait ${s}s` `` |
+| `timeout`        | `number`                                                                   | `3000`                   |
+| `duration`       | `number`                                                                   | `1200`                   |
+| `holdFallback`   | `"click-again" \| "none"`                                                  | `"click-again"`          |
+| `announcements`  | `{ armed?, hold?, slide?, fallback?, wait?, error? }`                      | —                        |
 
 ## Accessibility
 
@@ -113,5 +113,6 @@ It has no `undo`, since it closes when the action commits. Use [Undo Toast](/doc
 
 ### WCAG
 
-- 2.2.1 Timing Adjustable: the popover has no time limit. `timeout` only disarms `click-again`, and never runs or drops the action.
-- 2.5.2 Pointer Cancellation: `gesture="hold"` meets it, because releasing early or moving off the button cancels.
+- [2.2.1 Timing Adjustable](https://www.w3.org/WAI/WCAG22/Understanding/timing-adjustable): the popover has no time limit. `timeout` only disarms `click-again`, and never runs or drops the action.
+- `wait` isn't a time limit under 2.2.1: it only delays when confirm unlocks, and never ends anything or drops the action.
+- [2.5.2 Pointer Cancellation](https://www.w3.org/WAI/WCAG22/Understanding/pointer-cancellation): `gesture="hold"` meets it, because releasing early or moving off the button cancels.

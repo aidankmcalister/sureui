@@ -66,33 +66,33 @@ Spread `rootProps` on the root. While `when` is `true`, Escape, a click outside 
 
 ### useUnsavedChanges(options)
 
-| Prop | Type | Default |
-| --- | --- | --- |
-| `when` | `boolean` | required |
-| `onSave` | `() => void \| Promise<unknown>` | — |
-| `onDiscard` | `() => void \| Promise<unknown>` | — |
-| `onConfirmError` | `(error: unknown) => void` | — |
-| `beforeUnload` | `boolean` | `true` |
-| `title` | `string` | `"Discard unsaved changes?"` |
-| `saveTitle` | `string` | `"Save changes before leaving?"` |
-| `description` | `ReactNode` | `"Your changes haven't been saved."` |
-| `keepLabel` | `string` | `"Keep editing"` |
-| `discardLabel` | `string` | `"Discard changes"` |
-| `saveLabel` | `string` | `"Save"` |
-| `open` | `boolean` | — |
-| `onOpenChange` | `(open: boolean) => void` | — |
+| Prop             | Type                             | Default                              |
+| ---------------- | -------------------------------- | ------------------------------------ |
+| `when`           | `boolean`                        | required                             |
+| `onSave`         | `() => void \| Promise<unknown>` | —                                    |
+| `onDiscard`      | `() => void \| Promise<unknown>` | —                                    |
+| `onConfirmError` | `(error: unknown) => void`       | —                                    |
+| `beforeUnload`   | `boolean`                        | `true`                               |
+| `title`          | `string`                         | `"Discard unsaved changes?"`         |
+| `saveTitle`      | `string`                         | `"Save changes before leaving?"`     |
+| `description`    | `ReactNode`                      | `"Your changes haven't been saved."` |
+| `keepLabel`      | `string`                         | `"Keep editing"`                     |
+| `discardLabel`   | `string`                         | `"Discard changes"`                  |
+| `saveLabel`      | `string`                         | `"Save"`                             |
+| `open`           | `boolean`                        | —                                    |
+| `onOpenChange`   | `(open: boolean) => void`        | —                                    |
 
 `beforeUnload={false}` leaves reloads and closed tabs alone, for when your router already prompts. `open` and `onOpenChange` control the dialog that `rootProps` goes on.
 
 If `onSave` or `onDiscard` returns a promise, its button stays pending until it settles, and nothing closes unless it succeeds. If it fails, the buttons stay and the error goes to `onConfirmError`, as on [Confirm Button](/docs/confirm-button#errors).
 
-| Name | Type | Description |
-| --- | --- | --- |
+| Name           | Type                     | Description                                                                                                                                                                                                                 |
+| -------------- | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `confirmLeave` | `() => Promise<boolean>` | Opens the confirm dialog while `when` is true. Resolves `true` once the changes are saved or discarded, and `false` on Keep editing, Escape or unmount. Called again while the dialog is open, it returns the same promise. |
-| `dialog` | `ReactElement` | The confirm dialog for `confirmLeave`. Render it once. |
-| `rootProps` | `{ open, onOpenChange }` | Props for your Dialog, Sheet or Drawer root. |
-| `question` | `ReactElement \| null` | The buttons to render in its footer while asking, otherwise `null`. |
-| `close` | `() => void` | Closes your dialog without asking. |
+| `dialog`       | `ReactElement`           | The confirm dialog for `confirmLeave`. Render it once.                                                                                                                                                                      |
+| `rootProps`    | `{ open, onOpenChange }` | Props for your Dialog, Sheet or Drawer root.                                                                                                                                                                                |
+| `question`     | `ReactElement \| null`   | The buttons to render in its footer while asking, otherwise `null`.                                                                                                                                                         |
+| `close`        | `() => void`             | Closes your dialog without asking.                                                                                                                                                                                          |
 
 ## Accessibility
 

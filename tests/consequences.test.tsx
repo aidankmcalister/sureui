@@ -12,6 +12,12 @@ import { TypeToConfirm } from "@/components/ui/sureui/type-to-confirm"
 const projects = ["acme-web", "acme-api", "docs"]
 const many = Array.from({ length: 43 }, (_, index) => `site-${index + 1}`)
 
+function spoken(element: HTMLElement) {
+  const copy = element.cloneNode(true) as HTMLElement
+  copy.querySelectorAll('[aria-hidden="true"]').forEach((node) => node.remove())
+  return copy.textContent
+}
+
 function itemText(name: RegExp) {
   return screen
     .getAllByRole("listitem")
@@ -61,6 +67,28 @@ describe("Consequences", () => {
     expect(screen.getByRole("listitem").textContent).toBe(
       "Projects, 3: acme-web, acme-api, docs"
     )
+  })
+
+  it("reads a change as its label, from and to, without the arrow", () => {
+    render(
+      <Consequences
+        items={[
+          { label: "Plan", from: "Pro", to: "Free" },
+          { label: "Region", to: "Frankfurt" },
+        ]}
+      />
+    )
+    const [plan, region] = screen.getAllByRole("listitem")
+    expect(spoken(plan)).toBe("Plan, from Pro to Free")
+    expect(plan.textContent).toContain("→")
+    expect(spoken(region)).toBe("Region, Frankfurt")
+  })
+
+  it("shows the change instead of the count", () => {
+    render(
+      <Consequences items={[{ label: "Seats", count: 9, from: 5, to: 1 }]} />
+    )
+    expect(spoken(screen.getByRole("listitem"))).toBe("Seats, from 5 to 1")
   })
 
   it("reads a count without names as just the label and count", () => {

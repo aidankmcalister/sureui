@@ -51,7 +51,7 @@ Moving off the button or losing focus also cancels.
 
 ### Slide
 
-`gesture="slide"` confirms when people drag across the button and let go at the end. Letting go early slides it back and cancels, and scrolling the page up or down still works. Keyboard and screen reader users confirm with two activations, like click again.
+`gesture="slide"` confirms when people drag across the button and let go at the end. Letting go early slides it back and cancels, and scrolling the page up or down still works. Two clicks or taps, or two presses of Enter or Space, also confirm, like click again, so nobody has to drag.
 
 <Example name="confirm-button/slide" />
 
@@ -135,5 +135,7 @@ The button sets `data-state`, so you can style around it. After `onConfirm` fail
 
 ### WCAG
 
-- 2.2.1 Timing Adjustable: `undo="manual"` meets it, since Undo has no time limit. A numeric `undo` stops at 60 seconds.
-- 2.5.2 Pointer Cancellation: `gesture="hold"` meets it, because releasing early or moving off the button cancels. `click` and `click-again` run on the up event.
+- [2.2.1 Timing Adjustable](https://www.w3.org/WAI/WCAG22/Understanding/timing-adjustable): `undo="manual"` meets it, since Undo has no time limit. A numeric `undo` stops at 60 seconds.
+- `wait` isn't a time limit under 2.2.1: it only delays when confirm unlocks, and never ends anything or drops the action.
+- [2.5.2 Pointer Cancellation](https://www.w3.org/WAI/WCAG22/Understanding/pointer-cancellation): `gesture="hold"` meets it, because releasing early or moving off the button cancels. `click` and `click-again` run on the up event.
+- [2.5.7 Dragging Movements](https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements): `gesture="slide"` meets it, because two clicks confirm without dragging.

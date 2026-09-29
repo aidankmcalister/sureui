@@ -51,14 +51,14 @@ The window pauses while the toast is hovered or focused, and while the tab is hi
 
 Returns a `Promise<boolean>`.
 
-| Prop | Type | Default |
-| --- | --- | --- |
-| `message` | `ReactNode` | required |
-| `description` | `ReactNode` | — |
-| `duration` | `number \| "manual"` | `5000` |
-| `undoLabel` | `ReactNode` | `"Undo"` |
-| `pauseUndoOnHover` | `boolean` | `true` |
-| `pauseUndoOnFocus` | `boolean` | `true` |
+| Prop               | Type                 | Default  |
+| ------------------ | -------------------- | -------- |
+| `message`          | `ReactNode`          | required |
+| `description`      | `ReactNode`          | —        |
+| `duration`         | `number \| "manual"` | `5000`   |
+| `undoLabel`        | `ReactNode`          | `"Undo"` |
+| `pauseUndoOnHover` | `boolean`            | `true`   |
+| `pauseUndoOnFocus` | `boolean`            | `true`   |
 
 ## Accessibility
 
@@ -68,4 +68,4 @@ Returns a `Promise<boolean>`.
 
 ### WCAG
 
-- 2.2.1 Timing Adjustable: `duration: "manual"` meets it, since the toast has no time limit. A numeric `duration` stops at 60 seconds.
+- [2.2.1 Timing Adjustable](https://www.w3.org/WAI/WCAG22/Understanding/timing-adjustable): `duration: "manual"` meets it, since the toast has no time limit. A numeric `duration` stops at 60 seconds.

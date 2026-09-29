@@ -15,7 +15,7 @@ description: A list item or table row that collapses in place to a label and Und
 import { Button } from "@/components/ui/button"
 import { Undoable } from "@/components/ui/sureui/undoable"
 
-<Undoable
+;<Undoable
   render={<li />}
   label={`Deleted ${file.name}`}
   onConfirm={() => deleteFile(file.id)}
@@ -63,32 +63,32 @@ If `onConfirm` throws or rejects, the row comes back. Pass `onConfirmError` to r
 
 The table lists the props it adds to the element it renders.
 
-| Prop | Type | Default |
-| --- | --- | --- |
-| `...elementProps` | props of the `render` element | — |
-| `onConfirm` | `() => void \| Promise<unknown>` | required |
-| `onCancel` | `() => void` | — |
-| `onConfirmError` | `(error: unknown) => void` | — |
-| `children` | `ReactNode \| (({ remove, state }) => ReactNode)` | — |
-| `render` | `ReactElement` | `<div />` |
-| `label` | `ReactNode` | `"Deleted"` |
-| `undoLabel` | `ReactNode` | `"Undo"` |
-| `undo` | `boolean \| number \| "manual"` | `true` |
-| `pauseUndoOnHover` | `boolean` | `true` |
-| `pauseUndoOnFocus` | `boolean` | `true` |
-| `focusAfterRemove` | `(row: HTMLElement) => HTMLElement \| null` | next row, previous row, then the list |
-| `announcements` | `{ undo? }` | — |
+| Prop               | Type                                              | Default                               |
+| ------------------ | ------------------------------------------------- | ------------------------------------- |
+| `...elementProps`  | props of the `render` element                     | —                                     |
+| `onConfirm`        | `() => void \| Promise<unknown>`                  | required                              |
+| `onCancel`         | `() => void`                                      | —                                     |
+| `onConfirmError`   | `(error: unknown) => void`                        | —                                     |
+| `children`         | `ReactNode \| (({ remove, state }) => ReactNode)` | —                                     |
+| `render`           | `ReactElement`                                    | `<div />`                             |
+| `label`            | `ReactNode`                                       | `"Deleted"`                           |
+| `undoLabel`        | `ReactNode`                                       | `"Undo"`                              |
+| `undo`             | `boolean \| number \| "manual"`                   | `true`                                |
+| `pauseUndoOnHover` | `boolean`                                         | `true`                                |
+| `pauseUndoOnFocus` | `boolean`                                         | `true`                                |
+| `focusAfterRemove` | `(row: HTMLElement) => HTMLElement \| null`       | next row, previous row, then the list |
+| `announcements`    | `{ undo? }`                                       | —                                     |
 
 ### Data attributes
 
 The rendered element sets `data-state`. Drop the item from your data once it's `removed`. After `onConfirm` fails, it also sets `data-error` until the next removal.
 
-| Value | When |
-| --- | --- |
-| `idle` | Showing its children. |
-| `undo` | Collapsed, with the undo window open. |
+| Value     | When                                                |
+| --------- | --------------------------------------------------- |
+| `idle`    | Showing its children.                               |
+| `undo`    | Collapsed, with the undo window open.               |
 | `pending` | `onConfirm` returned a promise that hasn't settled. |
-| `removed` | `onConfirm` has run. |
+| `removed` | `onConfirm` has run.                                |
 
 ## Accessibility
 
@@ -99,4 +99,4 @@ The rendered element sets `data-state`. Drop the item from your data once it's `
 
 ### WCAG
 
-- 2.2.1 Timing Adjustable: `undo="manual"` meets it, since Undo has no time limit. A numeric `undo` stops at 60 seconds.
+- [2.2.1 Timing Adjustable](https://www.w3.org/WAI/WCAG22/Understanding/timing-adjustable): `undo="manual"` meets it, since Undo has no time limit. A numeric `undo` stops at 60 seconds.

@@ -15,7 +15,7 @@ description: An alert dialog that asks before an action runs, with a confirm but
 import { Button } from "@/components/ui/button"
 import { ConfirmDialog } from "@/components/ui/sureui/confirm-dialog"
 
-<ConfirmDialog
+;<ConfirmDialog
   title="Leave the Design team?"
   description="An admin can add you back later."
   confirmLabel="Leave team"
@@ -52,7 +52,7 @@ Each item in `choices` adds a checkbox that doesn't block confirming. `onConfirm
 
 ### Alternative
 
-`alternative` adds a softer action next to the destructive one, such as archiving instead of deleting. It doesn't need the phrase, and `onCancel` doesn't run. If `onSelect` returns a promise, the dialog stays open until it settles.
+`alternative` adds a softer action, such as archiving instead of deleting. It gets its own full-width row under Cancel and the confirm button, so the gentler choice is the easiest to reach. It doesn't need the phrase, and `onCancel` doesn't run. If `onSelect` returns a promise, the dialog stays open until it settles.
 
 <Example name="confirm-dialog/alternative" />
 
@@ -106,44 +106,44 @@ Pass a [Consequences](/docs/consequences) list to show what the action removes.
 
 For a way back after it closes, use [Undo Toast](/docs/undo-toast).
 
-| Prop | Type | Default |
-| --- | --- | --- |
-| `title` | `ReactNode` | required |
-| `children` | `ReactElement` | required |
-| `onConfirm` | `(choices: Record<string, boolean>) => void \| Promise<unknown>` | required |
-| `onCancel` | `() => void` | — |
-| `onConfirmError` | `(error: unknown) => void` | — |
-| `description` | `ReactNode` | — |
-| `consequences` | `ReactNode` | — |
-| `confirmLabel` | `ReactNode` | `"Confirm"` |
-| `cancelLabel` | `ReactNode` | `"Cancel"` |
-| `errorLabel` | `ReactNode` | — |
-| `variant` | [`Button`](https://ui.shadcn.com/docs/components/base/button) `variant` | `"default"` |
-| `initialFocus` | `"cancel" \| "confirm" \| "none"` | `"cancel"`, the first field with `phrase` |
-| `alternative` | `{ label: ReactNode, onSelect: () => void \| Promise<unknown> }` | — |
-| `gesture` | `"click" \| "click-again" \| "hold" \| "slide"` | `"click"` |
-| `armDelay` | `number` | `0` |
-| `wait` | `number` | `0` |
-| `waitLabel` | `(seconds: number) => ReactNode` | ``(s) => `Wait ${s}s` `` |
-| `timeout` | `number` | `3000` |
-| `duration` | `number` | `1200` |
-| `holdFallback` | `"click-again" \| "none"` | `"click-again"` |
-| `phrase` | `string \| string[]` | — |
-| `caseSensitive` | `boolean` | `true` |
-| `trim` | `boolean` | `false` |
-| `acknowledgements` | `string[]` | — |
-| `choices` | `{ name: string, label: ReactNode, defaultChecked?: boolean }[]` | — |
-| `announcements` | `{ armed?, hold?, slide?, fallback?, wait?, match?, error? }` | — |
+| Prop               | Type                                                                    | Default                                   |
+| ------------------ | ----------------------------------------------------------------------- | ----------------------------------------- |
+| `title`            | `ReactNode`                                                             | required                                  |
+| `children`         | `ReactElement`                                                          | required                                  |
+| `onConfirm`        | `(choices: Record<string, boolean>) => void \| Promise<unknown>`        | required                                  |
+| `onCancel`         | `() => void`                                                            | —                                         |
+| `onConfirmError`   | `(error: unknown) => void`                                              | —                                         |
+| `description`      | `ReactNode`                                                             | —                                         |
+| `consequences`     | `ReactNode`                                                             | —                                         |
+| `confirmLabel`     | `ReactNode`                                                             | `"Confirm"`                               |
+| `cancelLabel`      | `ReactNode`                                                             | `"Cancel"`                                |
+| `errorLabel`       | `ReactNode`                                                             | —                                         |
+| `variant`          | [`Button`](https://ui.shadcn.com/docs/components/base/button) `variant` | `"default"`                               |
+| `initialFocus`     | `"cancel" \| "confirm" \| "none"`                                       | `"cancel"`, the first field with `phrase` |
+| `alternative`      | `{ label: ReactNode, onSelect: () => void \| Promise<unknown> }`        | —                                         |
+| `gesture`          | `"click" \| "click-again" \| "hold" \| "slide"`                         | `"click"`                                 |
+| `armDelay`         | `number`                                                                | `0`                                       |
+| `wait`             | `number`                                                                | `0`                                       |
+| `waitLabel`        | `(seconds: number) => ReactNode`                                        | ``(s) => `Wait ${s}s` ``                  |
+| `timeout`          | `number`                                                                | `3000`                                    |
+| `duration`         | `number`                                                                | `1200`                                    |
+| `holdFallback`     | `"click-again" \| "none"`                                               | `"click-again"`                           |
+| `phrase`           | `string \| string[]`                                                    | —                                         |
+| `caseSensitive`    | `boolean`                                                               | `true`                                    |
+| `trim`             | `boolean`                                                               | `false`                                   |
+| `acknowledgements` | `string[]`                                                              | —                                         |
+| `choices`          | `{ name: string, label: ReactNode, defaultChecked?: boolean }[]`        | —                                         |
+| `announcements`    | `{ armed?, hold?, slide?, fallback?, wait?, match?, error? }`           | —                                         |
 
 ### useConfirm()
 
 Takes no arguments.
 
-| Name | Type | Description |
-| --- | --- | --- |
-| `confirm` | `(options: ConfirmOptions) => Promise<boolean>` | Opens the dialog. Resolves `false` on cancel, after `alternative`, when another `confirm()` replaces it, or on unmount. |
-| `dialog` | `ReactElement` | The dialog. Render it once. |
-| `ConfirmOptions` | `object` | `ConfirmDialog` props without `children` and `onCancel`. `onConfirm` is optional. |
+| Name             | Type                                            | Description                                                                                                             |
+| ---------------- | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `confirm`        | `(options: ConfirmOptions) => Promise<boolean>` | Opens the dialog. Resolves `false` on cancel, after `alternative`, when another `confirm()` replaces it, or on unmount. |
+| `dialog`         | `ReactElement`                                  | The dialog. Render it once.                                                                                             |
+| `ConfirmOptions` | `object`                                        | `ConfirmDialog` props without `children` and `onCancel`. `onConfirm` is optional.                                       |
 
 ## Accessibility
 
@@ -154,5 +154,6 @@ Takes no arguments.
 
 ### WCAG
 
-- 2.2.1 Timing Adjustable: the dialog has no time limit. `timeout` only disarms `click-again`, and never runs or drops the action.
-- 2.5.2 Pointer Cancellation: `gesture="hold"` meets it, because releasing early or moving off the button cancels.
+- [2.2.1 Timing Adjustable](https://www.w3.org/WAI/WCAG22/Understanding/timing-adjustable): the dialog has no time limit. `timeout` only disarms `click-again`, and never runs or drops the action.
+- `wait` isn't a time limit under 2.2.1: it only delays when confirm unlocks, and never ends anything or drops the action.
+- [2.5.2 Pointer Cancellation](https://www.w3.org/WAI/WCAG22/Understanding/pointer-cancellation): `gesture="hold"` meets it, because releasing early or moving off the button cancels.
