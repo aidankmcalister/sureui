@@ -2,10 +2,10 @@
 
 import { Consequences } from "@/components/ui/sureui/consequences"
 import { TypeToConfirm } from "@/components/ui/sureui/type-to-confirm"
-import { useLog } from "@/components/site/docs/preview"
+import { useActions } from "@/components/site/docs/preview"
 
 export default function TypeToConfirmConsequences() {
-  const log = useLog()
+  const { deleteOrganization } = useActions()
 
   return (
     <TypeToConfirm
@@ -25,7 +25,7 @@ export default function TypeToConfirmConsequences() {
         />
       }
       confirmLabel="Delete organization"
-      onConfirm={() => log("Deleted the acme organization")}
+      onConfirm={deleteOrganization}
       className="w-full max-w-sm"
     />
   )

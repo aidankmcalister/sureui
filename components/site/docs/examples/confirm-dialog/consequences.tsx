@@ -3,10 +3,10 @@
 import { Button } from "@/components/ui/button"
 import { ConfirmDialog } from "@/components/ui/sureui/confirm-dialog"
 import { Consequences } from "@/components/ui/sureui/consequences"
-import { useLog } from "@/components/site/docs/preview"
+import { useActions } from "@/components/site/docs/preview"
 
 export default function ConfirmDialogConsequences() {
-  const log = useLog()
+  const { deleteEnvironment } = useActions()
 
   return (
     <ConfirmDialog
@@ -29,10 +29,9 @@ export default function ConfirmDialogConsequences() {
       }
       confirmLabel="Delete environment"
       variant="destructive"
-      onConfirm={() => log("Deleted staging")}
-      onCancel={() => log("Closed, nothing deleted")}
+      onConfirm={deleteEnvironment}
     >
-      <Button variant="outline">Delete staging</Button>
+      <Button>Delete staging</Button>
     </ConfirmDialog>
   )
 }

@@ -4,55 +4,34 @@ import * as React from "react"
 
 import { Button } from "@/components/ui/button"
 import { Undoable } from "@/components/ui/sureui/undoable"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { useLog } from "@/components/site/docs/preview"
-
-const initialBranches = [
-  { name: "feature/billing-v2", updated: "2 hours ago" },
-  { name: "fix/login-redirect", updated: "Yesterday" },
-  { name: "chore/bump-deps", updated: "3 days ago" },
-]
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
+import { useActions } from "@/components/site/docs/preview"
 
 export default function UndoableTable() {
-  const log = useLog()
-  const [branches, setBranches] = React.useState(initialBranches)
+  const { deleteBranch } = useActions()
+  const [branches, setBranches] = React.useState([
+    "feature/billing-v2",
+    "fix/login-redirect",
+  ])
 
   return (
     <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Branch</TableHead>
-          <TableHead>Updated</TableHead>
-          <TableHead>
-            <span className="sr-only">Actions</span>
-          </TableHead>
-        </TableRow>
-      </TableHeader>
       <TableBody>
         {branches.map((branch) => (
           <Undoable
-            key={branch.name}
+            key={branch}
             render={<TableRow />}
-            label={`Deleted ${branch.name}`}
+            label={`Deleted ${branch}`}
             onConfirm={() => {
+              deleteBranch(branch)
               setBranches((current) =>
-                current.filter((item) => item.name !== branch.name)
+                current.filter((item) => item !== branch)
               )
-              log(`Deleted ${branch.name}`)
             }}
-            onCancel={() => log(`Undone, ${branch.name} kept`)}
           >
             {({ remove }) => (
               <>
-                <TableCell>{branch.name}</TableCell>
-                <TableCell>{branch.updated}</TableCell>
+                <TableCell>{branch}</TableCell>
                 <TableCell className="text-right">
                   <Button variant="ghost" size="sm" onClick={remove}>
                     Delete

@@ -2,23 +2,19 @@
 
 import { Button } from "@/components/ui/button"
 import { undoToast } from "@/components/ui/sureui/undo-toast"
-import { useControl, useLog } from "@/components/site/docs/preview"
+import { useActions, useControl } from "@/components/site/docs/preview"
 
 export default function UndoToastPausing() {
-  const log = useLog()
+  const { markAllRead } = useActions()
   const control = useControl()
 
-  async function markAllRead() {
-    const marked = await undoToast("Marked 28 notifications as read", {
+  async function markRead() {
+    const confirmed = await undoToast("Marked 28 notifications as read", {
       pauseUndoOnHover: control("pauseUndoOnHover", false),
       pauseUndoOnFocus: false,
     })
-    log(marked ? "Marked 28 notifications as read" : "Undone, still unread")
+    if (confirmed) markAllRead()
   }
 
-  return (
-    <Button variant="outline" onClick={markAllRead}>
-      Mark all as read
-    </Button>
-  )
+  return <Button onClick={markRead}>Mark all as read</Button>
 }

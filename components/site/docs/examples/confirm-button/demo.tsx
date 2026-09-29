@@ -1,17 +1,16 @@
 "use client"
 
 import { ConfirmButton } from "@/components/ui/sureui/confirm-button"
-import { useLog } from "@/components/site/docs/preview"
+import { useActions } from "@/components/site/docs/preview"
 
 export default function ConfirmButtonDemo() {
-  const log = useLog()
+  const { deleteProject } = useActions()
 
   return (
     <ConfirmButton
       gesture="click-again"
       variant="destructive"
-      onConfirm={() => log("Deleted acme-prod")}
-      onCancel={() => log("Disarmed, nothing deleted")}
+      onConfirm={deleteProject}
     >
       Delete project
     </ConfirmButton>

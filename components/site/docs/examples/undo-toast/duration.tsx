@@ -2,22 +2,18 @@
 
 import { Button } from "@/components/ui/button"
 import { undoToast } from "@/components/ui/sureui/undo-toast"
-import { useControl, useLog } from "@/components/site/docs/preview"
+import { useActions, useControl } from "@/components/site/docs/preview"
 
 export default function UndoToastDuration() {
-  const log = useLog()
+  const { removeMembers } = useActions()
   const control = useControl()
 
-  async function removeMembers() {
-    const removed = await undoToast("Removed 4 members from Design", {
+  async function remove() {
+    const confirmed = await undoToast("Removed 4 members", {
       duration: control("duration", 10000),
     })
-    log(removed ? "Removed 4 members" : "Undone, nobody removed")
+    if (confirmed) removeMembers()
   }
 
-  return (
-    <Button variant="outline" onClick={removeMembers}>
-      Remove 4 members
-    </Button>
-  )
+  return <Button onClick={remove}>Remove members</Button>
 }

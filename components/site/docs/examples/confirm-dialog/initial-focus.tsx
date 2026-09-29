@@ -2,10 +2,10 @@
 
 import { Button } from "@/components/ui/button"
 import { ConfirmDialog } from "@/components/ui/sureui/confirm-dialog"
-import { useLog } from "@/components/site/docs/preview"
+import { useActions } from "@/components/site/docs/preview"
 
 export default function ConfirmDialogInitialFocus() {
-  const log = useLog()
+  const { publishChangelog } = useActions()
 
   return (
     <ConfirmDialog
@@ -13,10 +13,9 @@ export default function ConfirmDialogInitialFocus() {
       description="Subscribers get an email with the release notes."
       initialFocus="confirm"
       confirmLabel="Publish"
-      onConfirm={() => log("Published the changelog")}
-      onCancel={() => log("Closed, not published")}
+      onConfirm={publishChangelog}
     >
-      <Button variant="outline">Publish</Button>
+      <Button>Publish</Button>
     </ConfirmDialog>
   )
 }

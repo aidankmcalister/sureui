@@ -7,9 +7,9 @@ import { ConfirmButton } from "@/components/ui/sureui/confirm-button"
 import { Outcome, useToggle } from "@/components/site/home/examples/outcome"
 
 const sessions = [
-  { device: "iPhone 16", detail: "Safari · Boston · 2h ago" },
-  { device: "Windows laptop", detail: "Firefox · Tulsa · Yesterday" },
-  { device: "iPad Air", detail: "Safari · Boston · Last week" },
+  { device: "iPhone 15", detail: "Safari · Boston · 2h ago" },
+  { device: "Windows desktop", detail: "Firefox · Tulsa · Yesterday" },
+  { device: "Macbook Air", detail: "Firefox · Boston · Last week" },
 ]
 
 export function Sessions() {

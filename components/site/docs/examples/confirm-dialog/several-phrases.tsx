@@ -2,10 +2,10 @@
 
 import { Button } from "@/components/ui/button"
 import { ConfirmDialog } from "@/components/ui/sureui/confirm-dialog"
-import { useLog } from "@/components/site/docs/preview"
+import { useActions } from "@/components/site/docs/preview"
 
 export default function ConfirmDialogSeveralPhrases() {
-  const log = useLog()
+  const { deleteProject } = useActions()
 
   return (
     <ConfirmDialog
@@ -14,10 +14,9 @@ export default function ConfirmDialogSeveralPhrases() {
       phrase={["acme-prod", "delete my project"]}
       confirmLabel="Delete project"
       variant="destructive"
-      onConfirm={() => log("Deleted acme-prod")}
-      onCancel={() => log("Closed, nothing deleted")}
+      onConfirm={deleteProject}
     >
-      <Button variant="outline">Delete project</Button>
+      <Button>Delete project</Button>
     </ConfirmDialog>
   )
 }

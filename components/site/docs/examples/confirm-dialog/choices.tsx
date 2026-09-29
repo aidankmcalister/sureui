@@ -2,10 +2,10 @@
 
 import { Button } from "@/components/ui/button"
 import { ConfirmDialog } from "@/components/ui/sureui/confirm-dialog"
-import { useLog } from "@/components/site/docs/preview"
+import { useActions } from "@/components/site/docs/preview"
 
 export default function ConfirmDialogChoices() {
-  const log = useLog()
+  const { deleteDatabase } = useActions()
 
   return (
     <ConfirmDialog
@@ -20,14 +20,9 @@ export default function ConfirmDialogChoices() {
       ]}
       confirmLabel="Delete database"
       variant="destructive"
-      onConfirm={({ snapshot }) =>
-        log(
-          snapshot ? "Saved a snapshot, deleted orders-db" : "Deleted orders-db"
-        )
-      }
-      onCancel={() => log("Closed, nothing deleted")}
+      onConfirm={deleteDatabase}
     >
-      <Button variant="outline">Delete database</Button>
+      <Button>Delete database</Button>
     </ConfirmDialog>
   )
 }

@@ -2,10 +2,10 @@
 
 import { Button } from "@/components/ui/button"
 import { ConfirmDialog } from "@/components/ui/sureui/confirm-dialog"
-import { useLog } from "@/components/site/docs/preview"
+import { useActions } from "@/components/site/docs/preview"
 
 export default function ConfirmDialogDemo() {
-  const log = useLog()
+  const { leaveTeam } = useActions()
 
   return (
     <ConfirmDialog
@@ -13,10 +13,9 @@ export default function ConfirmDialogDemo() {
       description="An admin can add you back later."
       confirmLabel="Leave team"
       variant="destructive"
-      onConfirm={() => log("Left the Design team")}
-      onCancel={() => log("Closed, still on the team")}
+      onConfirm={leaveTeam}
     >
-      <Button variant="outline">Leave team</Button>
+      <Button>Leave team</Button>
     </ConfirmDialog>
   )
 }

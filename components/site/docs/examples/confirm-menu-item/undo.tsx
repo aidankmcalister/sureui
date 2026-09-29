@@ -7,23 +7,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { ConfirmMenuItem } from "@/components/ui/sureui/confirm-menu-item"
-import { useLog } from "@/components/site/docs/preview"
+import { useActions } from "@/components/site/docs/preview"
 
 export default function ConfirmMenuItemUndo() {
-  const log = useLog()
+  const { archiveThread } = useActions()
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger render={<Button variant="outline" />}>
-        Actions
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-auto">
-        <ConfirmMenuItem
-          gesture="click"
-          undo
-          onConfirm={() => log("Archived the thread")}
-          onCancel={() => log("Undone, nothing archived")}
-        >
+      <DropdownMenuTrigger render={<Button />}>Actions</DropdownMenuTrigger>
+      <DropdownMenuContent className="w-auto">
+        <ConfirmMenuItem gesture="click" undo onConfirm={archiveThread}>
           Archive
         </ConfirmMenuItem>
       </DropdownMenuContent>

@@ -61,7 +61,7 @@ const { rootProps, question, close } = useConfirmClose(dirty, {
 </Dialog>
 ```
 
-Spread `rootProps` on the root. While `dirty` is `true`, Escape, a click outside or a close button keeps it open and sets `question`: Keep editing and Discard changes, plus Save with `onSave`. Render it in place of your footer buttons, so the dialog keeps its size. While `dirty` is `false`, it closes straight away and `question` is `null`. `close()` closes without asking; call it after saving.
+Spread `rootProps` on the root. While `dirty` is `true`, Escape, a click outside or the × button keeps it open and sets `question`: Keep editing and Discard changes, plus Save with `onSave`. Render it in place of your footer buttons, so the dialog keeps its size. While `dirty` is `false`, it closes straight away and `question` is `null`. `close()` closes without asking. Call it after saving, or from a Cancel button after resetting the form.
 
 ## API reference
 

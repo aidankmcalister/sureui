@@ -24,10 +24,9 @@ function stripDocsHooks(file: string) {
       /^import \{[^}]*\} from "@\/components\/site\/docs\/preview"\n/m,
       ""
     )
-    .replace(/^ *const log = useLog\(\)\n/m, "")
+    .replace(/^ *const \{[^}]*\} = useActions\((?:[^()]|\([^()]*\))*\)\n/m, "")
     .replace(/^ *const control = useControl\(\)\n/m, "")
     .replace(/\{\n\n+/g, "{\n")
-    .replace(/\blog\(/g, "console.log(")
     .trim()
 }
 
@@ -52,7 +51,7 @@ export function parseExample(file: string): ExampleSource {
       name,
       value: parseValue(value),
     })),
-    log: file.includes("useLog()"),
+    log: file.includes("useActions("),
     template,
     conditions,
   }

@@ -6,10 +6,10 @@ import {
   ToolApproval,
   type ToolApprovalPart,
 } from "@/components/ui/sureui/tool-approval"
-import { useLog } from "@/components/site/docs/preview"
+import { useActions } from "@/components/site/docs/preview"
 
 export default function ToolApprovalScopes() {
-  const log = useLog()
+  const { addToolApprovalResponse } = useActions()
   const [part, setPart] = React.useState<ToolApprovalPart>({
     state: "approval-requested",
     approval: { id: "approval_1" },
@@ -21,9 +21,7 @@ export default function ToolApprovalScopes() {
       part={part}
       onRespond={(response) => {
         setPart({ state: "approval-responded", approval: response })
-        log(
-          `${response.approved ? "Approved" : "Denied"} readFile, scope: ${response.scope}`
-        )
+        addToolApprovalResponse(response)
       }}
     />
   )

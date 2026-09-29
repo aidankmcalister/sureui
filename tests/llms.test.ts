@@ -21,7 +21,7 @@ describe("llms.txt", () => {
       const markdown = pageMarkdown(page)
       expect(markdown).not.toContain("<Example")
       expect(markdown).not.toContain("<Install")
-      expect(markdown).not.toContain("useLog")
+      expect(markdown).not.toContain("useActions")
       expect(markdown).not.toContain("](/docs")
     }
   })

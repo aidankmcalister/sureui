@@ -2,10 +2,10 @@
 
 import { Button } from "@/components/ui/button"
 import { ConfirmDialog } from "@/components/ui/sureui/confirm-dialog"
-import { useLog } from "@/components/site/docs/preview"
+import { useActions } from "@/components/site/docs/preview"
 
 export default function ConfirmDialogHold() {
-  const log = useLog()
+  const { signOutEverywhere } = useActions()
 
   return (
     <ConfirmDialog
@@ -14,10 +14,9 @@ export default function ConfirmDialogHold() {
       gesture="hold"
       confirmLabel="Hold to sign out"
       variant="destructive"
-      onConfirm={() => log("Signed out of 4 devices")}
-      onCancel={() => log("Closed, still signed in")}
+      onConfirm={signOutEverywhere}
     >
-      <Button variant="outline">Sign out everywhere</Button>
+      <Button>Sign out everywhere</Button>
     </ConfirmDialog>
   )
 }

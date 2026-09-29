@@ -4,43 +4,34 @@ import * as React from "react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { useUnsavedChanges } from "@/components/ui/sureui/unsaved-changes"
-import { useLog } from "@/components/site/docs/preview"
-
-function wait(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
+import { useActions } from "@/components/site/docs/preview"
 
 export default function UnsavedChangesSave() {
-  const log = useLog()
-  const [saved, setSaved] = React.useState("Ship the beta on Friday")
+  const { saveTask, closeTask } = useActions({ saveTask: { wait: 800 } })
+  const [saved, setSaved] = React.useState("Ship the beta")
   const [title, setTitle] = React.useState(saved)
   const { confirmLeave, dialog } = useUnsavedChanges({
     when: title !== saved,
     onSave: async () => {
-      await wait(800)
+      await saveTask(title)
       setSaved(title)
-      log(`Saved "${title}"`)
     },
     onDiscard: () => setTitle(saved),
   })
 
   async function close() {
-    if (await confirmLeave()) log("Closed the task")
+    if (await confirmLeave()) closeTask()
   }
 
   return (
-    <div className="grid w-full max-w-sm gap-3">
-      <Label htmlFor="task-title">Task</Label>
+    <div className="flex w-full max-w-sm gap-2">
       <Input
-        id="task-title"
+        aria-label="Task"
         value={title}
         onChange={(event) => setTitle(event.target.value)}
       />
-      <Button variant="outline" className="justify-self-start" onClick={close}>
-        Close
-      </Button>
+      <Button onClick={close}>Close</Button>
       {dialog}
     </div>
   )

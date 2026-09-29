@@ -5,60 +5,52 @@ import * as React from "react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogFooter,
-  DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { useConfirmClose } from "@/components/ui/sureui/unsaved-changes"
-import { useLog } from "@/components/site/docs/preview"
+import { useActions } from "@/components/site/docs/preview"
 
 export default function UnsavedChangesDialog() {
-  const log = useLog()
+  const { saveProfile } = useActions()
   const [saved, setSaved] = React.useState("Ada Lovelace")
   const [name, setName] = React.useState(saved)
   const { rootProps, question, close } = useConfirmClose(name !== saved, {
-    onDiscard: () => {
-      setName(saved)
-      log("Discarded the edits")
-    },
+    onDiscard: () => setName(saved),
   })
 
   function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    saveProfile(name)
     setSaved(name)
-    log(`Saved the name ${name}`)
+    close()
+  }
+
+  function cancel() {
+    setName(saved)
     close()
   }
 
   return (
     <Dialog {...rootProps}>
-      <DialogTrigger render={<Button variant="outline" />}>
-        Edit profile
-      </DialogTrigger>
+      <DialogTrigger render={<Button />}>Edit profile</DialogTrigger>
       <DialogContent>
         <form className="grid gap-4" onSubmit={save}>
-          <DialogHeader>
-            <DialogTitle>Edit profile</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-2">
-            <Label htmlFor="profile-name">Name</Label>
-            <Input
-              id="profile-name"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-            />
-          </div>
+          <DialogTitle>Edit profile</DialogTitle>
+          <Input
+            aria-label="Name"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+          />
           <DialogFooter>
             {question ?? (
               <>
-                <DialogClose render={<Button variant="outline" />}>
+                <Button type="button" variant="outline" onClick={cancel}>
                   Cancel
-                </DialogClose>
+                </Button>
                 <Button type="submit">Save</Button>
               </>
             )}

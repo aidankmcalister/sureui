@@ -22,10 +22,68 @@ type Log = (message: string) => void
 
 type Line = { id: number; message: string }
 
+type ActionOptions = { wait?: number; fail?: string }
+
+type Action = (...args: unknown[]) => void | Promise<void>
+
 const LogContext = React.createContext<Log>(() => {})
 
-export function useLog() {
-  return React.useContext(LogContext)
+function format(value: unknown): string {
+  if (value instanceof Error) return `Error(${JSON.stringify(value.message)})`
+  if (Array.isArray(value)) return `[${value.map(format).join(", ")}]`
+  if (value && typeof value === "object") {
+    const entries = Object.entries(value).filter(
+      ([, entry]) => entry !== undefined
+    )
+    return `{ ${entries.map(([key, entry]) => `${key}: ${format(entry)}`).join(", ")} }`
+  }
+  return JSON.stringify(value)
+}
+
+function isNoise(value: unknown) {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    !(value instanceof Error) &&
+    ("nativeEvent" in value || Object.keys(value).length === 0)
+  )
+}
+
+export function useActions(options: Record<string, ActionOptions> = {}) {
+  const log = React.useContext(LogContext)
+  const calls = React.useRef<Record<string, number>>({})
+  const optionsRef = React.useRef(options)
+
+  React.useEffect(() => {
+    optionsRef.current = options
+  })
+
+  return React.useMemo(
+    () =>
+      new Proxy({} as Record<string, Action>, {
+        get(_, name: string) {
+          return (...args: unknown[]) => {
+            log(
+              `${name}(${args
+                .filter((arg) => !isNoise(arg))
+                .map(format)
+                .join(", ")})`
+            )
+            const { wait, fail } = optionsRef.current[name] ?? {}
+            const count = (calls.current[name] = (calls.current[name] ?? 0) + 1)
+            if (wait === undefined && fail === undefined) return
+            return new Promise<void>((resolve, reject) =>
+              setTimeout(
+                () =>
+                  fail && count % 2 === 1 ? reject(new Error(fail)) : resolve(),
+                wait ?? 0
+              )
+            )
+          }
+        },
+      }),
+    [log]
+  )
 }
 
 function Stage({ children }: { children: React.ReactNode }) {
@@ -102,7 +160,7 @@ export function Preview({
               {log && (
                 <p
                   role="log"
-                  aria-label="Console"
+                  aria-label="Calls"
                   className="flex h-10 items-center gap-2 truncate border-t border-(--rule) px-4 font-mono text-xs"
                 >
                   {line ? (
@@ -116,7 +174,7 @@ export function Preview({
                     </>
                   ) : (
                     <span className="text-(--ink-label)">
-                      {"// console.log output shows up here"}
+                      {"// Nothing has run yet"}
                     </span>
                   )}
                 </p>

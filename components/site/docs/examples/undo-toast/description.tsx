@@ -2,21 +2,17 @@
 
 import { Button } from "@/components/ui/button"
 import { undoToast } from "@/components/ui/sureui/undo-toast"
-import { useLog } from "@/components/site/docs/preview"
+import { useActions } from "@/components/site/docs/preview"
 
 export default function UndoToastDescription() {
-  const log = useLog()
+  const { deleteBranch } = useActions()
 
-  async function deleteBranch() {
-    const deleted = await undoToast("Deleted feature/billing-v2", {
+  async function remove() {
+    const confirmed = await undoToast("Deleted feature/billing-v2", {
       description: "14 commits that aren't on main",
     })
-    log(deleted ? "Deleted feature/billing-v2" : "Undone, branch kept")
+    if (confirmed) deleteBranch("feature/billing-v2")
   }
 
-  return (
-    <Button variant="outline" onClick={deleteBranch}>
-      Delete branch
-    </Button>
-  )
+  return <Button onClick={remove}>Delete branch</Button>
 }

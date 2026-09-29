@@ -4,28 +4,18 @@ import * as React from "react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { useUnsavedChanges } from "@/components/ui/sureui/unsaved-changes"
-import { useLog } from "@/components/site/docs/preview"
 
 export default function UnsavedChangesDemo() {
-  const log = useLog()
   const [page, setPage] = React.useState("General")
-  const [saved, setSaved] = React.useState("Acme")
-  const [name, setName] = React.useState(saved)
+  const [name, setName] = React.useState("Acme")
   const { confirmLeave, dialog } = useUnsavedChanges({
-    when: name !== saved,
-    onDiscard: () => setName(saved),
+    when: name !== "Acme",
+    onDiscard: () => setName("Acme"),
   })
 
-  async function navigate(to: string) {
-    if (to === page) return
-    if (await confirmLeave()) {
-      setPage(to)
-      log(`Opened ${to}`)
-    } else {
-      log(`Stayed on ${page}`)
-    }
+  async function open(to: string) {
+    if (await confirmLeave()) setPage(to)
   }
 
   return (
@@ -36,32 +26,18 @@ export default function UnsavedChangesDemo() {
             key={item}
             variant={item === page ? "secondary" : "ghost"}
             size="sm"
-            onClick={() => navigate(item)}
+            onClick={() => open(item)}
           >
             {item}
           </Button>
         ))}
       </nav>
       {page === "General" ? (
-        <div className="grid gap-2">
-          <Label htmlFor="team-name">Team name</Label>
-          <div className="flex gap-2">
-            <Input
-              id="team-name"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-            />
-            <Button
-              disabled={name === saved}
-              onClick={() => {
-                setSaved(name)
-                log(`Saved the team name as ${name}`)
-              }}
-            >
-              Save
-            </Button>
-          </div>
-        </div>
+        <Input
+          aria-label="Team name"
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+        />
       ) : (
         <p className="text-sm text-muted-foreground">Billing settings</p>
       )}

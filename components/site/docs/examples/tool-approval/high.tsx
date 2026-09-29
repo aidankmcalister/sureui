@@ -6,10 +6,10 @@ import {
   ToolApproval,
   type ToolApprovalPart,
 } from "@/components/ui/sureui/tool-approval"
-import { useControl, useLog } from "@/components/site/docs/preview"
+import { useActions, useControl } from "@/components/site/docs/preview"
 
 export default function ToolApprovalHigh() {
-  const log = useLog()
+  const { addToolApprovalResponse } = useActions()
   const control = useControl()
   const [part, setPart] = React.useState<ToolApprovalPart>({
     state: "approval-requested",
@@ -23,11 +23,7 @@ export default function ToolApprovalHigh() {
       part={part}
       onRespond={(response) => {
         setPart({ state: "approval-responded", approval: response })
-        log(
-          response.approved
-            ? "Approved: rotate the production database password"
-            : `Denied${response.reason ? `: ${response.reason}` : ""}`
-        )
+        addToolApprovalResponse(response)
       }}
     />
   )

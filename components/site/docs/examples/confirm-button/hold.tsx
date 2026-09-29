@@ -1,10 +1,10 @@
 "use client"
 
 import { ConfirmButton } from "@/components/ui/sureui/confirm-button"
-import { useControl, useLog } from "@/components/site/docs/preview"
+import { useActions, useControl } from "@/components/site/docs/preview"
 
 export default function ConfirmButtonHold() {
-  const log = useLog()
+  const { revokeKey } = useActions()
   const control = useControl()
 
   return (
@@ -12,9 +12,7 @@ export default function ConfirmButtonHold() {
       gesture="hold"
       duration={control("duration", 1200)}
       confirmOnRelease={control("confirmOnRelease", false)}
-      variant="destructive"
-      onConfirm={() => log("Revoked the key")}
-      onCancel={() => log("Let go early, nothing revoked")}
+      onConfirm={revokeKey}
     >
       Hold to revoke
     </ConfirmButton>

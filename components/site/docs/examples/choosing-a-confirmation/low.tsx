@@ -1,18 +1,13 @@
 "use client"
 
 import { ConfirmButton } from "@/components/ui/sureui/confirm-button"
-import { useLog } from "@/components/site/docs/preview"
+import { useActions } from "@/components/site/docs/preview"
 
 export default function ChoosingLow() {
-  const log = useLog()
+  const { archiveConversations } = useActions()
 
   return (
-    <ConfirmButton
-      undo
-      variant="outline"
-      onConfirm={() => log("Archived 3 conversations")}
-      onCancel={() => log("Undone, nothing archived")}
-    >
+    <ConfirmButton undo onConfirm={archiveConversations}>
       Archive 3 conversations
     </ConfirmButton>
   )

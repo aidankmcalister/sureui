@@ -6,10 +6,10 @@ import {
   ToolApproval,
   type ToolApprovalPart,
 } from "@/components/ui/sureui/tool-approval"
-import { useLog } from "@/components/site/docs/preview"
+import { useActions } from "@/components/site/docs/preview"
 
 export default function ToolApprovalCritical() {
-  const log = useLog()
+  const { addToolApprovalResponse } = useActions()
   const [part, setPart] = React.useState<ToolApprovalPart>({
     state: "approval-requested",
     approval: { id: "approval_1" },
@@ -22,11 +22,7 @@ export default function ToolApprovalCritical() {
       part={part}
       onRespond={(response) => {
         setPart({ state: "approval-responded", approval: response })
-        log(
-          response.approved
-            ? "Approved: delete the acme-prod project"
-            : `Denied${response.reason ? `: ${response.reason}` : ""}`
-        )
+        addToolApprovalResponse(response)
       }}
     />
   )

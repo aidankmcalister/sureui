@@ -3,10 +3,10 @@
 import { Button } from "@/components/ui/button"
 import { ConfirmDialog } from "@/components/ui/sureui/confirm-dialog"
 import { Consequences } from "@/components/ui/sureui/consequences"
-import { useLog } from "@/components/site/docs/preview"
+import { useActions } from "@/components/site/docs/preview"
 
 export default function ChoosingHigh() {
-  const log = useLog()
+  const { deleteProject } = useActions()
 
   return (
     <ConfirmDialog
@@ -26,10 +26,9 @@ export default function ChoosingHigh() {
       }
       confirmLabel="Delete acme-prod"
       variant="destructive"
-      onConfirm={() => log("Deleted acme-prod")}
-      onCancel={() => log("Closed, nothing deleted")}
+      onConfirm={deleteProject}
     >
-      <Button variant="outline">Delete project</Button>
+      <Button>Delete project</Button>
     </ConfirmDialog>
   )
 }

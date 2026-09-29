@@ -1,10 +1,10 @@
 "use client"
 
 import { TypeToConfirm } from "@/components/ui/sureui/type-to-confirm"
-import { useLog } from "@/components/site/docs/preview"
+import { useActions } from "@/components/site/docs/preview"
 
 export default function TypeToConfirmAcknowledgements() {
-  const log = useLog()
+  const { deleteDatabase } = useActions()
 
   return (
     <TypeToConfirm
@@ -14,7 +14,7 @@ export default function TypeToConfirmAcknowledgements() {
         "I understand apps connected to it stop working.",
       ]}
       confirmLabel="Delete database"
-      onConfirm={() => log("Deleted orders-db and its backups")}
+      onConfirm={deleteDatabase}
       className="w-full max-w-sm"
     />
   )

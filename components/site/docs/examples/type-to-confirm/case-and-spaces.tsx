@@ -1,10 +1,10 @@
 "use client"
 
 import { TypeToConfirm } from "@/components/ui/sureui/type-to-confirm"
-import { useLog } from "@/components/site/docs/preview"
+import { useActions } from "@/components/site/docs/preview"
 
 export default function TypeToConfirmCaseAndSpaces() {
-  const log = useLog()
+  const { deleteAccount } = useActions()
 
   return (
     <TypeToConfirm
@@ -12,7 +12,7 @@ export default function TypeToConfirmCaseAndSpaces() {
       caseSensitive={false}
       trim
       confirmLabel="Delete account"
-      onConfirm={() => log("Deleted the account")}
+      onConfirm={deleteAccount}
       className="w-full max-w-sm"
     />
   )
