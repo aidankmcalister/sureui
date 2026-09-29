@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import Script from "next/script"
 import {
   Atkinson_Hyperlegible_Mono,
   Atkinson_Hyperlegible_Next,
@@ -58,6 +59,12 @@ export default function RootLayout({
       <body>
         <Analytics />
         <SpeedInsights />
+        <Script
+          src="https://cloud.umami.is/script.js"
+          data-website-id="07b2fcd9-52fb-4fe8-aa0f-7a9e24ff6557"
+          data-domains="sureui.com"
+          strategy="afterInteractive"
+        />
         <ThemeProvider>
           <div className="flex min-h-svh flex-col bg-(--paper) text-(--ink)">
             <Header />
