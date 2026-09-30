@@ -12,7 +12,11 @@ export const generateStaticParams = staticParams
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const page = pageAt(`/docs/${(await params).slug}`)
-  return { title: page?.title, description: page?.description }
+  return {
+    title: page?.title,
+    description: page?.description,
+    alternates: { canonical: page?.href },
+  }
 }
 
 export default async function DocsPage({ params }: Props) {

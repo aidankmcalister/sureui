@@ -12,6 +12,7 @@ import {
 export const metadata: Metadata = {
   title: "Changelog",
   description: "What changed in each SureUI release.",
+  alternates: { canonical: "/changelog" },
 }
 
 function formatDate(date: string) {

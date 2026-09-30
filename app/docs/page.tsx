@@ -8,6 +8,7 @@ const page = pageAt("/docs")!
 export const metadata: Metadata = {
   title: page.title,
   description: page.description,
+  alternates: { canonical: page.href },
 }
 
 export default function Introduction() {

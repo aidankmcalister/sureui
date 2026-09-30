@@ -17,6 +17,7 @@ import { blocks, type Block } from "@/lib/site/registry"
 export const metadata: Metadata = {
   title: "Blocks",
   description: "Full screens built from SureUI confirmation components.",
+  alternates: { canonical: "/blocks" },
 }
 
 const blocksLead =
