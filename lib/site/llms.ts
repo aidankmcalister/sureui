@@ -1,11 +1,12 @@
 import registry from "@/registry.json"
+import { rulesMarkdown } from "@/lib/site/choose"
 import { siteUrl } from "@/lib/site/config"
 import { renderExample } from "@/lib/site/example-source"
 import { loadExample } from "@/lib/site/examples"
 import { docsBody, pageAt, pages, type Page } from "@/lib/site/docs"
 
 const description =
-  "Confirmation components for shadcn/ui: undo, click again, hold, type to confirm, dialogs and popovers. Installed with the shadcn CLI from the `@sureui` registry and built on Base UI."
+  "Open source confirmation components for shadcn/ui: undo, hold to confirm, type to confirm and more. Built on Base UI. Installed with the shadcn CLI from the `@sureui` registry."
 
 function markdownUrl(page: Page) {
   return `${siteUrl}/llms/${page.slug}.md`
@@ -21,6 +22,7 @@ function toMarkdown(body: string) {
       /<Install args="([^"]+)" \/>/g,
       (_, args) => "```bash\nnpx shadcn@latest " + args + "\n```"
     )
+    .replace(/<Chooser \/>/g, () => rulesMarkdown())
     .replace(
       /<Example name="([^"]+)"[^>]*\/>/g,
       (_, name) => "```tsx\n" + renderExample(loadExample(name)) + "\n```"
@@ -44,7 +46,7 @@ function llmsIndex() {
   return [
     "# SureUI",
     `> ${description}`,
-    "Every component except ToolApproval takes the same `onConfirm`, which can return a promise, and sets `data-state` so you can style around it. Add the registry to `components.json` first; the Installation page shows how.",
+    "Every component except ToolApproval takes the same `onConfirm`, which can return a promise, and sets `data-state` so you can style around it. `@sureui` is in the shadcn registry index, so installing needs no setup.",
     "## Docs",
     list(
       pages.map(

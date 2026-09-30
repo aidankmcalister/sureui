@@ -764,3 +764,51 @@ describe("ConfirmDialog options", () => {
     expect(screen.getByRole("button", { name: "Try again" })).toBeTruthy()
   })
 })
+
+describe("confirm a select change example", () => {
+  it("keeps the old value until the dialog is confirmed", async () => {
+    const { Preview } = await import("@/components/site/docs/preview")
+    const { default: Example } =
+      await import("@/components/site/docs/examples/confirm-dialog/select-change")
+    render(
+      <Preview name="confirm-dialog/select-change" code={null} log>
+        <Example />
+      </Preview>
+    )
+    const trigger = screen.getByRole("combobox", { name: "Role" })
+    async function pick(name: string) {
+      fireEvent.click(trigger)
+      const option = await screen.findByRole(
+        "option",
+        { name },
+        { timeout: 2000 }
+      )
+      await act(async () => {
+        fireEvent.pointerDown(option, { button: 0, pointerType: "mouse" })
+        fireEvent.pointerUp(option, { button: 0, pointerType: "mouse" })
+        fireEvent.click(option)
+      })
+    }
+    await pick("Viewer")
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Cancel" }, { timeout: 2000 })
+    )
+    await waitFor(() => expect(trigger.textContent).toContain("Admin"), {
+      timeout: 2000,
+    })
+    await pick("Viewer")
+    fireEvent.click(
+      await screen.findByRole(
+        "button",
+        { name: "Make Viewer" },
+        { timeout: 2000 }
+      )
+    )
+    await waitFor(() => expect(trigger.textContent).toContain("Viewer"), {
+      timeout: 2000,
+    })
+    expect(screen.getByRole("log").textContent).toContain(
+      'changeRole("Viewer")'
+    )
+  })
+})

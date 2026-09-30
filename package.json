@@ -1,6 +1,7 @@
 {
   "name": "sureui",
   "version": "0.1.1",
+  "description": "Open source confirmation components for shadcn/ui: undo, hold to confirm, type to confirm and more. Built on Base UI.",
   "type": "module",
   "private": true,
   "packageManager": "pnpm@10.30.3",
@@ -25,7 +26,6 @@
     "@base-ui/react": "^1.8.0",
     "@mdx-js/loader": "^3.1.1",
     "@next/mdx": "^16.3.6",
-    "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.4.0",

@@ -1,0 +1,75 @@
+---
+title: Confirmation Core
+description: useConfirmation, the hook every SureUI control is built on. Put click again, hold, slide and undo on any element.
+---
+
+<Example name="confirmation-core/hold-card" />
+
+Every SureUI control is built on one hook, `useConfirmation`. It owns the gesture rules, the timing, the undo window and the pending state. The controls only add labels and styling. Use it when you need a confirmation on something SureUI doesn't ship: a card, a toolbar icon, a keyboard shortcut or a canvas tool.
+
+`confirmation.ts` comes with every SureUI item, so there's nothing extra to install.
+
+## Usage
+
+```tsx
+import { useConfirmation } from "@/components/ui/sureui/confirmation"
+
+const { state, fillRef, getTriggerProps } = useConfirmation({
+  gesture: "hold",
+  onConfirm: archiveProject,
+})
+
+<button {...getTriggerProps({})} data-state={state}>
+  <span ref={fillRef} className="origin-left scale-x-0" />
+  Hold to archive
+</button>
+```
+
+Spread `getTriggerProps` on the element people press. Pass your own handlers to it (`getTriggerProps({ onClick })`) rather than setting them next to it, so yours run first and the hook's still run. Put `fillRef` on an element to get the hold or slide fill; it animates the `scale` property from `scale-x-0`.
+
+## Examples
+
+### Icon button
+
+An icon-only button that turns red and asks for a second click.
+
+<Example name="confirmation-core/icon-button" />
+
+### Keyboard shortcut
+
+A shortcut is a trigger too. Here Backspace clicks the button, so pressing it twice deletes, the way terminals ask you to press Ctrl+C twice. Typing in a field is left alone.
+
+<Example name="confirmation-core/shortcut" />
+
+## API reference
+
+### useConfirmation(options)
+
+| Prop               | Type                                            | Default         |
+| ------------------ | ----------------------------------------------- | --------------- |
+| `onConfirm`        | `() => void \| Promise<unknown>`                | required        |
+| `onCancel`         | `() => void`                                    | —               |
+| `onConfirmError`   | `(error: unknown) => void`                      | —               |
+| `gesture`          | `"click" \| "click-again" \| "hold" \| "slide"` | `"click"`       |
+| `undo`             | `boolean \| number \| "manual"`                 | `false`         |
+| `pauseUndoOnHover` | `boolean`                                       | `true`          |
+| `pauseUndoOnFocus` | `boolean`                                       | `true`          |
+| `timeout`          | `number`                                        | `3000`          |
+| `duration`         | `number`                                        | `1200`          |
+| `holdFallback`     | `"click-again" \| "none"`                       | `"click-again"` |
+| `armDelay`         | `number`                                        | `0`             |
+| `wait`             | `number`                                        | `0`             |
+| `disabled`         | `boolean`                                       | `false`         |
+
+It returns:
+
+- `state`: `"idle" | "armed" | "holding" | "undo" | "pending"`. Set it as `data-state` to style each state.
+- `failed`: `true` after `onConfirm` failed with `onConfirmError` set, until the next attempt.
+- `waiting`: the seconds left while `wait` counts down.
+- `fillRef`: a ref for the fill element.
+- `getTriggerProps(props)`: your props with the gesture handlers composed in, plus `disabled` while pending or waiting.
+
+## Accessibility
+
+- The hook handles pointer, keyboard and focus: Space and Enter hold, a second activation confirms a hold or slide, and leaving the element cancels.
+- Labels and announcements are yours. Change the visible text or `aria-label` with `state`, as the examples do, and announce armed and undo states in a polite live region. `confirm-button.tsx` shows how the built-in controls do it with `useConfirmationLabels`.

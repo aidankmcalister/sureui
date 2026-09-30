@@ -13,13 +13,13 @@ describe("docs search", () => {
   })
 
   it("puts the page with a matching title first", () => {
-    expect(titles("bulk")[0]).toBe("Bulk Confirm")
+    expect(titles("undoable")[0]).toBe("Undoable")
     expect(titles("tool approval")[0]).toBe("Tool Approval")
   })
 
   it("lists a page's sections only when the query names them", () => {
-    expect(titles("bulk")).not.toContain("Installation")
-    expect(titles("bulk install")).toContain("Installation")
+    expect(titles("undoable")).not.toContain("Installation")
+    expect(titles("undoable install")).toContain("Installation")
   })
 
   it("finds sections inside pages", () => {
@@ -29,7 +29,7 @@ describe("docs search", () => {
 
   it("matches the start of words", () => {
     expect(titles("hold")).not.toContain("Thresholds")
-    expect(titles("confirm")).toContain("Bulk Confirm")
+    expect(titles("to confirm")).toContain("Type to Confirm")
   })
 
   it("needs every word to match", () => {

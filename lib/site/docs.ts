@@ -97,6 +97,7 @@ export function staticParams() {
 function read(slug: string) {
   const cached = sources.get(slug)
   if (!cached || process.env.NODE_ENV !== "development") return cached
+  if (!fs.existsSync(cached.file)) return cached
   const source = fs.readFileSync(cached.file, "utf8")
   return { ...cached, source, body: parse(source).body }
 }

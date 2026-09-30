@@ -9,6 +9,7 @@ type Events = {
   "search-miss": { query: string }
   theme: { to: string }
   "not-found": { path: string }
+  choose: { undo: string; count: string; place: string; item: string }
 }
 
 type Umami = { track: (event: string, data?: object) => void }

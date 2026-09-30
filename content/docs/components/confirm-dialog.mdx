@@ -96,9 +96,15 @@ Pass a [Consequences](/docs/consequences) list to show what the action removes.
 
 ### Awaiting the answer
 
-`useConfirm()` returns a `confirm()` to await in a handler and a `dialog` to render once.
+`useConfirm()` returns a `confirm()` to await in a handler and a `dialog` to render once. Use it when confirming removes the button that opened the dialog, like a row that turns into a badge: `dialog` stays mounted, so it closes normally instead of disappearing.
 
 <Example name="confirm-dialog/use-confirm" />
+
+### Confirm a select change
+
+A select or radio group can ask before its new value applies. Keep the field on the old value, await `confirm()`, and only set the new value when it resolves `true`. Cancelling changes nothing.
+
+<Example name="confirm-dialog/select-change" />
 
 ## API reference
 

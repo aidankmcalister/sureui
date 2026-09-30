@@ -3,6 +3,7 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Code } from "@/components/site/code/code"
 import { InstallCommand } from "@/components/site/code/install-command"
+import { Chooser } from "@/components/site/docs/chooser"
 import { Example } from "@/components/site/docs/example"
 import { FramedTable } from "@/components/site/docs/framed-table"
 import { Label, Plus } from "@/components/site/layout/frame"
@@ -199,4 +200,5 @@ export const mdxComponents = {
   table: Table,
   Example,
   Install: InstallCommand,
+  Chooser,
 }

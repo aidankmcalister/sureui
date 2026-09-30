@@ -4,6 +4,10 @@ import { describe, expect, it } from "vitest"
 import type { Button } from "@/components/ui/button"
 import type { DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import type { Switch } from "@/components/ui/switch"
+import type {
+  ConfirmationOptions,
+  GestureOptions,
+} from "@/components/ui/sureui/confirmation"
 import type { ConfirmButtonProps } from "@/components/ui/sureui/confirm-button"
 import type { ConfirmDialogProps } from "@/components/ui/sureui/confirm-dialog"
 import type { ConfirmPopoverProps } from "@/components/ui/sureui/confirm-popover"
@@ -18,7 +22,6 @@ import type {
   ToolApprovalProps,
 } from "@/components/ui/sureui/tool-approval"
 import type { TypeToConfirmProps } from "@/components/ui/sureui/type-to-confirm"
-import type { BulkConfirmProps } from "@/components/ui/sureui/bulk-confirm"
 import type { UndoToastOptions } from "@/components/ui/sureui/undo-toast"
 import type { UndoableProps } from "@/components/ui/sureui/undoable"
 import type { UnsavedChangesOptions } from "@/components/ui/sureui/unsaved-changes"
@@ -95,19 +98,6 @@ const typeToConfirm = {
   errorLabel: true,
   className: true,
 } satisfies Record<keyof TypeToConfirmProps, true>
-
-const bulkConfirm = {
-  count: true,
-  label: true,
-  onConfirm: true,
-  onCancel: true,
-  onConfirmError: true,
-  thresholds: true,
-  errorLabel: true,
-  variant: true,
-  disabled: true,
-  className: true,
-} satisfies Record<keyof BulkConfirmProps, true>
 
 const confirmDialog = {
   onConfirm: true,
@@ -302,12 +292,27 @@ const confirmSwitch = {
   true
 >
 
+const useConfirmationOptions = {
+  onConfirm: true,
+  onCancel: true,
+  onConfirmError: true,
+  gesture: true,
+  undo: true,
+  pauseUndoOnHover: true,
+  pauseUndoOnFocus: true,
+  timeout: true,
+  duration: true,
+  holdFallback: true,
+  armDelay: true,
+  wait: true,
+  disabled: true,
+} satisfies Record<keyof (ConfirmationOptions & GestureOptions), true>
+
 const documented = {
   ConfirmButton: confirmButton,
   ConfirmMenuItem: confirmMenuItem,
   ConfirmSwitch: confirmSwitch,
   TypeToConfirm: typeToConfirm,
-  BulkConfirm: bulkConfirm,
   ConfirmDialog: confirmDialog,
   ConfirmPopover: confirmPopover,
   Consequences: consequences,
@@ -317,6 +322,7 @@ const documented = {
   "useUnsavedChanges(options)": unsavedChanges,
   ToolApproval: toolApproval,
   ToolApprovalBatch: toolApprovalBatch,
+  "useConfirmation(options)": useConfirmationOptions,
 }
 
 function tableAfter(heading: string) {

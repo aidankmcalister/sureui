@@ -48,6 +48,16 @@ For an irreversible action with wide impact, show what will be lost and ask for 
 
 Keep this tier for the few actions that need it.
 
+## Many at once
+
+When one action hits many things, let the friction grow with the count: undo for a few, a second click for dozens, and the count typed for hundreds. There's nothing extra to install. Pick the control from the count.
+
+<Example name="choosing-a-confirmation/count" />
+
+<Install args="add @sureui/type-to-confirm" />
+
+Type to Confirm installs Confirm Button with it. The [bulk actions block](/blocks#bulk-actions-01) shows the same idea in an issue list.
+
 ## AI agents
 
 [Tool Approval](/docs/tool-approval) maps its `risk` levels onto the same tiers. Deny is one click at every level.
@@ -79,6 +89,6 @@ Keep this tier for the few actions that need it.
 
 ## Accessibility
 
-- An undo window is a time limit under [WCAG 2.2.1 Timing Adjustable](https://www.w3.org/WAI/WCAG22/Understanding/timing-adjustable). It pauses while the pointer or focus is on the control and while the tab is hidden, and `undo` takes up to 60 seconds. For an action people may need longer to reconsider, keep a way to restore it afterwards, like a trash.
+- An undo window is a time limit under [WCAG 2.2.1 Timing Adjustable](https://www.w3.org/WAI/WCAG22/Understanding/timing-adjustable). It pauses while the pointer or focus is on the control and while the tab is hidden, and `undo` takes up to 60 seconds. For an action people may need longer to reconsider, keep a way to restore it afterwards, like a trash, as in the [file manager block](/blocks#file-manager-01).
 - A hold meets [WCAG 2.5.2 Pointer Cancellation](https://www.w3.org/WAI/WCAG22/Understanding/pointer-cancellation) because letting go early cancels.
 - Keyboard users hold Space or Enter. Screen reader users can confirm a hold with two activations. See [Confirm Button](/docs/confirm-button#accessibility).

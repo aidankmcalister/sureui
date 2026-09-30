@@ -14,7 +14,6 @@ import { Footer } from "@/components/site/layout/footer"
 import { Header } from "@/components/site/layout/header"
 import { siteUrl } from "@/lib/site/config"
 
-import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const fontSans = Atkinson_Hyperlegible_Next({
@@ -36,7 +35,8 @@ const fontMono = Atkinson_Hyperlegible_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: { default: "SureUI", template: "%s · SureUI" },
-  description: "Confirmation components for shadcn/ui.",
+  description:
+    "Open source confirmation components for shadcn/ui: undo, hold to confirm, type to confirm and more. Built on Base UI.",
 }
 
 export default function RootLayout({
@@ -57,7 +57,6 @@ export default function RootLayout({
       )}
     >
       <body>
-        <Analytics />
         <SpeedInsights />
         <Script
           src="/u/script.js"

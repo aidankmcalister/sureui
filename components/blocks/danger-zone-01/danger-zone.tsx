@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/card"
 import { ConfirmButton } from "@/components/ui/sureui/confirm-button"
 import { ConfirmDialog } from "@/components/ui/sureui/confirm-dialog"
+import { Consequences } from "@/components/ui/sureui/consequences"
 
 type DangerZoneProps = {
   project?: string
@@ -92,7 +93,16 @@ function DangerZone({
       action: transferred ? null : (
         <ConfirmDialog
           title={`Transfer ${project} to ${transferTo}?`}
-          description={`Members of ${team} lose access. Owners of ${transferTo} get the project, its deployments and domains.`}
+          description={`${transferTo} gets the project, its deployments and domains.`}
+          consequences={
+            <Consequences
+              title="What changes"
+              items={[
+                { label: "Owner", from: team, to: transferTo },
+                { label: `${team} members`, to: "No access" },
+              ]}
+            />
+          }
           confirmLabel="Transfer"
           onConfirm={async () => {
             await request()

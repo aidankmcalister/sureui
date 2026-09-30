@@ -46,9 +46,9 @@ export default function Home() {
           for shadcn/ui.
         </PageTitle>
         <PageLead>
-          Hold to confirm, click twice, type a name, undo, or a dialog. Install
-          them with the shadcn CLI. They use the shadcn components you already
-          have.
+          Undo, hold to confirm, type to confirm and more. Open source and built
+          on Base UI. Install them with the shadcn CLI, and they use the shadcn
+          components you already have.
         </PageLead>
         <Actions />
       </Band>

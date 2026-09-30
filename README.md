@@ -12,7 +12,9 @@
   </p>
 </div>
 
-When every action opens an "Are you sure?" dialog, people stop reading and confirm on reflex. SureUI has other ways to ask: undo, a second click, a press and hold, a typed name, or a dialog. The components install into your app with the shadcn CLI and look like stock shadcn, so they fit whatever your app already looks like. Free and open source.
+Open source confirmation components for shadcn/ui: undo, hold to confirm, type to confirm and more. Built on Base UI.
+
+When every action opens an "Are you sure?" dialog, people stop reading and confirm on reflex. SureUI has other ways to ask: undo, hold to confirm, type to confirm, a second click, or a dialog. The components install into your app with the shadcn CLI and look like stock shadcn, so they fit whatever your app already looks like.
 
 | Component           | What it does                                                                |
 | ------------------- | --------------------------------------------------------------------------- |
@@ -20,10 +22,9 @@ When every action opens an "Are you sure?" dialog, people stop reading and confi
 | `ConfirmMenuItem`   | The same gestures in dropdown and context menus                             |
 | `ConfirmSwitch`     | A switch that moves right away and can be flipped back to undo              |
 | `TypeToConfirm`     | Unlocks only after the exact phrase is typed                                |
-| `BulkConfirm`       | Gets harder as the count grows: undo, then click again, then type the count |
 | `ConfirmDialog`     | An alert dialog around any confirmation, with an awaitable `useConfirm`     |
 | `ConfirmPopover`    | A one-line confirmation anchored to its trigger                             |
-| `Consequences`      | Lists what a confirmation will remove, with counts and names                |
+| `Consequences`      | Lists what a confirmation will remove or change, with counts and names      |
 | `undoToast`         | A toast with Undo that resolves once nobody undoes                          |
 | `Undoable`          | Collapses a removed row in place to a label and an Undo button              |
 | `useUnsavedChanges` | Asks before unsaved changes are lost, on a page or in a dialog              |
