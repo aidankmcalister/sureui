@@ -1,6 +1,6 @@
 {
   "name": "sureui",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Open source confirmation components for shadcn/ui: undo, hold to confirm, type to confirm and more. Built on Base UI.",
   "type": "module",
   "private": true,

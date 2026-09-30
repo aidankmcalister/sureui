@@ -1,3 +1,59 @@
+<Release version="0.2.0" date="2026-09-30">
+
+New gestures, three new components, four new blocks and docs search. `@sureui` is in the shadcn registry index, so `npx shadcn add @sureui/<item>` works with no setup. Some options were renamed or removed; see Breaking.
+
+### New components
+
+- [`ToolApproval`](/docs/tool-approval) and `ToolApprovalBatch` approve AI SDK tool calls with a gesture that matches the risk, with optional once, session and always scopes. `note` sends a line of text to the agent as `reason`.
+- [`useUnsavedChanges`](/docs/unsaved-changes) asks before unsaved changes are lost: when leaving a page, before a Dialog, Sheet or Drawer closes, and on reload. It can offer Save.
+- [`ConfirmSwitch`](/docs/confirm-switch) is back. It flips right away and can be flipped back during the undo window, with a thumb or ring indicator.
+
+### New options
+
+- [`gesture="slide"`](/docs/confirm-button#slide): drag to the end and let go to confirm. Two clicks also confirm, so nobody has to drag.
+- [`wait`](/docs/confirm-button#wait): confirm stays disabled for a few seconds, counting down on the button ("Wait 3s").
+- [`armDelay`](/docs/confirm-button#arm-delay) ignores activation for a moment after the button appears or arms.
+- `onConfirmError` and `errorLabel` show an error with retry instead of rethrowing.
+- `undo="manual"` is an undo with no timer.
+- [`Consequences`](/docs/consequences#changes) items take `from` and `to` for changes ("Plan: Pro → Free"), and `subject` names the thing being deleted.
+- ConfirmDialog takes an `alternative` ("Archive instead"), several typed phrases, and `choices` checkboxes. ConfirmDialog and ConfirmPopover take `initialFocus`.
+- Undoable takes `focusAfterRemove`.
+- Every label and title accepts any React node.
+
+### Breaking
+
+- undoToast's `pauseOnHover` and `pauseOnFocus` are now `pauseUndoOnHover` and `pauseUndoOnFocus`.
+- `fill.ts` and `undo-window.ts` are merged into `confirmation.ts`. After updating, delete the two old files from `components/ui/sureui/`.
+- `confirmOnRelease`, `releaseLabel`, the `ready` state and `announcements.ready` are removed. A hold confirms when the fill completes.
+- `cancelOnBlur` and `cancelHoldOnLeave` are removed. An armed control always disarms when focus leaves, and a hold always cancels when the pointer leaves.
+- ConfirmPopover's `showCancel`, ConfirmMenuItem's `closeOnUndo` and `commitUndoOnClose`, and the per-row `limit`, `expandable`, `moreLabel` and `lessLabel` on Consequences items are removed.
+- TypeToConfirm's `variant` now defaults to `"default"`, like every other control. Pass `variant="destructive"` to keep it red.
+
+### Behavior
+
+- An armed hold is labeled, and Android holds no longer arm on release.
+- Letting go of Space or Enter early cancels a hold instead of arming it.
+- ConfirmDialog shows `acknowledgements` without a `phrase` too. With an `alternative`, Cancel and Confirm share a row and the alternative gets its own full-width row.
+- ToolApproval's critical approve is disabled while a response is sending.
+- Undoable sets `data-error` after a failed `onConfirm`.
+
+### Blocks
+
+- New: agent-approval-01, bulk-actions-01, settings-save-bar-01 and cancel-subscription-01. danger-zone-01's Transfer dialog now shows what changes.
+- Back: danger-zone-01, api-keys-01, delete-account-01, team-members-01, file-manager-01 and inbox-01.
+
+### Docs
+
+- Search with ⌘K, Ctrl+K or `/`.
+- A [Choosing a confirmation](/docs/choosing-a-confirmation) guide, including [friction that grows with the count](/docs/choosing-a-confirmation#many-at-once) for bulk actions.
+- Examples show only their component, and the strip under each preview shows what ran, like `deleteProject()`. Timings and toggles can be changed in the preview.
+- Every WCAG claim links to its W3C page.
+- llms.txt lists the exact install command for every item.
+- [Confirmation Core](/docs/confirmation-core) documents `useConfirmation` for building your own control.
+- An [agent skill](/docs/installation#coding-agents) for Claude Code, Cursor, Codex and other agents: `npx skills add aidankmcalister/sureui`.
+
+</Release>
+
 <Release version="0.1.1" date="2026-09-28">
 
 A redesigned Consequences, a pulse while controls are pending, and new docs. ConfirmSwitch is removed for now.
