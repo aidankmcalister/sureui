@@ -17,6 +17,16 @@ SureUI installs into a shadcn/ui project on Base UI, the shadcn default. Project
 
 Each component page lists its own command, and blocks install the same way.
 
+## Coding agents
+
+SureUI has an agent skill for Claude Code, Cursor, Codex and other agents that read skills. Add it with the skills CLI:
+
+```bash
+npx skills add aidankmcalister/sureui
+```
+
+The skill reads your project with `shadcn info`, picks a control by how hard the action is to take back, and installs it with the shadcn CLI. Ask it to review your code and it lists destructive actions that run on one click. Its rules are in [`skills/sureui`](https://github.com/aidankmcalister/sureui/tree/main/skills/sureui), and [llms.txt](https://sureui.com/llms.txt) lists every page.
+
 ## Use them in a client component
 
 Every SureUI component takes functions like `onConfirm`, so in the Next.js App Router, render it from a file that starts with `"use client"`. A Server Component can't pass functions to it, the same as with `onClick` on a Button. The examples on these pages already start with `"use client"`.

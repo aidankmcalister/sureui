@@ -1,3 +1,6 @@
+import fs from "node:fs"
+import path from "node:path"
+
 import { describe, expect, it } from "vitest"
 
 import registry from "@/registry.json"
@@ -22,4 +25,30 @@ describe("choosing a control", () => {
       }
     }
   )
+})
+
+describe("the agent skill", () => {
+  const dir = path.join(process.cwd(), "skills/sureui")
+  const files = [
+    "SKILL.md",
+    ...fs.readdirSync(path.join(dir, "rules")).map((file) => `rules/${file}`),
+  ]
+  const read = (file: string) => fs.readFileSync(path.join(dir, file), "utf8")
+
+  it("lists every item", () => {
+    const skill = read("SKILL.md")
+    for (const item of items) expect(skill).toContain(`- \`${item.name}\`: `)
+  })
+
+  it.each(files)("%s links only to files and pages that exist", (file) => {
+    const text = read(file)
+    for (const [, link] of text.matchAll(/\]\((\.\/[^)]+)\)/g)) {
+      expect(fs.existsSync(path.join(dir, path.dirname(file), link))).toBe(true)
+    }
+    for (const [, href] of text.matchAll(
+      /https:\/\/sureui\.com(\/docs\/[\w-]+)/g
+    )) {
+      expect(pageAt(href)).toBeDefined()
+    }
+  })
 })
