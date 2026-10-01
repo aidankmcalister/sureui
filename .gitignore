@@ -22,9 +22,6 @@ pnpm-debug.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# local notes
-/temp
-
 # registry
 /public/r
 
@@ -33,4 +30,3 @@ next-env.d.ts
 
 # private notes
 /plans
-/.impeccable

@@ -191,7 +191,7 @@ function when(answers: Answers[]) {
     .join("; ")
 }
 
-export function rules() {
+function rules() {
   const groups = new Map<string, { choice: Choice; answers: Answers[] }>()
   for (const answers of everyAnswer()) {
     const choice = choose(answers)
