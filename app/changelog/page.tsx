@@ -94,7 +94,11 @@ const components = {
 
 export default function Changelog() {
   return (
-    <main className="flex flex-1 flex-col">
+    <main
+      id="content"
+      tabIndex={-1}
+      className="flex flex-1 flex-col outline-none"
+    >
       <Band className="grid gap-6 px-3 py-14 sm:px-6 sm:py-16 lg:py-20">
         <PageTitle>Changelog</PageTitle>
         <PageLead>

@@ -1,5 +1,6 @@
 "use client"
 
+import * as React from "react"
 import { MonitorSmartphoneIcon } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -14,6 +15,7 @@ const sessions = [
 
 export function Sessions() {
   const signedOut = useToggle()
+  const id = React.useId()
 
   return (
     <Outcome
@@ -22,14 +24,14 @@ export function Sessions() {
       title="Only this device is signed in"
     >
       <div className="grid w-full divide-y">
-        {sessions.map((session) => (
+        {sessions.map((session, index) => (
           <div
             key={session.device}
             className="flex items-center justify-between gap-3 py-2.5 first:pt-0 last:pb-0"
           >
             <div className="grid gap-0.5 text-sm">
               <span className="flex items-center gap-2 font-medium">
-                {session.device}
+                <span id={`${id}-${index}`}>{session.device}</span>
                 {signedOut.has(session.device) && (
                   <Badge variant="outline">Signed out</Badge>
                 )}
@@ -43,6 +45,7 @@ export function Sessions() {
                 gesture="hold"
                 variant="destructive"
                 size="sm"
+                aria-describedby={`${id}-${index}`}
                 onConfirm={() => signedOut.toggle(session.device)}
               >
                 Hold to sign out

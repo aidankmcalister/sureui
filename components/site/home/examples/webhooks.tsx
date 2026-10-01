@@ -15,6 +15,7 @@ const initialWebhooks = [
 
 export function Webhooks() {
   const [webhooks, setWebhooks] = React.useState(initialWebhooks)
+  const id = React.useId()
 
   return (
     <Outcome
@@ -39,12 +40,19 @@ export function Webhooks() {
             {({ remove }) => (
               <>
                 <div className="grid flex-1 gap-0.5">
-                  <span className="font-medium">{webhook.name}</span>
+                  <span id={`${id}-${webhook.name}`} className="font-medium">
+                    {webhook.name}
+                  </span>
                   <span className="truncate font-mono text-xs text-muted-foreground">
                     {webhook.url}
                   </span>
                 </div>
-                <Button variant="outline" size="sm" onClick={remove}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  aria-describedby={`${id}-${webhook.name}`}
+                  onClick={remove}
+                >
                   Remove
                 </Button>
               </>

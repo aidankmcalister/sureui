@@ -36,4 +36,19 @@ describe("docs search", () => {
     expect(titles("slide dialog")).not.toContain("Confirm Button")
     expect(search(entries, "zzzz")).toEqual([])
   })
+
+  it("finds pages by the words people search for", () => {
+    expect(titles("delete")[0]).toBe("Choosing a confirmation")
+    expect(titles("modal")[0]).toBe("Confirm Dialog")
+    expect(titles("are you sure")[0]).toBe("Choosing a confirmation")
+    expect(titles("countdown")[0]).toBe("Confirm Button")
+    expect(titles("double click")[0]).toBe("Confirm Button")
+    expect(titles("snackbar")[0]).toBe("Undo Toast")
+    expect(titles("irreversible")).toContain("Type to Confirm")
+  })
+
+  it("lists a section every page shares only once, unless the page is named", () => {
+    expect(titles("install")).toEqual(["Installation"])
+    expect(titles("undoable install")).toContain("Installation")
+  })
 })

@@ -1,6 +1,8 @@
 import { readFileSync } from "node:fs"
 import type { Metadata } from "next"
 
+import { cn } from "@/lib/utils"
+
 import { BlockPreview } from "@/components/site/blocks/previews"
 import { Code } from "@/components/site/code/code"
 import { InstallCommand } from "@/components/site/code/install-command"
@@ -11,6 +13,7 @@ import {
   Band,
   PageLead,
   PageTitle,
+  tapTarget,
 } from "@/components/site/layout/frame"
 import { blocks, type Block } from "@/lib/site/registry"
 
@@ -40,7 +43,6 @@ function BlockSection({ block }: { block: Block }) {
           {block.description}
         </p>
       </div>
-      <InstallCommand args={`add @sureui/${block.name}`} />
       <Preview
         name={block.name}
         log={false}
@@ -65,13 +67,14 @@ function BlockSection({ block }: { block: Block }) {
           <BlockPreview name={block.name} />
         </div>
       </Preview>
+      <InstallCommand args={`add @sureui/${block.name}`} />
     </section>
   )
 }
 
 export default function Blocks() {
   return (
-    <main>
+    <main id="content" tabIndex={-1} className="outline-none">
       <Band className="grid gap-6 px-3 py-14 sm:px-6 sm:py-16 lg:py-20">
         <PageTitle>
           <span className="block text-(--mark)">Blocks</span>
@@ -80,6 +83,23 @@ export default function Blocks() {
         <PageLead className="text-[17px] leading-7 [&_code]:font-mono [&_code]:text-[0.9em] [&_code]:text-(--ink)">
           <InlineCode>{blocksLead}</InlineCode>
         </PageLead>
+        <nav aria-label="Blocks" className="hidden md:block">
+          <ul className="flex flex-wrap gap-x-5 gap-y-2 font-mono text-[11px] tracking-widest uppercase">
+            {blocks.map((block) => (
+              <li key={block.name}>
+                <a
+                  href={`#${block.name}`}
+                  className={cn(
+                    tapTarget,
+                    "text-(--ink-muted) underline-offset-4 hover:text-(--ink) hover:underline"
+                  )}
+                >
+                  {block.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </Band>
       {blocks.map((block) => (
         <Band key={block.name} className={aboveMark}>

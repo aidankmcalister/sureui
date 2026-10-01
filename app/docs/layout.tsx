@@ -10,7 +10,11 @@ export default function DocsLayout({
   return (
     <Band grow className="grid lg:grid-cols-[240px_minmax(0,1fr)]">
       <DocsSidebar sections={sections} />
-      <main className="flex min-w-0 flex-col">
+      <main
+        id="content"
+        tabIndex={-1}
+        className="flex min-w-0 flex-col outline-none"
+      >
         <div className="flex-1">{children}</div>
         <DocsPager pages={pages} />
       </main>

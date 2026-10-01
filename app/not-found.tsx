@@ -9,7 +9,11 @@ export const metadata: Metadata = { title: "Page not found" }
 
 export default function NotFound() {
   return (
-    <main className="flex flex-1 flex-col">
+    <main
+      id="content"
+      tabIndex={-1}
+      className="flex flex-1 flex-col outline-none"
+    >
       <TrackNotFound />
       <Band
         grow

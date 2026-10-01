@@ -133,8 +133,24 @@ export function Search({ entries }: { entries: SearchEntry[] }) {
             className="overflow-y-auto p-1.5"
           >
             {results.length === 0 && (
-              <li className="px-3 py-6 text-center text-sm text-(--ink-muted)">
-                No results for “{query}”
+              <li className="grid gap-1 px-3 py-6 text-center text-sm text-(--ink-muted)">
+                <span>No results for “{query}”</span>
+                <span>
+                  Not sure what you need?{" "}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      go({
+                        href: "/docs/choosing-a-confirmation",
+                        title: "Choosing a confirmation",
+                        text: "",
+                      })
+                    }
+                    className="font-medium text-(--ink) underline decoration-(--rule) underline-offset-4 hover:decoration-(--ink)"
+                  >
+                    Choosing a confirmation
+                  </button>
+                </span>
               </li>
             )}
             {results.map((entry, index) => (

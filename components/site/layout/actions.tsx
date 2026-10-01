@@ -14,6 +14,12 @@ export function Actions() {
       >
         Get started
       </Link>
+      <Link
+        href="/docs/choosing-a-confirmation"
+        className={siteButton({ size: "lg" })}
+      >
+        Which one?
+      </Link>
       <SiteLink
         href={githubUrl}
         aria-label="GitHub"

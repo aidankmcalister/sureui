@@ -27,7 +27,7 @@ const links = [
       .flatMap((section) => section.pages.map((page) => page.href)),
   },
   {
-    href: components.pages[0].href,
+    href: "/docs#components",
     label: "Components",
     matches: components.pages.map((page) => page.href),
   },

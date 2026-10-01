@@ -40,7 +40,7 @@ const grid =
 
 export default function Home() {
   return (
-    <main>
+    <main id="content" tabIndex={-1} className="outline-none">
       <Band className="grid gap-6 px-3 py-14 sm:px-6 sm:py-16 lg:py-20">
         <PageTitle>
           <span className="block text-(--mark)">Confirmation components</span>

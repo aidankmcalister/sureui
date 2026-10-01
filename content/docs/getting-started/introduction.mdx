@@ -1,6 +1,7 @@
 ---
 title: Introduction
 description: Open source confirmation components for shadcn/ui: undo, hold to confirm, type to confirm and more. Built on Base UI.
+keywords: overview, what is sureui, confirmation, safe actions
 ---
 
 When every action opens an "Are you sure?" dialog, people stop reading and confirm on reflex. The one dialog that matters gets the same click as the fifty before it.
@@ -9,17 +10,30 @@ SureUI has other ways to ask: undo, hold to confirm, type to confirm, a second c
 
 ## Components
 
+### On the control itself
+
 - [Confirm Button](/docs/confirm-button) confirms on a click, a second click or a press and hold, with optional undo.
 - [Confirm Menu Item](/docs/confirm-menu-item) brings the same gestures to dropdown and context menu items.
 - [Confirm Switch](/docs/confirm-switch) moves right away and can be flipped back during the undo window.
+
+### When it needs more room
+
 - [Type to Confirm](/docs/type-to-confirm) unlocks only after the exact phrase is typed.
 - [Confirm Dialog](/docs/confirm-dialog) puts a confirmation in an alert dialog, with an awaitable `useConfirm`.
 - [Confirm Popover](/docs/confirm-popover) anchors a one-line confirmation to its trigger.
 - [Consequences](/docs/consequences) lists what a confirmation will remove or change, with counts and names.
+
+### Undo after the fact
+
 - [Undo Toast](/docs/undo-toast) shows a toast with Undo and resolves once nobody undoes.
 - [Undoable](/docs/undoable) collapses a removed row in place to a label and an Undo button.
+
+### Moments with their own rules
+
 - [Unsaved Changes](/docs/unsaved-changes) asks before unsaved changes are lost, when leaving a page or closing a dialog.
 - [Tool Approval](/docs/tool-approval) approves or denies an AI SDK tool call with a gesture that matches its risk.
+
+To build your own trigger, like a card or a keyboard shortcut, use the hook every component is built on: [Confirmation Core](/docs/confirmation-core).
 
 ## One contract
 

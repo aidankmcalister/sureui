@@ -13,6 +13,7 @@ export type Page = {
   href: string
   title: string
   description: string
+  keywords: string
   group: string
   section: string
 }
@@ -75,6 +76,7 @@ export const sections: Section[] = readJson<{ sections: string[] }>(
         href: slug === indexSlug ? "/docs" : `/docs/${slug}`,
         title: meta.title,
         description: meta.description,
+        keywords: meta.keywords ?? "",
         group: title,
         section: folder,
       }
@@ -134,7 +136,12 @@ export function headings(slug: string): Heading[] {
 
 export function searchEntries(): SearchEntry[] {
   return pages.flatMap((page) => [
-    { href: page.href, title: page.title, text: page.description },
+    {
+      href: page.href,
+      title: page.title,
+      text: page.description,
+      keywords: page.keywords,
+    },
     ...headings(page.slug).map((heading) => ({
       href: `${page.href}#${heading.id}`,
       title: heading.text,

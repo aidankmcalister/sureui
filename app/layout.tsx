@@ -67,6 +67,12 @@ export default function RootLayout({
         />
         <ThemeProvider>
           <div className="flex min-h-svh flex-col bg-(--paper) text-(--ink)">
+            <a
+              href="#content"
+              className="sr-only font-mono text-[11px] tracking-widest uppercase focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-60 focus:bg-(--ink) focus:px-3 focus:py-2 focus:text-(--paper) focus:outline-2 focus:outline-offset-2 focus:outline-(--mark)"
+            >
+              Skip to content
+            </a>
             <Header />
             {children}
             <Footer />
