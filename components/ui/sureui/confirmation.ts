@@ -829,7 +829,7 @@ function useConfirmationLabels(options: ConfirmationLabelOptions) {
   ) {
     labels.push({
       state: "armed",
-      node: confirmLabel ?? (isHold ? "Confirm" : "Click again to confirm"),
+      node: confirmLabel ?? (isHold ? "Confirm" : "Click again"),
     })
   }
   if (undo) labels.push({ state: "undo", node: undoLabel })

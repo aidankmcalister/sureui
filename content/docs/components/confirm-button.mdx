@@ -83,7 +83,7 @@ The error label is announced in the polite live region. Change the text with `an
 
 ### Labels
 
-`confirmLabel` shows while armed and `undoLabel` during the undo window.
+`confirmLabel` shows while armed (default "Click again"; screen readers hear "Click again to confirm") and `undoLabel` during the undo window.
 
 <Example name="confirm-button/labels" />
 
@@ -93,26 +93,26 @@ The error label is announced in the polite live region. Change the text with `an
 
 Extends the shadcn [`Button`](https://ui.shadcn.com/docs/components/base/button). The table lists the props it adds.
 
-| Prop               | Type                                                                | Default                                               |
-| ------------------ | ------------------------------------------------------------------- | ----------------------------------------------------- |
-| `...buttonProps`   | [`Button`](https://ui.shadcn.com/docs/components/base/button) props | —                                                     |
-| `onConfirm`        | `() => void \| Promise<unknown>`                                    | required                                              |
-| `onCancel`         | `() => void`                                                        | —                                                     |
-| `onConfirmError`   | `(error: unknown) => void`                                          | —                                                     |
-| `gesture`          | `"click" \| "click-again" \| "hold" \| "slide"`                     | `"click"`                                             |
-| `undo`             | `boolean \| number \| "manual"`                                     | —                                                     |
-| `pauseUndoOnHover` | `boolean`                                                           | `true`                                                |
-| `pauseUndoOnFocus` | `boolean`                                                           | `true`                                                |
-| `confirmLabel`     | `ReactNode`                                                         | `"Click again to confirm"`, or `"Confirm"` for a hold |
-| `undoLabel`        | `ReactNode`                                                         | `"Undo"`                                              |
-| `errorLabel`       | `ReactNode`                                                         | —                                                     |
-| `armDelay`         | `number`                                                            | `0`                                                   |
-| `wait`             | `number`                                                            | `0`                                                   |
-| `waitLabel`        | `(seconds: number) => ReactNode`                                    | ``(s) => `Wait ${s}s` ``                              |
-| `timeout`          | `number`                                                            | `3000`                                                |
-| `duration`         | `number`                                                            | `1200`                                                |
-| `holdFallback`     | `"click-again" \| "none"`                                           | `"click-again"`                                       |
-| `announcements`    | `{ armed?, hold?, slide?, fallback?, wait?, undo?, error? }`        | —                                                     |
+| Prop               | Type                                                                | Default                                    |
+| ------------------ | ------------------------------------------------------------------- | ------------------------------------------ |
+| `...buttonProps`   | [`Button`](https://ui.shadcn.com/docs/components/base/button) props | —                                          |
+| `onConfirm`        | `() => void \| Promise<unknown>`                                    | required                                   |
+| `onCancel`         | `() => void`                                                        | —                                          |
+| `onConfirmError`   | `(error: unknown) => void`                                          | —                                          |
+| `gesture`          | `"click" \| "click-again" \| "hold" \| "slide"`                     | `"click"`                                  |
+| `undo`             | `boolean \| number \| "manual"`                                     | —                                          |
+| `pauseUndoOnHover` | `boolean`                                                           | `true`                                     |
+| `pauseUndoOnFocus` | `boolean`                                                           | `true`                                     |
+| `confirmLabel`     | `ReactNode`                                                         | `"Click again"`, or `"Confirm"` for a hold |
+| `undoLabel`        | `ReactNode`                                                         | `"Undo"`                                   |
+| `errorLabel`       | `ReactNode`                                                         | —                                          |
+| `armDelay`         | `number`                                                            | `0`                                        |
+| `wait`             | `number`                                                            | `0`                                        |
+| `waitLabel`        | `(seconds: number) => ReactNode`                                    | ``(s) => `Wait ${s}s` ``                   |
+| `timeout`          | `number`                                                            | `3000`                                     |
+| `duration`         | `number`                                                            | `1200`                                     |
+| `holdFallback`     | `"click-again" \| "none"`                                           | `"click-again"`                            |
+| `announcements`    | `{ armed?, hold?, slide?, fallback?, wait?, undo?, error? }`        | —                                          |
 
 ### Data attributes
 

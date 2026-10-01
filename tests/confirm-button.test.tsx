@@ -31,9 +31,7 @@ describe("ConfirmButton", () => {
     const button = screen.getByRole("button")
     await click(button)
     expect(button.getAttribute("data-state")).toBe("armed")
-    expect(button).toBe(
-      screen.getByRole("button", { name: "Click again to confirm" })
-    )
+    expect(button).toBe(screen.getByRole("button", { name: "Click again" }))
     vi.advanceTimersByTime(500)
     await click(button)
     expect(onConfirm).toHaveBeenCalledOnce()

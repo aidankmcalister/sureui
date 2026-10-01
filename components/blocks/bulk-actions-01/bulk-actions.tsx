@@ -140,7 +140,7 @@ function BulkActions({
         gesture="click-again"
         variant="destructive"
         size="sm"
-        confirmLabel="Click again to delete"
+        confirmLabel="Click again"
         onConfirm={remove}
       >
         {label}

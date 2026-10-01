@@ -59,7 +59,7 @@ export function Variables() {
                 <ConfirmMenuItem
                   gesture="click-again"
                   variant="destructive"
-                  confirmLabel="Click again to delete"
+                  confirmLabel="Click again"
                   onConfirm={() =>
                     setVariables((prev) =>
                       prev.filter((item) => item.name !== variable.name)

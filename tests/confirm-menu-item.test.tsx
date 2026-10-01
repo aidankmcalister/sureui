@@ -55,9 +55,7 @@ describe("ConfirmMenuItem", () => {
     expect(item.getAttribute("data-state")).toBe("armed")
     expect(screen.getByRole("menu")).toBeTruthy()
     expect(closed(onOpenChange)).toBe(false)
-    expect(item).toBe(
-      screen.getByRole("menuitem", { name: "Click again to confirm" })
-    )
+    expect(item).toBe(screen.getByRole("menuitem", { name: "Click again" }))
     await click(item)
     expect(onConfirm).toHaveBeenCalledOnce()
     expect(closed(onOpenChange)).toBe(true)
