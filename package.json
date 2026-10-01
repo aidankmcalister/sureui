@@ -75,6 +75,14 @@
     "tailwindFunctions": [
       "cn",
       "cva"
+    ],
+    "overrides": [
+      {
+        "files": "*.mdx",
+        "options": {
+          "embeddedLanguageFormatting": "off"
+        }
+      }
     ]
   },
   "pnpm": {

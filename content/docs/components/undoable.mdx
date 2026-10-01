@@ -15,7 +15,7 @@ description: A list item or table row that collapses in place to a label and Und
 import { Button } from "@/components/ui/button"
 import { Undoable } from "@/components/ui/sureui/undoable"
 
-;<Undoable
+<Undoable
   render={<li />}
   label={`Deleted ${file.name}`}
   onConfirm={() => deleteFile(file.id)}

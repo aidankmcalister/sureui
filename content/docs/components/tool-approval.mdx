@@ -103,7 +103,7 @@ import { isToolUIPart } from "ai"
 
 import { ToolApprovalBatch } from "@/components/ui/sureui/tool-approval"
 
-;<ToolApprovalBatch
+<ToolApprovalBatch
   parts={message.parts.filter(isToolUIPart)}
   risk={(part) => (part.type === "tool-deleteProject" ? "high" : "low")}
   onRespond={addToolApprovalResponse}

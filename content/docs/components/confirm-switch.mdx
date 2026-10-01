@@ -14,7 +14,7 @@ description: A switch that moves right away and can be flipped back during the u
 ```tsx
 import { ConfirmSwitch } from "@/components/ui/sureui/confirm-switch"
 
-;<ConfirmSwitch onConfirm={setPublic} />
+<ConfirmSwitch onConfirm={setPublic} />
 ```
 
 The switch moves as soon as it's flipped, and a small timer in its thumb empties while the undo window runs. Flipping it again during the window puts it back and calls `onCancel`. When the window ends, `onConfirm` runs with the new value and `onCheckedChange` follows.
