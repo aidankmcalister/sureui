@@ -133,6 +133,33 @@
 }
 
 @layer components {
+  [data-token="sureui"] {
+    color: var(--code-sureui);
+    font-weight: 500;
+  }
+  [data-token="keyword"] {
+    color: var(--code-keyword);
+  }
+  [data-token="string"] {
+    color: var(--code-string);
+  }
+  [data-token="tag"] {
+    color: var(--code-tag);
+  }
+  [data-token="attribute"] {
+    color: var(--code-attribute);
+  }
+  [data-token="number"] {
+    color: var(--code-number);
+  }
+  [data-token="comment"] {
+    color: var(--code-comment);
+    font-style: italic;
+  }
+  [data-token="punctuation"] {
+    color: var(--code-punctuation);
+  }
+
   :where(.docs-body > *) {
     margin-inline: 0.75rem;
     margin-top: 1.25rem;

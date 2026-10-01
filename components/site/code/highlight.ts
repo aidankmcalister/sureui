@@ -3,7 +3,7 @@ import { createJavaScriptRegexEngine } from "shiki/engine/javascript"
 import json from "shiki/langs/json.mjs"
 import tsx from "shiki/langs/tsx.mjs"
 
-import type { Token } from "@/components/site/code/code-view"
+import type { Token, TokenKind } from "@/components/site/code/code-view"
 import { controlIn } from "@/lib/site/example-source"
 import { componentExports } from "@/lib/site/registry"
 
@@ -61,32 +61,50 @@ const highlighter = createHighlighterCoreSync({
   engine: createJavaScriptRegexEngine(),
 })
 
+function kindOf(color: string | undefined) {
+  const kind = /^var\(--code-(\w+)\)$/.exec(color ?? "")?.[1]
+  return kind === "foreground" ? undefined : (kind as TokenKind | undefined)
+}
+
+function merge(line: Token[]) {
+  return line.reduce<Token[]>((merged, token) => {
+    const last = merged[merged.length - 1]
+    if (
+      last &&
+      last.kind === token.kind &&
+      !controlIn(last.text) &&
+      !controlIn(token.text)
+    ) {
+      merged[merged.length - 1] = { ...last, text: last.text + token.text }
+    } else {
+      merged.push(token)
+    }
+    return merged
+  }, [])
+}
+
 export function highlight(text: string, lang: "tsx" | "json" = "tsx") {
   return highlighter
     .codeToTokens(text, { lang, theme: "sureui" })
     .tokens.map((line) =>
-      line.flatMap((token): Token[] => {
-        const [, before, word, after] =
-          /^(\s*)(.*?)(\s*)$/.exec(token.content) ?? []
-        const special = componentExports.has(word)
-          ? { color: color("sureui"), strong: true }
-          : controlIn(word)
-            ? { color: color("number") }
-            : null
-        if (!special) {
+      merge(
+        line.flatMap((token): Token[] => {
+          const [, before, word, after] =
+            /^(\s*)(.*?)(\s*)$/.exec(token.content) ?? []
+          const kind: TokenKind | null = componentExports.has(word)
+            ? "sureui"
+            : controlIn(word)
+              ? "number"
+              : null
+          if (!kind) {
+            return [{ text: token.content, kind: kindOf(token.color) }]
+          }
           return [
-            {
-              text: token.content,
-              color: token.color,
-              italic: token.fontStyle === 1,
-            },
-          ]
-        }
-        return [
-          { text: before },
-          { text: word, ...special },
-          { text: after },
-        ].filter((part) => part.text)
-      })
+            { text: before },
+            { text: word, kind },
+            { text: after },
+          ].filter((part) => part.text)
+        })
+      )
     )
 }

@@ -4,11 +4,19 @@ import { cn } from "@/lib/utils"
 import { CopyButton } from "@/components/site/code/copy-button"
 import { Label } from "@/components/site/layout/frame"
 
+export type TokenKind =
+  | "sureui"
+  | "keyword"
+  | "string"
+  | "tag"
+  | "attribute"
+  | "number"
+  | "comment"
+  | "punctuation"
+
 export type Token = {
   text: string
-  color?: string
-  italic?: boolean
-  strong?: boolean
+  kind?: TokenKind
 }
 
 export function CodeView({
@@ -46,18 +54,15 @@ export function CodeView({
       <code className="grid min-w-fit">
         {lines.map((line, index) => (
           <span key={index} className="min-h-6 px-4">
-            {line.map((token, offset) => (
-              <span
-                key={offset}
-                style={{
-                  color: token.color,
-                  fontStyle: token.italic ? "italic" : undefined,
-                  fontWeight: token.strong ? 500 : undefined,
-                }}
-              >
-                {token.text}
-              </span>
-            ))}
+            {line.map((token, offset) =>
+              token.kind ? (
+                <span key={offset} data-token={token.kind}>
+                  {token.text}
+                </span>
+              ) : (
+                token.text
+              )
+            )}
           </span>
         ))}
       </code>
