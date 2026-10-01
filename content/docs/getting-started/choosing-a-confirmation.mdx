@@ -5,6 +5,10 @@ description: Match how risky an action is to the confirmation that asks for it.
 
 [Carbon](https://carbondesignsystem.com/patterns/common-actions/), [GitLab Pajamas](https://design.gitlab.com/patterns/destructive-actions), [Apple's Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/alerts) and [Nielsen Norman Group](https://www.nngroup.com/articles/confirmation-dialog/) all sort destructive actions into three tiers. The harder an action is to take back, the more effort its confirmation asks for. A routine action that asks for too much teaches people to confirm without reading.
 
+Describe the action to see the control that fits, try it, and copy its code.
+
+<Chooser />
+
 | Risk   | Actions like                                                                   | Use                                                                                                                                                                                                                        |
 | ------ | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Low    | Archiving a message, removing an item from a list. Common and easy to reverse. | Undo: [Confirm Button](/docs/confirm-button) with `undo`, [Undo Toast](/docs/undo-toast) or [Undoable](/docs/undoable).                                                                                                    |

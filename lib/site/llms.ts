@@ -22,7 +22,9 @@ function toMarkdown(body: string) {
       /<Install args="([^"]+)" \/>/g,
       (_, args) => "```bash\nnpx shadcn@latest " + args + "\n```"
     )
-    .replace(/<Chooser \/>/g, () => rulesMarkdown())
+    .replace(/<Chooser \/>/g, () =>
+      rulesMarkdown((name) => renderExample(loadExample(name)))
+    )
     .replace(
       /<Example name="([^"]+)"[^>]*\/>/g,
       (_, name) => "```tsx\n" + renderExample(loadExample(name)) + "\n```"

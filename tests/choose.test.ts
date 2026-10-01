@@ -4,7 +4,9 @@ import path from "node:path"
 import { describe, expect, it } from "vitest"
 
 import registry from "@/registry.json"
-import { choose, everyAnswer } from "@/lib/site/choose"
+import { choose, everyAnswer, everyExample } from "@/lib/site/choose"
+import { exampleFile } from "@/lib/site/examples"
+import { demos } from "@/components/site/docs/chooser-picker"
 import { headings, pageAt } from "@/lib/site/docs"
 
 const items = registry.items.filter((item) => item.type !== "registry:block")
@@ -23,6 +25,16 @@ describe("choosing a control", () => {
           anchor
         )
       }
+    }
+  )
+})
+
+describe("the picker's demos", () => {
+  it.each(everyExample())(
+    "%s is a real example the picker can render",
+    (name) => {
+      expect(() => exampleFile(name)).not.toThrow()
+      expect(demos[name]).toBeDefined()
     }
   )
 })

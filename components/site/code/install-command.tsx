@@ -2,6 +2,8 @@
 
 import * as React from "react"
 
+import { cn } from "@/lib/utils"
+
 import { SiteTab, SiteTabs, SiteTabsList } from "@/components/site/ui/tabs"
 import { CopyButton } from "@/components/site/code/copy-button"
 
@@ -42,7 +44,13 @@ function write(value: Runner) {
   listeners.forEach((listener) => listener())
 }
 
-export function InstallCommand({ args }: { args: string }) {
+export function InstallCommand({
+  args,
+  framed = true,
+}: {
+  args: string
+  framed?: boolean
+}) {
   const runner = React.useSyncExternalStore<Runner>(
     subscribe,
     read,
@@ -51,7 +59,12 @@ export function InstallCommand({ args }: { args: string }) {
   const command = `${runners[runner]} shadcn@latest ${args}`
 
   return (
-    <div className="border border-(--rule) bg-(--well) text-(--ink)">
+    <div
+      className={cn(
+        "bg-(--well) text-(--ink)",
+        framed && "border border-(--rule)"
+      )}
+    >
       <div className="flex h-10 items-center justify-between gap-2 border-b border-(--rule) pr-1.5 pl-2">
         <SiteTabs
           value={runner}
