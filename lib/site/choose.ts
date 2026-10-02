@@ -26,8 +26,8 @@ export const questions = [
       },
       {
         value: "later",
-        label: "can be restored later",
-        when: "can only be restored later",
+        label: "my app can restore later",
+        when: "only your app can restore it later, from a trash or archive",
       },
       { value: "no", label: "can't be undone", when: "can't be undone" },
     ],
