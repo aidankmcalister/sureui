@@ -35,6 +35,18 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  --animate-pulse-out: pulse-out 600ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+  @keyframes pulse-out {
+    from {
+      scale: 0.4;
+      opacity: 0.8;
+    }
+    to {
+      scale: 1.6;
+      opacity: 0;
+    }
+  }
 }
 
 :root {

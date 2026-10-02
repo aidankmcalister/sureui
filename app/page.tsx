@@ -9,6 +9,7 @@ import {
 } from "@/components/site/layout/frame"
 import { cn } from "@/lib/utils"
 import { Cell } from "@/components/site/home/cell"
+import { Tour } from "@/components/site/home/tour"
 import { Agent } from "@/components/site/home/examples/agent"
 import { ConfirmByName } from "@/components/site/home/examples/confirm-by-name"
 import { Database } from "@/components/site/home/examples/database"
@@ -41,17 +42,20 @@ const grid =
 export default function Home() {
   return (
     <main id="content" tabIndex={-1} className="outline-none">
-      <Band className="grid gap-6 px-3 py-14 sm:px-6 sm:py-16 lg:py-20">
-        <PageTitle>
-          <span className="block text-(--mark)">Confirmation components</span>
-          for shadcn/ui.
-        </PageTitle>
-        <PageLead>
-          Undo, hold to confirm, type to confirm and more. Open source and built
-          on Base UI. Install them with the shadcn CLI, and they use the shadcn
-          components you already have.
-        </PageLead>
-        <Actions />
+      <Band className="grid items-center gap-10 px-3 py-14 sm:px-6 sm:py-16 lg:grid-cols-[minmax(0,1fr)_440px] lg:py-20">
+        <div className="grid gap-6">
+          <PageTitle>
+            <span className="block text-(--mark)">Confirmation components</span>
+            for shadcn/ui.
+          </PageTitle>
+          <PageLead>
+            Undo, hold to confirm, type to confirm and more. Open source and
+            built on Base UI. Install them with the shadcn CLI, and they use the
+            shadcn components you already have.
+          </PageLead>
+          <Actions />
+        </div>
+        <Tour />
       </Band>
       <Band>
         <div className="grid gap-4 border-b border-(--rule) px-3 py-12 sm:px-6 sm:py-14">
