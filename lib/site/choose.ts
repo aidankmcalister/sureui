@@ -158,8 +158,8 @@ export function choose({ undo, count, place }: Answers): Choice {
   return {
     item: "confirm-dialog",
     name: "`ConfirmDialog`",
-    href: "/docs/confirm-dialog#typed-phrase",
-    example: "confirm-dialog/typed-phrase",
+    href: "/docs/type-to-confirm#in-a-dialog",
+    example: "type-to-confirm/dialog",
     why: "It can't be taken back, so show what goes and ask for the name.",
   }
 }

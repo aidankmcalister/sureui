@@ -37,6 +37,12 @@ Pass `phrase` an array to ask for more than one field, such as the project name 
 
 <Example name="type-to-confirm/several-phrases" />
 
+### In a dialog
+
+[Confirm Dialog](/docs/confirm-dialog) puts the same field in a dialog when you pass it `phrase`. `caseSensitive`, `trim`, `acknowledgements` and an array of phrases work the same way there.
+
+<Example name="type-to-confirm/dialog" />
+
 ### Choices
 
 Each item in `choices` adds a checkbox that doesn't block confirming. `onConfirm` receives their values by `name`, as they were when the person confirmed, and they reset to `defaultChecked` afterwards.

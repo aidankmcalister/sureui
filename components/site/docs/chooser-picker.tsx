@@ -14,12 +14,12 @@ import ChoosingCount from "@/components/site/docs/examples/choosing-a-confirmati
 import ConfirmButtonClickAgain from "@/components/site/docs/examples/confirm-button/click-again"
 import ConfirmButtonUndo from "@/components/site/docs/examples/confirm-button/undo"
 import ConfirmDialogSelectChange from "@/components/site/docs/examples/confirm-dialog/select-change"
-import ConfirmDialogTypedPhrase from "@/components/site/docs/examples/confirm-dialog/typed-phrase"
 import ConfirmMenuItemDemo from "@/components/site/docs/examples/confirm-menu-item/demo"
 import ConfirmMenuItemUndo from "@/components/site/docs/examples/confirm-menu-item/undo"
 import ToolApprovalCritical from "@/components/site/docs/examples/tool-approval/critical"
 import ToolApprovalLow from "@/components/site/docs/examples/tool-approval/low"
 import ToolApprovalMedium from "@/components/site/docs/examples/tool-approval/medium"
+import TypeToConfirmDialog from "@/components/site/docs/examples/type-to-confirm/dialog"
 import UndoableDemo from "@/components/site/docs/examples/undoable/demo"
 import UnsavedChangesDemo from "@/components/site/docs/examples/unsaved-changes/demo"
 
@@ -28,19 +28,19 @@ export const demos: Record<string, React.ComponentType> = {
   "confirm-button/click-again": ConfirmButtonClickAgain,
   "confirm-button/undo": ConfirmButtonUndo,
   "confirm-dialog/select-change": ConfirmDialogSelectChange,
-  "confirm-dialog/typed-phrase": ConfirmDialogTypedPhrase,
   "confirm-menu-item/demo": ConfirmMenuItemDemo,
   "confirm-menu-item/undo": ConfirmMenuItemUndo,
   "tool-approval/critical": ToolApprovalCritical,
   "tool-approval/low": ToolApprovalLow,
   "tool-approval/medium": ToolApprovalMedium,
+  "type-to-confirm/dialog": TypeToConfirmDialog,
   "undoable/demo": UndoableDemo,
   "unsaved-changes/demo": UnsavedChangesDemo,
 }
 
 const rows: Record<string, string[]> = {
   "confirm-button/click-again": ["fix/login-redirect", "feat/billing-page"],
-  "confirm-dialog/typed-phrase": ["acme-prod", "acme-staging"],
+  "type-to-confirm/dialog": ["acme-prod", "acme-staging"],
 }
 
 type Question = (typeof questions)[number]
