@@ -3,10 +3,33 @@
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
-import { Plus } from "@/components/site/layout/frame"
-import { scenes, type Cursor } from "@/components/site/home/tour-scenes"
+import {
+  scenes,
+  type Cursor,
+  type Scene,
+} from "@/components/site/home/tour-scenes"
 
 type Point = { x: number; y: number }
+
+async function estimate(scene: Scene) {
+  let total = 500
+  const add = (ms: number) => {
+    total += ms
+  }
+  await scene.run({
+    moveTo: async () => add(850),
+    press: async (_, ms = 1450) => add(ms),
+    click: async () => add(190),
+    type: async (_, text) => add(text.length * 55),
+    wait: async (ms) => add(ms),
+    find: () => null,
+    until: async () => {
+      add(1200)
+      return null
+    },
+  })
+  return total
+}
 
 function Arrow() {
   return (
@@ -29,6 +52,7 @@ export function Tour() {
   const [index, setIndex] = React.useState(0)
   const [round, setRound] = React.useState(0)
   const [leaving, setLeaving] = React.useState(false)
+  const [length, setLength] = React.useState(0)
   const [last, setLast] = React.useState<{ text: string; id: number }>()
   const [cursor, setCursor] = React.useState({
     x: 0,
@@ -51,6 +75,7 @@ export function Tour() {
 
   const restart = React.useCallback((next?: number) => {
     setLeaving(false)
+    setLength(0)
     setLast(undefined)
     if (next !== undefined) setIndex(next)
     setRound((value) => value + 1)
@@ -145,10 +170,18 @@ export function Tour() {
         for (const char of text) {
           set?.call(target, target.value + char)
           target.dispatchEvent(new Event("input", { bubbles: true }))
-          await wait(90)
+          await wait(55)
         }
       },
       wait,
+      async until(get) {
+        for (let tries = 0; tries < 50; tries++) {
+          const found = get()
+          if (found) return found
+          await wait(100)
+        }
+        return null
+      },
       find(selector, text) {
         const all = sceneRef.current?.querySelectorAll<HTMLElement>(selector)
         return (
@@ -160,6 +193,7 @@ export function Tour() {
     }
 
     async function play() {
+      setLength(await estimate(scene))
       if (!shownRef.current) {
         const box = boxRef.current?.getBoundingClientRect()
         posRef.current = {
@@ -177,6 +211,7 @@ export function Tour() {
       setLeaving(true)
       await wait(250)
       setLeaving(false)
+      setLength(0)
       setLast(undefined)
       setIndex((scenes.indexOf(scene) + 1) % scenes.length)
     }
@@ -190,96 +225,100 @@ export function Tour() {
   }, [scene, round])
 
   return (
-    <div className="relative grid gap-4 border border-(--rule) bg-(--well) p-5">
-      <Plus side="left" />
-      <Plus side="right" />
-      <div className="flex flex-wrap gap-x-4 gap-y-1 font-mono text-[11px] tracking-widest uppercase">
+    <div className="border border-(--rule) bg-(--well)">
+      <div className="flex flex-wrap border-b border-(--rule) px-2 font-mono text-[11px]">
         {scenes.map((item, i) => (
           <button
             key={item.id}
             type="button"
             onClick={() => restart(i)}
             className={cn(
-              "relative pb-1 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--mark)",
+              "relative px-3 py-2.5 whitespace-nowrap transition-colors outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-(--mark)",
               i === index
                 ? "text-(--ink)"
                 : "text-(--ink-label) hover:text-(--ink-muted)"
             )}
           >
             {item.label}
-            {i === index && (
-              <span className="absolute inset-x-0 bottom-0 h-px bg-(--mark)" />
+            {i === index && length > 0 && (
+              <span
+                key={`${scene.id}-${round}`}
+                className="absolute inset-x-0 -bottom-px h-0.5 origin-left animate-fill-x bg-(--mark) motion-reduce:animate-none"
+                style={{ animationDuration: `${length}ms` }}
+              />
             )}
           </button>
         ))}
       </div>
-      <div
-        ref={boxRef}
-        inert
-        className={cn(
-          "relative transition-opacity duration-250",
-          leaving && "opacity-0"
-        )}
-      >
+      <div className="grid gap-4 p-5">
         <div
-          key={`${scene.id}-${round}`}
-          ref={sceneRef}
-          className="grid h-44 animate-in place-items-center text-foreground duration-300 fade-in motion-reduce:animate-none"
-        >
-          {scene.render(call)}
-        </div>
-        {pulse && (
-          <span
-            key={pulse.id}
-            className="absolute top-0 left-0 z-10 -mt-4 -ml-4 size-8 animate-pulse-out rounded-full border-2 border-(--mark) motion-reduce:hidden"
-            style={{ translate: `${pulse.x}px ${pulse.y}px` }}
-          />
-        )}
-        <div
-          className="absolute top-0 left-0 z-20 ease-[cubic-bezier(0.5,0.05,0.2,1)]"
-          style={{
-            translate: `${cursor.x}px 0`,
-            opacity: cursor.shown ? 1 : 0,
-            transitionProperty: "translate, opacity",
-            transitionDuration: `${cursor.ms}ms, 400ms`,
-          }}
+          ref={boxRef}
+          inert
+          className={cn(
+            "relative transition-opacity duration-250",
+            leaving && "opacity-0"
+          )}
         >
           <div
-            className="transition-[translate] ease-[cubic-bezier(0.3,0.1,0.15,1)]"
+            key={`${scene.id}-${round}`}
+            ref={sceneRef}
+            className="grid h-44 animate-in place-items-center text-foreground duration-300 fade-in motion-reduce:animate-none"
+          >
+            {scene.render(call)}
+          </div>
+          {pulse && (
+            <span
+              key={pulse.id}
+              className="absolute top-0 left-0 z-10 -mt-4 -ml-4 size-8 animate-pulse-out rounded-full border-2 border-(--mark) motion-reduce:hidden"
+              style={{ translate: `${pulse.x}px ${pulse.y}px` }}
+            />
+          )}
+          <div
+            className="absolute top-0 left-0 z-20 ease-[cubic-bezier(0.5,0.05,0.2,1)]"
             style={{
-              translate: `0 ${cursor.y}px`,
-              transitionDuration: `${cursor.ms}ms`,
+              translate: `${cursor.x}px 0`,
+              opacity: cursor.shown ? 1 : 0,
+              transitionProperty: "translate, opacity",
+              transitionDuration: `${cursor.ms}ms, 400ms`,
             }}
           >
             <div
-              className="origin-top-left transition-[scale] duration-150 ease-out"
-              style={{ scale: cursor.down ? "0.86" : "1" }}
+              className="transition-[translate] ease-[cubic-bezier(0.3,0.1,0.15,1)]"
+              style={{
+                translate: `0 ${cursor.y}px`,
+                transitionDuration: `${cursor.ms}ms`,
+              }}
             >
-              <Arrow />
+              <div
+                className="origin-top-left transition-[scale] duration-150 ease-out"
+                style={{ scale: cursor.down ? "0.86" : "1" }}
+              >
+                <Arrow />
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div className="flex h-5 items-center justify-between gap-4 border-t border-(--rule) pt-4 font-mono text-xs">
-        <span
-          key={last?.id ?? "none"}
-          className={cn(
-            "animate-in truncate duration-300 fade-in motion-reduce:animate-none",
-            last ? "text-(--ink-muted)" : "text-(--ink-label)",
-            leaving && "opacity-0 transition-opacity duration-250"
-          )}
-        >
-          {last ? (
-            <>
-              <span className="text-(--mark)">›</span> {last.text}
-            </>
-          ) : (
-            "// nothing has run yet"
-          )}
-        </span>
-        <span className="shrink-0 text-(--ink-label) max-sm:hidden">
-          {scene.hint}
-        </span>
+        <div className="flex h-5 items-center justify-between gap-4 border-t border-(--rule) pt-4 font-mono text-xs">
+          <span
+            key={last?.id ?? "none"}
+            className={cn(
+              "animate-in truncate duration-300 fade-in motion-reduce:animate-none",
+              last ? "text-(--ink-muted)" : "text-(--ink-label)",
+              leaving && "opacity-0 transition-opacity duration-250"
+            )}
+          >
+            {last ? (
+              <>
+                <span className="text-(--mark)">›</span> {last.text}
+              </>
+            ) : (
+              "// nothing has run yet"
+            )}
+          </span>
+          <span className="shrink-0 text-(--ink-label) max-sm:hidden">
+            {scene.hint}
+          </span>
+        </div>
       </div>
     </div>
   )

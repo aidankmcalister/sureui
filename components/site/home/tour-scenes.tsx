@@ -1,7 +1,9 @@
 "use client"
 
 import * as React from "react"
+import { ArrowUpIcon, BotIcon } from "lucide-react"
 
+import { Button } from "@/components/ui/button"
 import { ConfirmButton } from "@/components/ui/sureui/confirm-button"
 import { ConfirmSwitch } from "@/components/ui/sureui/confirm-switch"
 import {
@@ -22,6 +24,7 @@ export type Cursor = {
   type: (target: Element | null, text: string) => Promise<void>
   wait: (ms: number) => Promise<void>
   find: (selector: string, text?: string) => HTMLElement | null
+  until: (get: () => HTMLElement | null) => Promise<HTMLElement | null>
 }
 
 export type Scene = {
@@ -33,23 +36,82 @@ export type Scene = {
 }
 
 function AgentScene({ call }: { call: Call }) {
+  const [draft, setDraft] = React.useState("")
+  const [sent, setSent] = React.useState("")
+  const [step, setStep] = React.useState<"sent" | "thinking" | "reply">("sent")
   const [part, setPart] = React.useState<ToolApprovalPart>({
     state: "approval-requested",
     approval: { id: "approval_1" },
   })
+
+  React.useEffect(() => {
+    if (!sent) return
+    const timers = [
+      setTimeout(() => setStep("thinking"), 500),
+      setTimeout(() => setStep("reply"), 1200),
+    ]
+    return () => timers.forEach(clearTimeout)
+  }, [sent])
+
   return (
-    <div className="grid w-full gap-3 text-sm">
-      <p className="w-fit rounded-lg bg-muted px-3 py-2">
-        I&apos;ll drop the <code className="font-mono">users_old</code> table.
-      </p>
-      <ToolApproval
-        risk="high"
-        part={part}
-        onRespond={(response) => {
-          setPart({ state: "approval-responded", approval: response })
-          call(`addToolApprovalResponse({ approved: ${response.approved} })`)
-        }}
-      />
+    <div className="grid h-full w-full grid-rows-[1fr_auto] gap-3 self-stretch text-sm">
+      <div className="grid content-end gap-2">
+        {sent && (
+          <p className="w-fit max-w-[80%] animate-in justify-self-end rounded-xl rounded-br-sm bg-primary px-3 py-1.5 text-primary-foreground duration-200 fade-in slide-in-from-bottom-1 motion-reduce:animate-none">
+            {sent}
+          </p>
+        )}
+        {step !== "sent" && (
+          <div className="flex max-w-[90%] animate-in items-start gap-2 duration-200 fade-in slide-in-from-bottom-1 motion-reduce:animate-none">
+            <BotIcon className="mt-1 size-4 shrink-0 text-muted-foreground" />
+            <div className="grid gap-2">
+              <p className="w-fit rounded-xl rounded-bl-sm bg-muted px-3 py-1.5">
+                {step === "reply" ? (
+                  <>
+                    I&apos;ll drop <code className="font-mono">users_old</code>.
+                    It has 2.1M rows.
+                  </>
+                ) : (
+                  <span className="animate-pulse tracking-widest">···</span>
+                )}
+              </p>
+              {step === "reply" && (
+                <ToolApproval
+                  risk="high"
+                  part={part}
+                  onRespond={(response) => {
+                    setPart({ state: "approval-responded", approval: response })
+                    call(
+                      `addToolApprovalResponse({ approved: ${response.approved} })`
+                    )
+                  }}
+                />
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="flex items-center gap-2 rounded-xl border bg-background py-1.5 pr-1.5 pl-3 shadow-xs">
+        <input
+          aria-label="Message the agent"
+          placeholder="Message the agent"
+          value={draft}
+          onChange={(event) => setDraft(event.target.value)}
+          className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
+        />
+        <Button
+          size="icon"
+          aria-label="Send"
+          disabled={!draft}
+          onClick={() => {
+            setSent(draft)
+            setDraft("")
+          }}
+          className="size-7 rounded-full"
+        >
+          <ArrowUpIcon />
+        </Button>
+      </div>
     </div>
   )
 }
@@ -182,11 +244,19 @@ export const scenes: Scene[] = [
     hint: "the agent waits for you",
     render: (call) => <AgentScene call={call} />,
     async run(c) {
-      await c.wait(400)
-      const button = c.find("button", "Hold to approve")
+      const input = c.find("input")
+      await c.moveTo(input, { x: 0.3 })
+      await c.click(input)
+      await c.type(input, "Clean up the old users table")
+      await c.wait(150)
+      const send = c.find("[aria-label=Send]")
+      await c.moveTo(send)
+      await c.click(send)
+      const button = await c.until(() => c.find("button", "Hold to approve"))
+      await c.wait(250)
       await c.moveTo(button)
       await c.press(button)
-      await c.wait(1500)
+      await c.wait(1200)
     },
   },
 ]
