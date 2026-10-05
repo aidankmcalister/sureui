@@ -251,18 +251,14 @@ export function Tour() {
         ))}
       </div>
       <div className="grid gap-4 p-5">
-        <div
-          ref={boxRef}
-          inert
-          className={cn(
-            "relative transition-opacity duration-250",
-            leaving && "opacity-0"
-          )}
-        >
+        <div ref={boxRef} inert className="relative">
           <div
             key={`${scene.id}-${round}`}
             ref={sceneRef}
-            className="grid h-44 animate-in place-items-center text-foreground duration-300 fade-in motion-reduce:animate-none"
+            className={cn(
+              "grid h-44 animate-in place-items-center text-foreground transition-opacity duration-300 fade-in motion-reduce:animate-none",
+              leaving && "opacity-0"
+            )}
           >
             {scene.render(call)}
           </div>
