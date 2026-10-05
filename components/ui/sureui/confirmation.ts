@@ -286,6 +286,7 @@ function useConfirmationMachine(
   const [fill, setFill] = React.useState<Fill | null>(null)
   const [paused, setPaused] = React.useState(false)
   const [failed, setFailed] = React.useState(false)
+  const [undoSeconds, setUndoSeconds] = React.useState<number | null>(null)
   const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
   const holdStartRef = React.useRef(0)
   const holdDurationRef = React.useRef(0)
@@ -363,6 +364,9 @@ function useConfirmationMachine(
       within: () => triggerRef.current,
     })
     undoRef.current = { window: undoWindow, pausable: new Set() }
+    setUndoSeconds(
+      undoWindow.manual ? null : Math.ceil(undoWindow.duration / 1000)
+    )
     enter(
       "undo",
       undoWindow.manual
@@ -391,6 +395,22 @@ function useConfirmationMachine(
     undo.pausable.add(reason)
     undo.window.resume(reason)
   }, [])
+
+  React.useEffect(() => {
+    const undo = undoRef.current?.window
+    if (state !== "undo" || paused || !undo || undo.manual) return
+    let timer: ReturnType<typeof setTimeout>
+    function tick() {
+      const left = undo!.duration - undo!.elapsed()
+      setUndoSeconds(Math.max(1, Math.ceil(left / 1000)))
+      timer = setTimeout(tick, (left % 1000 || 1000) + 1)
+    }
+    timer = setTimeout(
+      tick,
+      ((undo.duration - undo.elapsed()) % 1000 || 1000) + 1
+    )
+    return () => clearTimeout(timer)
+  }, [state, paused])
 
   const arm = React.useCallback(() => {
     clearTimer()
@@ -469,6 +489,7 @@ function useConfirmationMachine(
     pauseUndo,
     resumeUndo,
     reset,
+    undoSeconds: state === "undo" ? undoSeconds : null,
   }
 }
 
@@ -500,6 +521,7 @@ function useConfirmation<
     pauseUndo,
     resumeUndo,
     reset,
+    undoSeconds,
   } = useConfirmationMachine(options, triggerRef)
   const fillRef = React.useRef<F>(null)
   useFill(fillRef, fill, paused)
@@ -749,7 +771,7 @@ function useConfirmation<
     }
   }
 
-  return { state, failed, waiting, fillRef, getTriggerProps }
+  return { state, failed, waiting, undoSeconds, fillRef, getTriggerProps }
 }
 
 type ConfirmationAnnouncements = {

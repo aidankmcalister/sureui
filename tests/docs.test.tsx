@@ -286,6 +286,8 @@ const confirmSwitch = {
   onCheckedChange: true,
   confirmWhen: true,
   undoIndicator: true,
+  undoLabel: true,
+  undoLabelSide: true,
   undo: true,
   pauseUndoOnHover: true,
   pauseUndoOnFocus: true,

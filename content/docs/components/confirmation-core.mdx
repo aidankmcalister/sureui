@@ -67,6 +67,7 @@ It returns:
 - `state`: `"idle" | "armed" | "holding" | "undo" | "pending"`. Set it as `data-state` to style each state.
 - `failed`: `true` after `onConfirm` failed with `onConfirmError` set, until the next attempt.
 - `waiting`: the seconds left while `wait` counts down.
+- `undoSeconds`: the whole seconds left in the undo window, or `null` outside it and for `undo="manual"`. It holds still while the window is paused.
 - `fillRef`: a ref for the fill element.
 - `getTriggerProps(props)`: your props with the gesture handlers composed in, plus `disabled` while pending or waiting.
 

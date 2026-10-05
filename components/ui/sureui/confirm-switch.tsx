@@ -21,6 +21,8 @@ interface ConfirmSwitchProps
   onCheckedChange?: (checked: boolean) => void
   confirmWhen?: "on" | "off" | "both"
   undoIndicator?: "thumb" | "ring"
+  undoLabel?: boolean | ((seconds: number) => React.ReactNode)
+  undoLabelSide?: "left" | "right"
   announcements?: { undo?: string; error?: string }
 }
 
@@ -37,6 +39,8 @@ function ConfirmSwitch(props: ConfirmSwitchProps) {
     pauseUndoOnFocus,
     confirmWhen = "both",
     undoIndicator = "thumb",
+    undoLabel = false,
+    undoLabelSide = "left",
     announcements,
     disabled,
     size,
@@ -55,23 +59,21 @@ function ConfirmSwitch(props: ConfirmSwitchProps) {
     onCheckedChange?.(value)
   }
 
-  const { state, failed, fillRef, getTriggerProps } = useConfirmation<
-    HTMLElement,
-    SVGGeometryElement
-  >({
-    onConfirm: () => {
-      const value = next
-      const result = onConfirm(value)
-      if (!isPromise(result)) return settle(value)
-      return Promise.resolve(result).then(() => settle(value))
-    },
-    onCancel,
-    onConfirmError,
-    undo: guarded ? undo : false,
-    pauseUndoOnHover,
-    pauseUndoOnFocus,
-    disabled,
-  })
+  const { state, failed, undoSeconds, fillRef, getTriggerProps } =
+    useConfirmation<HTMLElement, SVGGeometryElement>({
+      onConfirm: () => {
+        const value = next
+        const result = onConfirm(value)
+        if (!isPromise(result)) return settle(value)
+        return Promise.resolve(result).then(() => settle(value))
+      },
+      onCancel,
+      onConfirmError,
+      undo: guarded ? undo : false,
+      pauseUndoOnHover,
+      pauseUndoOnFocus,
+      disabled,
+    })
 
   const [previous, setPrevious] = React.useState(state)
   if (state !== previous) {
@@ -95,6 +97,21 @@ function ConfirmSwitch(props: ConfirmSwitchProps) {
         render={(renderProps) => (
           <button {...renderProps}>
             {renderProps.children}
+            {undoLabel && undoSeconds !== null && (
+              <span
+                aria-hidden
+                className={cn(
+                  "pointer-events-none absolute top-1/2 -translate-y-1/2 text-xs font-normal whitespace-nowrap text-muted-foreground tabular-nums",
+                  undoLabelSide === "left"
+                    ? "right-full mr-2.5"
+                    : "left-full ml-2.5"
+                )}
+              >
+                {undoLabel === true
+                  ? `Saves in ${undoSeconds}s`
+                  : undoLabel(undoSeconds)}
+              </span>
+            )}
             {undoIndicator === "ring" ? (
               <svg
                 aria-hidden

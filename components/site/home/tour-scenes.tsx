@@ -226,6 +226,7 @@ export const scenes: Scene[] = [
           aria-label="Public repository"
           defaultChecked
           undo={2500}
+          undoLabel
           onConfirm={(checked) => call(`setPublic(${checked})`)}
         />
       </div>

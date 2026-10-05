@@ -6,5 +6,11 @@ import { useActions } from "@/components/site/docs/preview"
 export default function ConfirmSwitchDemo() {
   const { setPublic } = useActions()
 
-  return <ConfirmSwitch aria-label="Public repository" onConfirm={setPublic} />
+  return (
+    <ConfirmSwitch
+      aria-label="Public repository"
+      undoLabel
+      onConfirm={setPublic}
+    />
+  )
 }

@@ -36,6 +36,12 @@ If `onConfirm` returns a promise, the switch stays pending until it settles. If 
 
 <Example name="confirm-switch/ring" />
 
+### Time left
+
+Set `undoLabel` to show the seconds left beside the switch while the window runs, so the change doesn't look saved yet. It reads "Saves in 5s", or pass a function of the seconds for your own text. It holds still while the window is paused, and floats to the left of the switch without moving anything, so leave about 80px clear there. When the switch comes first in its row, set `undoLabelSide="right"`.
+
+<Example name="confirm-switch/time-left" />
+
 ## API reference
 
 ### ConfirmSwitch
@@ -50,6 +56,8 @@ Extends the shadcn [`Switch`](https://ui.shadcn.com/docs/components/base/switch)
 | `onCheckedChange`  | `(checked: boolean) => void`                     | —         |
 | `confirmWhen`      | `"on" \| "off" \| "both"`                        | `"both"`  |
 | `undoIndicator`    | `"thumb" \| "ring"`                              | `"thumb"` |
+| `undoLabel`        | `boolean \| ((seconds: number) => ReactNode)`    | `false`   |
+| `undoLabelSide`    | `"left" \| "right"`                              | `"left"`  |
 | `undo`             | `boolean \| number \| "manual"`                  | `true`    |
 | `pauseUndoOnHover` | `boolean`                                        | `true`    |
 | `pauseUndoOnFocus` | `boolean`                                        | `true`    |
