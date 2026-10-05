@@ -96,6 +96,14 @@ export function highlight(text: string, lang: "tsx" | "json" = "tsx") {
             : controlIn(word)
               ? "number"
               : null
+          const inside = /^([^]*?)(__control_\w+__)([^]*)$/.exec(token.content)
+          if (!kind && inside) {
+            const own = kindOf(token.color)
+            return inside
+              .slice(1)
+              .filter(Boolean)
+              .map((text) => ({ text, kind: own }))
+          }
           if (!kind) {
             return [{ text: token.content, kind: kindOf(token.color) }]
           }

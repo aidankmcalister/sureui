@@ -67,4 +67,41 @@ describe("example source", () => {
       "pauseUndoOnHover: true"
     )
   })
+
+  it("reads a dropdown's options and renders its value as a plain prop", () => {
+    const select = parseExample(`"use client"
+
+import { ConfirmButton } from "@/components/ui/sureui/confirm-button"
+import { useActions, useControl } from "@/components/site/docs/preview"
+
+export default function Pending() {
+  const control = useControl({ pendingIndicator: ["ring", "spinner", "pulse"] })
+  const { deploy } = useActions()
+
+  return (
+    <ConfirmButton
+      pendingIndicator={control("pendingIndicator", "ring")}
+      pendingDelay={control("pendingDelay", 0)}
+      onConfirm={deploy}
+    >
+      Deploy
+    </ConfirmButton>
+  )
+}`)
+    expect(select.controls).toEqual([
+      {
+        name: "pendingIndicator",
+        value: "ring",
+        options: ["ring", "spinner", "pulse"],
+      },
+      { name: "pendingDelay", value: 0 },
+    ])
+    const text = renderExample(select, {
+      ...defaultValues(select.controls),
+      pendingIndicator: "spinner",
+    })
+    expect(text).not.toMatch(/useControl|control\(/)
+    expect(text).toMatch(/^ {6}pendingIndicator="spinner"$/m)
+    expect(text).toContain("pendingDelay={0}")
+  })
 })

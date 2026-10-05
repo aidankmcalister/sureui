@@ -2,6 +2,7 @@
 
 import * as React from "react"
 
+import { SiteSelect } from "@/components/site/ui/select"
 import type {
   Control,
   ControlValue,
@@ -14,10 +15,15 @@ export function useControlValues() {
   return React.useContext(ControlContext)
 }
 
-export function useControl() {
+export function useControl(options?: Record<string, readonly string[]>) {
   const values = useControlValues()
   return function control<T extends ControlValue>(name: string, fallback: T) {
-    return (values[name] as T | undefined) ?? fallback
+    const value = values[name] as T | undefined
+    const allowed = options?.[name]
+    if (value === undefined || (allowed && !allowed.includes(String(value)))) {
+      return fallback
+    }
+    return value
   }
 }
 
@@ -71,6 +77,23 @@ export function ExampleControls({
         const set = (next: ControlValue) =>
           onChange({ ...values, [control.name]: next })
 
+        if (control.options) {
+          return (
+            <label
+              key={control.name}
+              className="flex items-center gap-1 font-mono text-[11px] text-(--ink-label)"
+            >
+              {control.name}
+              <SiteSelect
+                aria-label={control.name}
+                value={String(value)}
+                options={control.options}
+                onValueChange={set}
+              />
+            </label>
+          )
+        }
+
         return typeof value === "number" ? (
           <NumberControl
             key={control.name}
@@ -86,7 +109,7 @@ export function ExampleControls({
             {control.name}
             <button
               type="button"
-              aria-pressed={value}
+              aria-pressed={value === true}
               onClick={() => set(!value)}
               className={`${box} min-w-[6ch]`}
             >
