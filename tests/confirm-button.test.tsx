@@ -1091,6 +1091,175 @@ describe("ConfirmButton", () => {
   })
 })
 
+describe("ConfirmButton pending", () => {
+  function shown(button: HTMLElement) {
+    return [...button.querySelectorAll("span.col-start-1")].find(
+      (span) => !span.hasAttribute("aria-hidden")
+    ) as HTMLElement
+  }
+
+  function deferred() {
+    let resolve!: () => void
+    let reject!: (error: unknown) => void
+    const promise = new Promise<void>((res, rej) => {
+      resolve = res
+      reject = rej
+    })
+    return { promise, resolve, reject }
+  }
+
+  async function settle(run: () => void) {
+    await act(async () => {
+      run()
+      await Promise.resolve()
+    })
+  }
+
+  it("runs a ring right away by default, keeps the label and sets aria-busy", async () => {
+    const { promise, resolve } = deferred()
+    render(<ConfirmButton onConfirm={() => promise}>Delete</ConfirmButton>)
+    const button = screen.getByRole("button")
+    await click(button)
+    expect(button.getAttribute("aria-busy")).toBe("true")
+    expect(button.hasAttribute("data-pending")).toBe(true)
+    expect(button.querySelector("[data-slot=pending-ring]")).not.toBeNull()
+    expect(shown(button).textContent).toBe("Delete")
+    await settle(resolve)
+    expect(button.getAttribute("aria-busy")).toBeNull()
+    expect(button.hasAttribute("data-pending")).toBe(false)
+  })
+
+  it("waits out pendingDelay before showing the spinner", async () => {
+    const { promise } = deferred()
+    render(
+      <ConfirmButton
+        pendingIndicator="spinner"
+        pendingDelay={300}
+        onConfirm={() => promise}
+      >
+        Delete
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await click(button)
+    expect(button.hasAttribute("data-pending")).toBe(false)
+    expect(shown(button).textContent).toBe("Delete")
+    await act(async () => vi.advanceTimersByTime(299))
+    expect(shown(button).textContent).toBe("Delete")
+    await act(async () => vi.advanceTimersByTime(1))
+    expect(button.hasAttribute("data-pending")).toBe(true)
+    expect(shown(button).querySelector("svg")).not.toBeNull()
+  })
+
+  it("never shows the pending state for a promise faster than the delay", async () => {
+    const { promise, resolve } = deferred()
+    render(
+      <ConfirmButton
+        pendingIndicator="spinner"
+        pendingDelay={300}
+        onConfirm={() => promise}
+      >
+        Delete
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await click(button)
+    await act(async () => vi.advanceTimersByTime(200))
+    await settle(resolve)
+    await act(async () => vi.advanceTimersByTime(500))
+    expect(shown(button).textContent).toBe("Delete")
+  })
+
+  it("puts pendingLabel next to the spinner", async () => {
+    const { promise } = deferred()
+    render(
+      <ConfirmButton
+        pendingIndicator="spinner"
+        pendingLabel="Deleting"
+        onConfirm={() => promise}
+      >
+        Delete
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await click(button)
+    await act(async () => vi.advanceTimersByTime(0))
+    expect(shown(button).textContent).toBe("Deleting")
+    expect(shown(button).querySelector("svg")).not.toBeNull()
+  })
+
+  it("pulses without a spinner when pendingIndicator is pulse", async () => {
+    const { promise } = deferred()
+    render(
+      <ConfirmButton
+        pendingIndicator="pulse"
+        pendingLabel="Deleting"
+        onConfirm={() => promise}
+      >
+        Delete
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await click(button)
+    await act(async () => vi.advanceTimersByTime(0))
+    expect(button.className).toContain("animate-pulse")
+    expect(button.querySelector("[data-slot=pending-ring]")).toBeNull()
+    expect(shown(button).textContent).toBe("Deleting")
+    expect(shown(button).querySelector("svg")).toBeNull()
+  })
+
+  it("removes the ring once it settles", async () => {
+    const { promise, resolve } = deferred()
+    render(<ConfirmButton onConfirm={() => promise}>Delete</ConfirmButton>)
+    const button = screen.getByRole("button")
+    expect(button.querySelector("[data-slot=pending-ring]")).toBeNull()
+    await click(button)
+    await act(async () => vi.advanceTimersByTime(0))
+    expect(button.querySelector("[data-slot=pending-ring]")).not.toBeNull()
+    expect(button.className).not.toContain("animate-pulse")
+    expect(shown(button).textContent).toBe("Delete")
+    await settle(resolve)
+    expect(button.querySelector("[data-slot=pending-ring]")).toBeNull()
+  })
+
+  it("shows successLabel for 1.5 seconds after it resolves", async () => {
+    const { promise, resolve } = deferred()
+    render(
+      <ConfirmButton successLabel="Deleted" onConfirm={() => promise}>
+        Delete
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await click(button)
+    await settle(resolve)
+    expect(shown(button).textContent).toBe("Deleted")
+    expect(document.querySelector('[aria-live="polite"]')?.textContent).toBe(
+      "Deleted"
+    )
+    await act(async () => vi.advanceTimersByTime(1499))
+    expect(shown(button).textContent).toBe("Deleted")
+    await act(async () => vi.advanceTimersByTime(1))
+    expect(shown(button).textContent).toBe("Delete")
+  })
+
+  it("skips successLabel when the promise rejects", async () => {
+    const { promise, reject } = deferred()
+    render(
+      <ConfirmButton
+        successLabel="Deleted"
+        onConfirmError={() => {}}
+        onConfirm={() => promise}
+      >
+        Delete
+      </ConfirmButton>
+    )
+    const button = screen.getByRole("button")
+    await click(button)
+    await settle(() => reject(new Error("boom")))
+    expect(shown(button).textContent).toBe("Delete")
+  })
+})
+
 describe("ConfirmButton failures", () => {
   function liveText() {
     return document.querySelector('[aria-live="polite"]')?.textContent

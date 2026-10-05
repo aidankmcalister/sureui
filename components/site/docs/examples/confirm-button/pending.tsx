@@ -7,5 +7,9 @@ export default function ConfirmButtonPending() {
   const control = useControl()
   const { deploy } = useActions({ deploy: { wait: control("wait", 2000) } })
 
-  return <ConfirmButton onConfirm={deploy}>Deploy</ConfirmButton>
+  return (
+    <ConfirmButton pendingLabel="Deploying" onConfirm={deploy}>
+      Deploy
+    </ConfirmButton>
+  )
 }

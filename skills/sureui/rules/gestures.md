@@ -69,5 +69,6 @@ When `onConfirm` throws or rejects, the control goes back to idle and the error 
 - Name the verb and the thing: "Delete 3 files", never "OK" or "Yes". `variant="destructive"` adds to the words; it doesn't replace them.
 - `confirmLabel`, `undoLabel` and `errorLabel` change the text for each state, and `announcements` changes what screen readers hear.
 - Controls set `data-state` to `idle`, `armed`, `holding`, `undo` or `pending`. Style with those attributes rather than tracking state yourself.
+- While an async `onConfirm` runs, ConfirmButton runs a ring in its own color around itself and sets `aria-busy` and `data-pending`. `pendingIndicator` switches to `"spinner"` or `"pulse"`, `pendingLabel` says what is happening, `pendingDelay` keeps fast actions from flashing it, and `successLabel` shows for 1.5 seconds after it resolves. The ring sits 3px outside the button, so don't put it flush inside an `overflow-hidden` container.
 
 Reference: https://sureui.com/docs/confirm-button, https://sureui.com/docs/confirm-menu-item

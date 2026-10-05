@@ -21,7 +21,141 @@ interface ConfirmButtonProps
   undoLabel?: React.ReactNode
   errorLabel?: React.ReactNode
   waitLabel?: (seconds: number) => React.ReactNode
+  pendingIndicator?: "ring" | "spinner" | "pulse"
+  pendingLabel?: React.ReactNode
+  pendingDelay?: number
+  successLabel?: React.ReactNode
   announcements?: ConfirmationAnnouncements
+}
+
+function useSpin<T extends Element>(duration: number) {
+  const ref = React.useRef<T>(null)
+
+  React.useEffect(() => {
+    const element = ref.current
+    if (!element) return
+    const still = window.matchMedia?.(
+      "(prefers-reduced-motion: reduce)"
+    ).matches
+    if (still || typeof element.animate !== "function") return
+    const animation = element.animate(
+      [{ rotate: "0deg" }, { rotate: "360deg" }],
+      { duration, iterations: Infinity }
+    )
+    return () => animation.cancel()
+  }, [duration])
+
+  return ref
+}
+
+function Spinner() {
+  const ref = useSpin<SVGSVGElement>(800)
+
+  return (
+    <svg ref={ref} viewBox="0 0 24 24" aria-hidden className="size-4 shrink-0">
+      <circle
+        cx="12"
+        cy="12"
+        r="9"
+        pathLength={1}
+        strokeDasharray="0.7 0.3"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
+function outline(button: HTMLElement, gap: number) {
+  const style = getComputedStyle(button)
+  const out = (parseFloat(style.borderTopWidth) || 0) + gap
+  const width = button.clientWidth + out * 2
+  const height = button.clientHeight + out * 2
+  const corner = (value: string) =>
+    Math.min((parseFloat(value) || 0) + gap, width / 2, height / 2)
+  const tl = corner(style.borderTopLeftRadius)
+  const tr = corner(style.borderTopRightRadius)
+  const br = corner(style.borderBottomRightRadius)
+  const bl = corner(style.borderBottomLeftRadius)
+  const right = width - out
+  const bottom = height - out
+  return [
+    `M${tl - out},${-out}`,
+    `H${right - tr}`,
+    `A${tr},${tr} 0 0 1 ${right},${tr - out}`,
+    `V${bottom - br}`,
+    `A${br},${br} 0 0 1 ${right - br},${bottom}`,
+    `H${bl - out}`,
+    `A${bl},${bl} 0 0 1 ${-out},${bottom - bl}`,
+    `V${tl - out}`,
+    `A${tl},${tl} 0 0 1 ${tl - out},${-out}`,
+    "Z",
+  ].join(" ")
+}
+
+function Ring(props: { className?: string }) {
+  const ref = React.useRef<SVGPathElement>(null)
+
+  React.useEffect(() => {
+    const path = ref.current
+    const button = path?.closest("button")
+    if (!path || !button) return
+    const draw = () => path.setAttribute("d", outline(button, 3))
+    draw()
+    const observer =
+      typeof ResizeObserver === "function" ? new ResizeObserver(draw) : null
+    observer?.observe(button)
+    const still = window.matchMedia?.(
+      "(prefers-reduced-motion: reduce)"
+    ).matches
+    const animation =
+      still || typeof path.animate !== "function"
+        ? null
+        : path.animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], {
+            duration: 1400,
+            iterations: Infinity,
+          })
+    return () => {
+      observer?.disconnect()
+      animation?.cancel()
+    }
+  }, [])
+
+  return (
+    <svg
+      aria-hidden
+      data-slot="pending-ring"
+      className={cn(
+        "pointer-events-none absolute inset-0 size-full overflow-visible",
+        props.className
+      )}
+    >
+      <path
+        ref={ref}
+        pathLength={1}
+        strokeDasharray="0.3 0.7"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.5}
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
+function pendingContent(
+  indicator: NonNullable<ConfirmButtonProps["pendingIndicator"]>,
+  label: React.ReactNode
+) {
+  if (indicator !== "spinner") return label ?? undefined
+  return (
+    <>
+      <Spinner />
+      {label}
+    </>
+  )
 }
 
 function ConfirmButton(props: ConfirmButtonProps) {
@@ -43,6 +177,10 @@ function ConfirmButton(props: ConfirmButtonProps) {
     undoLabel,
     errorLabel,
     waitLabel,
+    pendingIndicator = "ring",
+    pendingLabel,
+    pendingDelay,
+    successLabel,
     announcements,
     className,
     children,
@@ -65,24 +203,34 @@ function ConfirmButton(props: ConfirmButtonProps) {
       wait,
       disabled,
     })
-  const { shown, labels, ariaLabel, ariaDescribedBy, hint, announcement } =
-    useConfirmationLabels({
-      state,
-      failed,
-      gesture,
-      holdFallback,
-      undo,
-      label: children,
-      confirmLabel,
-      undoLabel,
-      errorLabel,
-      wait,
-      waiting,
-      waitLabel,
-      announcements,
-      ariaLabel: rest["aria-label"],
-      describedBy,
-    })
+  const {
+    shown,
+    busy,
+    labels,
+    ariaLabel,
+    ariaDescribedBy,
+    hint,
+    announcement,
+  } = useConfirmationLabels({
+    state,
+    failed,
+    gesture,
+    holdFallback,
+    undo,
+    label: children,
+    confirmLabel,
+    undoLabel,
+    errorLabel,
+    wait,
+    waiting,
+    waitLabel,
+    pendingLabel: pendingContent(pendingIndicator, pendingLabel),
+    pendingDelay,
+    successLabel,
+    announcements,
+    ariaLabel: rest["aria-label"],
+    describedBy,
+  })
 
   return (
     <>
@@ -92,8 +240,13 @@ function ConfirmButton(props: ConfirmButtonProps) {
         aria-describedby={ariaDescribedBy}
         data-state={state}
         data-error={failed || undefined}
+        aria-busy={state === "pending" || undefined}
+        data-pending={busy || undefined}
         className={cn(
-          "relative overflow-hidden transition-[color,background-color,border-color,box-shadow] active:not-aria-[haspopup]:translate-y-0 aria-disabled:opacity-50 motion-safe:data-[state=pending]:animate-pulse motion-safe:aria-disabled:data-[state=pending]:opacity-100",
+          "relative transition-[color,background-color,border-color,box-shadow] active:not-aria-[haspopup]:translate-none aria-disabled:opacity-50",
+          pendingIndicator === "pulse"
+            ? "motion-safe:data-pending:animate-pulse motion-safe:aria-disabled:data-[state=pending]:opacity-100"
+            : "aria-disabled:data-[state=pending]:opacity-100",
           gesture === "hold"
             ? "touch-none"
             : gesture === "slide"
@@ -106,10 +259,25 @@ function ConfirmButton(props: ConfirmButtonProps) {
         }
       >
         <span
-          ref={fillRef}
           aria-hidden
-          className="absolute inset-0 origin-left scale-x-0 bg-current opacity-20"
-        />
+          className="absolute inset-0 overflow-hidden rounded-[inherit]"
+        >
+          <span
+            ref={fillRef}
+            className="absolute inset-0 origin-left scale-x-0 bg-current opacity-20"
+          />
+        </span>
+        {busy && pendingIndicator === "ring" && (
+          <Ring
+            className={
+              rest.variant === "destructive"
+                ? "text-destructive"
+                : !rest.variant || rest.variant === "default"
+                  ? "text-primary"
+                  : undefined
+            }
+          />
+        )}
         <span className="grid gap-[inherit]">
           {labels.map((label) => (
             <span

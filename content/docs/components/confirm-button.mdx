@@ -58,9 +58,17 @@ Moving off the button or losing focus also cancels.
 
 ### Pending
 
-Return a promise from `onConfirm` and the button pulses until it settles. If it rejects, the button goes back to idle.
+Return a promise from `onConfirm` and a ring in the button's color runs around it until it settles. The ring sits 3 pixels outside the button, so a container that clips its overflow cuts it off. Pass `pendingLabel` to say what is happening while it runs. If the promise rejects, the button goes back to idle.
+
+Set `pendingIndicator` to `"spinner"` to put a spinner in front of the label, or `"pulse"` to fade the button in and out. Set `pendingDelay` in milliseconds to wait before showing any of them, so fast actions don't flash. The button keeps the width of its widest label, so it doesn't jump.
 
 <Example name="confirm-button/pending" />
+
+### Success
+
+Pass `successLabel` to show it for 1.5 seconds after the promise resolves. A rejection skips it and shows `errorLabel` instead, if you set one.
+
+<Example name="confirm-button/success" />
 
 ### Errors
 
@@ -94,30 +102,34 @@ The error label is announced in the polite live region. Change the text with `an
 
 Extends the shadcn [`Button`](https://ui.shadcn.com/docs/components/base/button). The table lists the props it adds.
 
-| Prop               | Type                                                                | Default                                    |
-| ------------------ | ------------------------------------------------------------------- | ------------------------------------------ |
-| `...buttonProps`   | [`Button`](https://ui.shadcn.com/docs/components/base/button) props | —                                          |
-| `onConfirm`        | `() => void \| Promise<unknown>`                                    | required                                   |
-| `onCancel`         | `() => void`                                                        | —                                          |
-| `onConfirmError`   | `(error: unknown) => void`                                          | —                                          |
-| `gesture`          | `"click" \| "click-again" \| "hold" \| "slide"`                     | `"click"`                                  |
-| `undo`             | `boolean \| number \| "manual"`                                     | —                                          |
-| `pauseUndoOnHover` | `boolean`                                                           | `true`                                     |
-| `pauseUndoOnFocus` | `boolean`                                                           | `true`                                     |
-| `confirmLabel`     | `ReactNode`                                                         | `"Click again"`, or `"Confirm"` for a hold |
-| `undoLabel`        | `ReactNode`                                                         | `"Undo"`                                   |
-| `errorLabel`       | `ReactNode`                                                         | —                                          |
-| `armDelay`         | `number`                                                            | `0`                                        |
-| `wait`             | `number`                                                            | `0`                                        |
-| `waitLabel`        | `(seconds: number) => ReactNode`                                    | ``(s) => `Wait ${s}s` ``                   |
-| `timeout`          | `number`                                                            | `3000`                                     |
-| `duration`         | `number`                                                            | `1200`                                     |
-| `holdFallback`     | `"click-again" \| "none"`                                           | `"click-again"`                            |
-| `announcements`    | `{ armed?, hold?, slide?, fallback?, wait?, undo?, error? }`        | —                                          |
+| Prop               | Type                                                                   | Default                                    |
+| ------------------ | ---------------------------------------------------------------------- | ------------------------------------------ |
+| `...buttonProps`   | [`Button`](https://ui.shadcn.com/docs/components/base/button) props    | —                                          |
+| `onConfirm`        | `() => void \| Promise<unknown>`                                       | required                                   |
+| `onCancel`         | `() => void`                                                           | —                                          |
+| `onConfirmError`   | `(error: unknown) => void`                                             | —                                          |
+| `gesture`          | `"click" \| "click-again" \| "hold" \| "slide"`                        | `"click"`                                  |
+| `undo`             | `boolean \| number \| "manual"`                                        | —                                          |
+| `pauseUndoOnHover` | `boolean`                                                              | `true`                                     |
+| `pauseUndoOnFocus` | `boolean`                                                              | `true`                                     |
+| `confirmLabel`     | `ReactNode`                                                            | `"Click again"`, or `"Confirm"` for a hold |
+| `undoLabel`        | `ReactNode`                                                            | `"Undo"`                                   |
+| `errorLabel`       | `ReactNode`                                                            | —                                          |
+| `armDelay`         | `number`                                                               | `0`                                        |
+| `wait`             | `number`                                                               | `0`                                        |
+| `waitLabel`        | `(seconds: number) => ReactNode`                                       | ``(s) => `Wait ${s}s` ``                   |
+| `pendingIndicator` | `"ring" \| "spinner" \| "pulse"`                                       | `"ring"`                                   |
+| `pendingLabel`     | `ReactNode`                                                            | —                                          |
+| `pendingDelay`     | `number`                                                               | `0`                                        |
+| `successLabel`     | `ReactNode`                                                            | —                                          |
+| `timeout`          | `number`                                                               | `3000`                                     |
+| `duration`         | `number`                                                               | `1200`                                     |
+| `holdFallback`     | `"click-again" \| "none"`                                              | `"click-again"`                            |
+| `announcements`    | `{ armed?, hold?, slide?, fallback?, wait?, undo?, error?, success? }` | —                                          |
 
 ### Data attributes
 
-The button sets `data-state`, so you can style around it. After `onConfirm` fails, it also sets `data-error` until the next activation.
+The button sets `data-state`, so you can style around it. After `onConfirm` fails, it also sets `data-error` until the next activation. While its pending indicator shows, it also sets `data-pending`.
 
 | Value     | When                                                                              |
 | --------- | --------------------------------------------------------------------------------- |
@@ -132,7 +144,8 @@ The button sets `data-state`, so you can style around it. After `onConfirm` fail
 - Key repeat is ignored, so holding Enter can't arm and confirm at once.
 - Each state change is announced in a polite live region. Replace the English text with `announcements`.
 - Keyboard users hold Space or Enter, and letting go early cancels. Screen readers send a click that can't be held, so a click with no press arms the button and a second one confirms. Set `holdFallback="none"` to turn this off.
-- With `prefers-reduced-motion`, fills jump to their end state instead of moving, and a pending button dims instead of pulsing.
+- With `prefers-reduced-motion`, fills jump to their end state instead of moving, the ring and the spinner hold still instead of running, and `pulse` dims the button instead of pulsing.
+- While `onConfirm` is pending, the button sets `aria-busy` and keeps focus. `successLabel` is announced in the same polite live region as the other states.
 
 ### WCAG
 

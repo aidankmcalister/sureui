@@ -760,7 +760,10 @@ type ConfirmationAnnouncements = {
   error?: string
   wait?: string
   slide?: string
+  success?: string
 }
+
+const successMs = 1500
 
 interface ConfirmationLabelOptions {
   state: ConfirmationState
@@ -775,6 +778,9 @@ interface ConfirmationLabelOptions {
   wait?: number
   waiting?: number
   waitLabel?: (seconds: number) => React.ReactNode
+  pendingLabel?: React.ReactNode
+  pendingDelay?: number
+  successLabel?: React.ReactNode
   announcements?: ConfirmationAnnouncements
   ariaLabel?: string
   describedBy?: string
@@ -802,23 +808,59 @@ function useConfirmationLabels(options: ConfirmationLabelOptions) {
     wait = 0,
     waiting = 0,
     waitLabel = (seconds: number) => `Wait ${seconds}s`,
+    pendingLabel,
+    pendingDelay = 0,
+    successLabel,
     announcements,
     ariaLabel,
     describedBy,
   } = options
   const hintId = React.useId()
+  const [previous, setPrevious] = React.useState(state)
+  const [late, setLate] = React.useState(false)
+  const [succeeded, setSucceeded] = React.useState(false)
+  if (previous !== state) {
+    setPrevious(state)
+    setLate(false)
+    setSucceeded(
+      previous === "pending" &&
+        state === "idle" &&
+        !failed &&
+        successLabel != null
+    )
+  }
+
+  React.useEffect(() => {
+    if (state !== "pending") return
+    const id = setTimeout(() => setLate(true), Math.max(0, pendingDelay))
+    return () => clearTimeout(id)
+  }, [state, pendingDelay])
+
+  React.useEffect(() => {
+    if (!succeeded) return
+    const id = setTimeout(() => setSucceeded(false), successMs)
+    return () => clearTimeout(id)
+  }, [succeeded])
+
   const waitTotal = waitSeconds(wait)
   const isHold = gesture === "hold"
   const isSlide = gesture === "slide"
   const showError = failed && state === "idle" && errorLabel != null
+  const busy = state === "pending" && (late || pendingDelay <= 0)
+  const showPending = busy && pendingLabel != null
+  const showSuccess = succeeded && state === "idle"
   const shown =
     state === "armed" || state === "undo"
       ? state
       : waiting > 0
         ? "wait"
-        : showError
-          ? "error"
-          : "idle"
+        : showPending
+          ? "pending"
+          : showSuccess
+            ? "success"
+            : showError
+              ? "error"
+              : "idle"
   const labels: { state: string; node: React.ReactNode }[] = [
     { state: "idle", node: label },
   ]
@@ -837,6 +879,10 @@ function useConfirmationLabels(options: ConfirmationLabelOptions) {
   if (waitTotal > 0) {
     labels.push({ state: "wait", node: waitLabel(waiting || waitTotal) })
   }
+  if (pendingLabel != null)
+    labels.push({ state: "pending", node: pendingLabel })
+  if (successLabel != null)
+    labels.push({ state: "success", node: successLabel })
 
   let announcement = ""
   if (shown === "wait") {
@@ -848,6 +894,8 @@ function useConfirmationLabels(options: ConfirmationLabelOptions) {
       announcements?.armed ?? text(confirmLabel, "Click again to confirm")
   } else if (state === "undo") {
     announcement = announcements?.undo ?? "Done. Undo is available."
+  } else if (showSuccess) {
+    announcement = announcements?.success ?? text(successLabel, "Done")
   } else if (showError) {
     announcement =
       announcements?.error ??
@@ -856,6 +904,7 @@ function useConfirmationLabels(options: ConfirmationLabelOptions) {
 
   return {
     shown,
+    busy,
     labels,
     ariaLabel:
       ariaLabel && shown === "undo"
